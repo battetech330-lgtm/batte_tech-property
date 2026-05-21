@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>My Properties - BATTETECH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f4fa;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #0a2b4e;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            background: white;
+            color: #0a2b4e;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+        }
+
+        .logo-text span {
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+
+        .owner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .welcome-text {
+            font-size: 1.1rem;
+            color: #0a2b4e;
+        }
+
+        .welcome-text strong {
+            color: #2c7be5;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            background: #f59e0b;
+            padding: 8px 12px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .notification-bell .badge {
+            background: #dc2626;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .property-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 5px solid #2c7be5;
+        }
+
+        .property-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .property-card.pending {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .property-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #0a2b4e;
+            margin-bottom: 0.3rem;
+        }
+
+        .property-location {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .property-stats {
+            display: flex;
+            gap: 0.8rem;
+            margin: 0.8rem 0;
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .property-stats span {
+            background: #eef3fc;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .property-image-preview {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-top: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            color: #666;
+        }
+
+        .main-footer {
+            background: #071e36;
+            color: white;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .phones {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+        }
+
+        .whatsapp-btn a {
+            background: #25D366;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+
+        /* Modal for notifications */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 24px;
+            padding: 1.5rem;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            color: #0a2b4e;
+            margin-bottom: 1rem;
+        }
+
+        .notification-item {
+            background: #f8fafc;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            border-left: 3px solid #f59e0b;
+            font-size: 0.8rem;
+        }
+
+        .notification-item.unread {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+
+        .notification-date {
+            font-size: 0.65rem;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        @media (max-width: 700px) {
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+            .owner-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <div class="logo-icon">🏢</div>
+        <div class="logo-text">
+            <h1>BATTETECH</h1>
+            <span>PROPERTY CONSULTANTS</span>
+        </div>
+    </div>
+</header>
+
+<div class="dashboard-container">
+    <div class="owner-header">
+        <div class="welcome-text">
+            👋 Welcome, <strong id="ownerName"></strong>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <div class="notification-bell" onclick="showNotifications()">
+                🔔 Notifications <span id="notificationBadge" class="badge">0</span>
+            </div>
+            <button onclick="logout()" class="logout-btn">🚪 Logout</button>
+        </div>
+    </div>
+
+    <h3 style="margin-bottom: 1rem;">📋 My Properties</h3>
+    <div id="propertiesGrid" class="properties-grid"></div>
+</div>
+
+<!-- Notifications Modal -->
+<div id="notificationsModal" class="modal">
+    <div class="modal-content">
+        <h3>🔔 Notifications</h3>
+        <div id="notificationsList"></div>
+        <button onclick="closeNotificationsModal()" style="margin-top: 1rem; width: 100%;">Close</button>
+    </div>
+</div>
+
+<footer class="main-footer">
+    <div class="contact-info">
+        <h3>YOUR PROPERTY, OUR PRIORITY</h3>
+        <div class="phones">
+            <p><strong>📱 MTN: 0794115704</strong></p>
+            <p><strong>📱 AIRTEL: 0756182284</strong></p>
+        </div>
+        <p><strong>📧 battetech330@gmail.com</strong></p>
+        <div class="whatsapp-btn">
+            <a href="https://wa.me/256794115704" target="_blank">💬 Chat on WhatsApp</a>
+        </div>
+    </div>
+    <div class="copyright" style="margin-top: 1rem;">
+        <p>&copy; 2026 BATTETECH PROPERTY CONSULTANTS - Kampala, Uganda</p>
+    </div>
+</footer>
+
+<script>
+    let ownerData = null;
+    let ownerProperties = [];
+
+    function checkLogin() {
+        const logged = localStorage.getItem('battetech_logged_owner');
+        if (!logged) {
+            window.location.href = 'login.html';
+            return false;
+        }
+        ownerData = JSON.parse(logged);
+        document.getElementById('ownerName').innerText = ownerData.name || 'Owner';
+        return true;
+    }
+
+    function logout() {
+        clearAutoLogin();
+        localStorage.removeItem('battetech_logged_owner');
+        window.location.href = 'index.html';
+    }
+
+    function loadProperties() {
+        const container = document.getElementById('propertiesGrid');
+        if (!container) return;
+
+        // Find all properties owned by this owner
+        ownerProperties = [];
+        for (let propId in propertiesDB) {
+            const prop = propertiesDB[propId];
+            // Match by owner password or owner name or property ID
+            if (prop.ownerPassword === ownerData.id || 
+                prop.id === ownerData.propertyId || 
+                prop.ownerName === ownerData.name ||
+                prop.ownerPassword === ownerData.password) {
+                ownerProperties.push(prop);
+            }
+        }
+
+        if (ownerProperties.length === 0) {
+            container.innerHTML = '<div class="empty-state">🏢 No properties found. Contact BattleTech if you own a property.</div>';
+            return;
+        }
+
+        let html = '';
+        ownerProperties.forEach(prop => {
+            const vacant = getVacantCount(prop);
+            const occupied = getOccupiedCount(prop);
+            const totalRooms = prop.units.length;
+            const statusClass = prop.status === 'pending' ? 'pending' : '';
+            const statusBadge = prop.status === 'pending' ? 
+                '<span class="status-badge status-pending">⏳ Pending</span>' : 
+                '<span class="status-badge status-active">✅ Active</span>';
+            
+            // Calculate total pending rent
+            let pendingRent = 0;
+            for (let room of prop.units) {
+                if (!room.vacant) {
+                    for (let month in room.payments) {
+                        if (room.payments[month].balance > 0) {
+                            pendingRent += room.payments[month].balance;
+                        }
+                    }
+                }
+            }
+
+            html += `
+                <div class="property-card ${statusClass}" onclick="selectProperty('${prop.id}')">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div class="property-name">🏢 ${escapeHtml(prop.name)}</div>
+                        ${statusBadge}
+                    </div>
+                    <div class="property-location">📍 ${escapeHtml(prop.location)}</div>
+                    ${prop.propertyImage ? `<img src="${prop.propertyImage}" class="property-image-preview" onerror="this.style.display='none'">` : ''}
+                    <div class="property-stats">
+                        <span>📊 ${occupied} occupied</span>
+                        <span>🏠 ${vacant} vacant</span>
+                        <span>💰 ${totalRooms} total</span>
+                        <span>💸 Fee: ${prop.managementFee}%</span>
+                    </div>
+                    <div class="property-stats">
+                        <span>📋 Pending Rent: UGX ${pendingRent.toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        
+        // Update notification badge
+        updateNotificationBadge();
+    }
+
+    function updateNotificationBadge() {
+        let totalUnread = 0;
+        for (let prop of ownerProperties) {
+            totalUnread += getUnreadUpdatesCount(prop.id);
+        }
+        const badge = document.getElementById('notificationBadge');
+        if (badge) {
+            badge.textContent = totalUnread;
+            if (totalUnread > 0) {
+                badge.style.background = '#dc2626';
+            } else {
+                badge.style.background = '#6c757d';
+            }
+        }
+    }
+
+    function showNotifications() {
+        const modal = document.getElementById('notificationsModal');
+        const container = document.getElementById('notificationsList');
+        
+        let allUpdates = [];
+        for (let prop of ownerProperties) {
+            const updates = getUpdatesForProperty(prop.id);
+            updates.forEach(update => {
+                allUpdates.push({
+                    propertyName: prop.name,
+                    propertyId: prop.id,
+                    message: update.message,
+                    date: update.date,
+                    read: update.read || false
+                });
+            });
+        }
+        
+        // Sort by date (newest first)
+        allUpdates.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        if (allUpdates.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#666;">No notifications yet.</p>';
+        } else {
+            let html = '';
+            allUpdates.forEach(update => {
+                const unreadClass = update.read ? '' : 'unread';
+                html += `
+                    <div class="notification-item ${unreadClass}">
+                        <div><strong>${escapeHtml(update.propertyName)}</strong></div>
+                        <div>${escapeHtml(update.message)}</div>
+                        <div class="notification-date">${new Date(update.date).toLocaleString()}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+        
+        // Mark all as read
+        for (let prop of ownerProperties) {
+            markUpdatesAsRead(prop.id);
+        }
+        updateNotificationBadge();
+        
+        modal.style.display = 'flex';
+    }
+
+    function closeNotificationsModal() {
+        document.getElementById('notificationsModal').style.display = 'none';
+    }
+
+    function selectProperty(propertyId) {
+        localStorage.setItem('battetech_selected_property', propertyId);
+        window.location.href = 'owner-property-view.html';
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Check for new notifications periodically
+    let notificationInterval = setInterval(() => {
+        if (checkLogin()) {
+            updateNotificationBadge();
+        }
+    }, 30000);
+
+    window.addEventListener('load', async () => {
+        await window.supabaseDataLoaded;
+        if (checkLogin()) {
+            loadProperties();
+        }
+    });
+
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-data.js"></script>
+</body>
+</html>

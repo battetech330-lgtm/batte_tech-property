@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, maximum-scale=1.0">
+    <title>Admin - BATTETECH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f4fa;
+        }
+
+        header {
+            background: #0a2b4e;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            background: white;
+            color: #0a2b4e;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .logo-text span {
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            opacity: 0.8;
+        }
+
+        .dashboard-container {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .image-upload-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: #0a2b4e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        button.danger {
+            background: #dc2626;
+        }
+
+        button.success {
+            background: #10b981;
+        }
+
+        .property-card-admin {
+            background: white;
+            padding: 1.2rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid #2c7be5;
+        }
+
+        .property-card-admin button {
+            margin: 0.3rem;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+
+        .unit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .image-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .image-item {
+            position: relative;
+            width: 120px;
+            height: 90px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-item button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .upload-area {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .upload-btn {
+            background: #f59e0b;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+
+        .chat-section {
+            margin-top: 1rem;
+        }
+
+        .chat-messages {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1rem;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            margin-bottom: 0.8rem;
+            padding: 0.6rem;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .chat-message.owner {
+            background: #2c7be5;
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-message.admin {
+            background: #e5e7eb;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+        }
+
+        .file-input-label {
+            background: #6c757d;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .notepad textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+        }
+
+        .main-footer {
+            background: #071e36;
+            color: white;
+            margin-top: 3rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .phones {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .whatsapp-btn a {
+            background: #25D366;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        h3 {
+            margin-bottom: 1rem;
+            color: #0a2b4e;
+        }
+
+        hr {
+            margin: 1.5rem 0;
+        }
+
+        .broadcast-all {
+            background: #10b981;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 700px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .unit-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <div class="logo-icon">🏢</div>
+        <div class="logo-text">
+            <h1>BATTETECH</h1>
+            <span>ADMIN PANEL</span>
+        </div>
+    </div>
+</header>
+
+<div class="dashboard-container">
+    <!-- IMAGE UPLOAD PANEL - FIXED -->
+    <div class="image-upload-panel">
+        <h3>🖼️ Slideshow Images (Homepage & Login Background)</h3>
+        <p style="font-size:0.8rem; color:#666; margin-bottom:0.5rem;">Select images from your device to add to slideshow</p>
+        <div class="upload-area">
+            <input type="file" id="imageUploadInput" accept="image/*" multiple style="display:none;" onchange="uploadImagesFromDevice()">
+            <button class="upload-btn" onclick="document.getElementById('imageUploadInput').click()">📷 Select Images from Device</button>
+        </div>
+        <div class="image-grid" id="imageGrid"></div>
+    </div>
+    
+    <hr>
+    
+    <h3>📋 All Properties Managed</h3>
+    <div id="propertiesList"></div>
+    
+    <hr>
+    
+    <!-- POST UPDATE TO ALL OWNERS - NEW -->
+    <h3>📢 Broadcast Update to ALL Property Owners</h3>
+    <textarea id="broadcastAllMessage" rows="3" placeholder="Type update message here... This message will be sent to ALL property owners at once." style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:1rem;"></textarea>
+    <button onclick="postUpdateToAllOwners()" class="success" style="background:#10b981;">📢 Send to ALL Owners</button>
+    
+    <hr>
+    
+    <h3>📢 Post Update to Specific Owner</h3>
+    <select id="adminPropertySelect" style="width:100%; padding:12px; border-radius:12px; margin-bottom:1rem;"></select>
+    <textarea id="adminMessage" rows="2" placeholder="Update message for selected property owner..." style="width:100%; padding:10px; border-radius:12px;"></textarea>
+    <button onclick="postUpdate()">📢 Post Update to Selected Owner</button>
+    
+    <hr>
+    
+    <h3>📋 Recent Updates</h3>
+    <div id="recentUpdatesList"></div>
+</div>
+
+<footer class="main-footer">
+    <div class="contact-info">
+        <h3>YOUR PROPERTY, OUR PRIORITY</h3>
+        <div class="phones">
+            <p><strong>📱 MTN: 0794115704</strong></p>
+            <p><strong>📱 AIRTEL: 0756182284</strong></p>
+        </div>
+        <p><strong>📧 battetech330@gmail.com</strong></p>
+        <div class="whatsapp-btn">
+            <a href="https://wa.me/256794115704" target="_blank">💬 Chat on WhatsApp</a>
+        </div>
+    </div>
+    <div class="copyright" style="margin-top: 1.5rem;">
+        <p>&copy; 2026 BATTETECH PROPERTY CONSULTANTS - Kampala, Uganda</p>
+    </div>
+</footer>
+
+<script>
+    // ============ FIXED IMAGE SLIDESHOW MANAGEMENT ============
+    
+    function loadImageGrid() {
+        const saved = localStorage.getItem("battetech_slideshow_images");
+        let images = saved ? JSON.parse(saved) : [
+            "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+            "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1200&q=80",
+            "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80"
+        ];
+        const grid = document.getElementById('imageGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        images.forEach((url, idx) => {
+            grid.innerHTML += `
+                <div class="image-item">
+                    <img src="${url}" onerror="this.src='https://placehold.co/600x400?text=Invalid+Image'">
+                    <button onclick="deleteImage(${idx})">✕</button>
+                </div>
+            `;
+        });
+    }
+    
+    // NEW: Upload images directly from device
+    function uploadImagesFromDevice() {
+        const fileInput = document.getElementById('imageUploadInput');
+        const files = fileInput.files;
+        
+        if (!files || files.length === 0) return;
+        
+        let saved = localStorage.getItem("battetech_slideshow_images");
+        let images = saved ? JSON.parse(saved) : [];
+        
+        let processed = 0;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    images.push(event.target.result);
+                    processed++;
+                    if (processed === files.length) {
+                        localStorage.setItem("battetech_slideshow_images", JSON.stringify(images));
+                        loadImageGrid();
+                        fileInput.value = '';
+                        alert(`✅ ${processed} image(s) added successfully!`);
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                processed++;
+                if (processed === files.length) {
+                    localStorage.setItem("battetech_slideshow_images", JSON.stringify(images));
+                    loadImageGrid();
+                    fileInput.value = '';
+                    alert(`✅ ${processed} image(s) added successfully!`);
+                }
+            }
+        }
+    }
+    
+    // FIXED: Delete image - removes only the selected image
+    function deleteImage(index) {
+        let saved = localStorage.getItem("battetech_slideshow_images");
+        let images = saved ? JSON.parse(saved) : [];
+        
+        if (index >= 0 && index < images.length) {
+            images.splice(index, 1);  // Remove only the selected index
+            if (images.length === 0) {
+                images = ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80"];
+            }
+            localStorage.setItem("battetech_slideshow_images", JSON.stringify(images));
+            loadImageGrid();
+            alert('✅ Image removed.');
+        }
+    }
+    
+    // ============ PROPERTY MANAGEMENT ============
+    
+    // REMOVED addNewProperty() - properties are added from admin-property-detail.html
+    
+    function renderPropertiesList() {
+        const container = document.getElementById('propertiesList');
+        if (!container) return;
+        
+        if (Object.keys(propertiesDB).length === 0) {
+            container.innerHTML = '<div style="background:white; padding:2rem; border-radius:20px; text-align:center;">🏢 No properties yet. Go to a property detail page to add rooms.</div>';
+            return;
+        }
+        
+        let html = '';
+        for (let propId in propertiesDB) {
+            const prop = propertiesDB[propId];
+            const vacant = getVacantCount(prop);
+            const occupied = getOccupiedCount(prop);
+            const safeId = propId.replace(/[^a-zA-Z0-9]/g, '_');
+            
+            html += `<div class="property-card-admin" id="card-${safeId}">
+                        <h4>🏢 ${prop.name}</h4>
+                        <p>📍 ${prop.location} | ${occupied}/${prop.totalRooms} occupied | ${vacant} vacant</p>
+                        <p>💰 UGX ${prop.monthlyRentPerUnit.toLocaleString()}/month | 🔑 Password: <strong>${prop.ownerPassword}</strong></p>
+                        <button onclick="toggleUnits('${propId}')">📋 Manage Units</button>
+                        <button onclick="openChat('${propId}')">💬 Chat with Owner</button>
+                        <button onclick="openNotepad('${propId}')">📝 Notepad</button>
+                        <button class="danger" onclick="deletePropertyConfirm('${propId}')">🗑 Delete Property</button>
+                        <div id="units-${safeId}" style="margin-top:1rem; display:none;"></div>
+                        <div id="chat-${safeId}" style="margin-top:1rem; display:none;"></div>
+                        <div id="note-${safeId}" style="margin-top:1rem; display:none;"></div>
+                     </div>`;
+        }
+        container.innerHTML = html;
+    }
+    
+    // NEW: Post update to ALL property owners
+    function postUpdateToAllOwners() {
+        const message = document.getElementById('broadcastAllMessage').value.trim();
+        if (!message) {
+            alert('Please enter an update message');
+            return;
+        }
+        
+        if (Object.keys(propertiesDB).length === 0) {
+            alert('No properties found. Add properties first.');
+            return;
+        }
+        
+        let count = 0;
+        for (let propId in propertiesDB) {
+            addGlobalUpdate(propId, `📢 BROADCAST: ${message}`);
+            count++;
+        }
+        
+        document.getElementById('broadcastAllMessage').value = '';
+        displayRecentUpdates();
+        alert(`✅ Update sent to ${count} property owner(s)!`);
+    }
+    
+    function toggleUnits(propertyId) {
+        const prop = propertiesDB[propertyId];
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const container = document.getElementById(`units-${safeId}`);
+        if (!container) return;
+        
+        if (container.style.display === 'none') {
+            let unitsHtml = `<h5>Rooms / Units</h5><div style="max-height:300px; overflow-y:auto;">`;
+            prop.units.forEach((unit, idx) => {
+                unitsHtml += `<div class="unit-row">
+                                <span><strong>${unit.room}</strong> - ${unit.vacant ? '✅ VACANT' : `👤 ${unit.tenant} (${unit.paid ? 'Paid' : 'Unpaid'})`}</span>
+                                <div>
+                                    <button onclick="toggleVacancy('${propertyId}', ${idx})">${unit.vacant ? 'Mark Occupied' : 'Mark Vacant'}</button>
+                                    ${unit.vacant ? `<button class="danger" onclick="prepareMerge('${propertyId}', ${idx})" style="background:#ffc107; color:#333;">🔗 Merge</button>` : ''}
+                                </div>
+                             </div>`;
+            });
+            unitsHtml += `</div><div id="merge-area-${safeId}" style="margin-top:10px;"></div>`;
+            container.innerHTML = unitsHtml;
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+    
+    let selectedMergeUnits = [];
+    function prepareMerge(propertyId, unitIndex) {
+        selectedMergeUnits.push(unitIndex);
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const mergeArea = document.getElementById(`merge-area-${safeId}`);
+        if (selectedMergeUnits.length === 1) {
+            mergeArea.innerHTML = `<p>✅ Selected ${propertiesDB[propertyId].units[unitIndex].room}. Select another vacant room to merge.</p>`;
+        } else if (selectedMergeUnits.length === 2) {
+            const unit1 = propertiesDB[propertyId].units[selectedMergeUnits[0]];
+            const unit2 = propertiesDB[propertyId].units[selectedMergeUnits[1]];
+            mergeArea.innerHTML = `<p>🔄 Merge ${unit1.room} + ${unit2.room}? 
+                <button onclick="confirmMerge('${propertyId}', ${selectedMergeUnits[0]}, ${selectedMergeUnits[1]})">Confirm Merge</button> 
+                <button onclick="cancelMerge('${propertyId}')">Cancel</button></p>`;
+        }
+    }
+    
+    function confirmMerge(propertyId, idx1, idx2) {
+        if (mergeUnits(propertyId, idx1, idx2)) {
+            alert('✅ Units merged successfully!');
+            addGlobalUpdate(propertyId, `Two units merged into one rental.`);
+            toggleUnits(propertyId);
+        } else {
+            alert('❌ Merge failed. Both units must be vacant.');
+        }
+        cancelMerge(propertyId);
+        renderPropertiesList();
+    }
+    
+    function cancelMerge(propertyId) {
+        selectedMergeUnits = [];
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const mergeArea = document.getElementById(`merge-area-${safeId}`);
+        if (mergeArea) mergeArea.innerHTML = '';
+    }
+    
+    function toggleVacancy(propertyId, unitIndex) {
+        const prop = propertiesDB[propertyId];
+        const unit = prop.units[unitIndex];
+        unit.vacant = !unit.vacant;
+        if (!unit.vacant) {
+            const tenantName = prompt('Enter tenant name:', 'New Tenant');
+            if (tenantName) unit.tenant = tenantName;
+            unit.paid = false;
+            unit.amountPaid = 0;
+        } else {
+            unit.tenant = "";
+            unit.paid = false;
+            unit.amountPaid = 0;
+        }
+        saveAllData();
+        toggleUnits(propertyId);
+        renderPropertiesList();
+    }
+    
+    function openChat(propertyId) {
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const container = document.getElementById(`chat-${safeId}`);
+        if (!container) return;
+        
+        if (container.style.display === 'none') {
+            loadAdminChat(propertyId, container);
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+    
+    function loadAdminChat(propertyId, container) {
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        container.innerHTML = `<div class="chat-section">
+            <div class="chat-messages" id="admin-chat-${safeId}" style="max-height:250px; overflow-y:auto;"></div>
+            <div class="chat-input-area">
+                <input type="text" id="adminMsgInput-${safeId}" placeholder="Reply to owner...">
+                <button onclick="sendAdminMessage('${propertyId}')">Send</button>
+                <input type="file" id="adminImageInput-${safeId}" accept="image/*" style="display:none;" onchange="sendAdminImage('${propertyId}')">
+                <label class="file-input-label" onclick="document.getElementById('adminImageInput-${safeId}').click()">📷 Image</label>
+            </div>
+        </div>`;
+        refreshAdminChat(propertyId);
+        setInterval(() => refreshAdminChat(propertyId), 5000);
+    }
+    
+    function refreshAdminChat(propertyId) {
+        const messages = getMessages(propertyId);
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const chatContainer = document.getElementById(`admin-chat-${safeId}`);
+        if (!chatContainer) return;
+        
+        if (messages.length === 0) {
+            chatContainer.innerHTML = '<p style="text-align:center; color:gray;">No messages yet.</p>';
+            return;
+        }
+        
+        let html = '';
+        messages.forEach(msg => {
+            const isAdmin = msg.sender === 'admin';
+            html += `<div class="chat-message ${isAdmin ? 'owner' : 'admin'}" style="${isAdmin ? 'background:#0a2b4e; color:white; margin-left:auto;' : 'background:#e5e7eb;'}">
+                        <small>${msg.sender === 'admin' ? 'You (Admin)' : 'Owner'} • ${new Date(msg.timestamp).toLocaleString()}</small>
+                        <div>${msg.message}</div>
+                        ${msg.image ? `<img src="${msg.image}" style="max-width:120px; border-radius:8px; margin-top:5px;">` : ''}
+                     </div>`;
+        });
+        chatContainer.innerHTML = html;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    function sendAdminMessage(propertyId) {
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const input = document.getElementById(`adminMsgInput-${safeId}`);
+        const message = input.value.trim();
+        if (!message) return;
+        sendMessage(propertyId, 'admin', message, null);
+        input.value = '';
+        refreshAdminChat(propertyId);
+    }
+    
+    function sendAdminImage(propertyId) {
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const fileInput = document.getElementById(`adminImageInput-${safeId}`);
+        const file = fileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            sendMessage(propertyId, 'admin', '(Image attached)', e.target.result);
+            refreshAdminChat(propertyId);
+        };
+        reader.readAsDataURL(file);
+        fileInput.value = '';
+    }
+    
+    function openNotepad(propertyId) {
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const container = document.getElementById(`note-${safeId}`);
+        if (!container) return;
+        const currentNote = getAdminNote(propertyId);
+        container.innerHTML = `<div class="notepad">
+            <textarea id="note-text-${safeId}" rows="3" placeholder="Private notes about this property...">${currentNote}</textarea>
+            <button onclick="saveNote('${propertyId}')">Save Note</button>
+        </div>`;
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    function saveNote(propertyId) {
+        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
+        const noteText = document.getElementById(`note-text-${safeId}`).value;
+        setAdminNote(propertyId, noteText);
+        alert('✅ Note saved privately.');
+    }
+    
+    function populatePropertySelect() {
+        const select = document.getElementById('adminPropertySelect');
+        if (!select) return;
+        select.innerHTML = '';
+        for (let propId in propertiesDB) {
+            select.innerHTML += `<option value="${propId}">${propertiesDB[propId].name}</option>`;
+        }
+        if (Object.keys(propertiesDB).length === 0) {
+            select.innerHTML = '<option>No properties yet</option>';
+        }
+    }
+    
+    function postUpdate() {
+        const propertyId = document.getElementById('adminPropertySelect').value;
+        const message = document.getElementById('adminMessage').value.trim();
+        if (!message) { alert('Please enter a message'); return; }
+        if (!propertiesDB[propertyId]) { alert('Please select a property'); return; }
+        addGlobalUpdate(propertyId, message);
+        document.getElementById('adminMessage').value = '';
+        displayRecentUpdates();
+        alert(`✅ Update posted to ${propertiesDB[propertyId].name}`);
+    }
+    
+    function displayRecentUpdates() {
+        const container = document.getElementById('recentUpdatesList');
+        if (!container) return;
+        
+        let allUpdates = [];
+        for (let propId in globalUpdates) {
+            const updates = globalUpdates[propId] || [];
+            const propName = propertiesDB[propId]?.name || 'Unknown Property';
+            updates.forEach(up => {
+                allUpdates.push({
+                    propertyName: propName,
+                    message: up.message,
+                    date: up.date
+                });
+            });
+        }
+        
+        allUpdates.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        if (allUpdates.length === 0) {
+            container.innerHTML = '<div style="background:white; padding:1rem; border-radius:16px;">No updates yet.</div>';
+            return;
+        }
+        
+        let html = '';
+        allUpdates.slice(0, 20).forEach(up => {
+            html += `<div style="background:white; padding:0.8rem; margin:0.5rem 0; border-radius:12px;">
+                        <strong>🏢 ${up.propertyName}</strong> <small>(${new Date(up.date).toLocaleDateString()})</small><br>
+                        📢 ${up.message}
+                     </div>`;
+        });
+        container.innerHTML = html;
+    }
+    
+    function deletePropertyConfirm(propertyId) {
+        const propName = propertiesDB[propertyId]?.name;
+        if (confirm(`⚠️ Delete "${propName}" permanently?\nThis will remove all data including tenants, chats, and notes.`)) {
+            deleteProperty(propertyId);
+            renderPropertiesList();
+            populatePropertySelect();
+            displayRecentUpdates();
+            alert(`✅ "${propName}" has been deleted.`);
+        }
+    }
+    
+    // Initial load
+    loadImageGrid();
+    renderPropertiesList();
+    populatePropertySelect();
+    displayRecentUpdates();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="supabase-data.js"></script>
+</body>
+</html>

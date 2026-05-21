@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Available Rentals - BATTETECH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f4fa;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #0a2b4e;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            background: white;
+            color: #0a2b4e;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .logo-text span {
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            opacity: 0.8;
+        }
+
+        .tagline {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.3rem;
+        }
+
+        .rentals-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 60px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .filter-section input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+        }
+
+        .filter-section button {
+            background: #0a2b4e;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .vacancy-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: 0.2s;
+        }
+
+        .vacancy-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .vacancy-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 16px;
+            object-fit: cover;
+            background: #e2e8f0;
+        }
+
+        .vacancy-details {
+            flex: 1;
+        }
+
+        .property-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #0a2b4e;
+        }
+
+        .room-number {
+            background: #2c7be5;
+            color: white;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin: 0.5rem 0;
+        }
+
+        .location {
+            color: #555;
+            margin: 0.3rem 0;
+        }
+
+        .rent-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #0a2b4e;
+            margin: 0.5rem 0;
+        }
+
+        .room-description {
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .btn-call {
+            background: #0a2b4e;
+            color: white;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            color: #666;
+        }
+
+        .main-footer {
+            background: #071e36;
+            color: white;
+            margin-top: 3rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .phones {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .whatsapp-btn a {
+            background: #25D366;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        @media (max-width: 700px) {
+            .vacancy-card {
+                flex-direction: column;
+            }
+            .vacancy-image {
+                width: 100%;
+                height: 180px;
+            }
+            .filter-section {
+                border-radius: 20px;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <div class="logo-icon">🏢</div>
+        <div class="logo-text">
+            <h1>BATTETECH</h1>
+            <span>PROPERTY CONSULTANTS</span>
+        </div>
+    </div>
+    <div class="tagline">Find Your Next Home</div>
+</header>
+
+<div class="rentals-container">
+    <div class="filter-section">
+        <input type="text" id="locationFilter" placeholder="📍 Filter by location (e.g., Kampala, Wandegeya...)" autocomplete="off">
+        <button onclick="filterVacancies()">🔍 Search</button>
+        <button onclick="clearFilter()" style="background:#6c757d;">Reset</button>
+    </div>
+    <div id="vacanciesList"></div>
+</div>
+
+<footer class="main-footer">
+    <div class="contact-info">
+        <h3>YOUR PROPERTY, OUR PRIORITY</h3>
+        <div class="phones">
+            <p><strong>📱 MTN: 0794115704</strong></p>
+            <p><strong>📱 AIRTEL: 0756182284</strong></p>
+        </div>
+        <p><strong>📧 battetech330@gmail.com</strong></p>
+        <div class="whatsapp-btn">
+            <a href="https://wa.me/256794115704" target="_blank">💬 Chat on WhatsApp</a>
+        </div>
+    </div>
+    <div class="copyright" style="margin-top: 1rem;">
+        <p>&copy; 2026 BATTETECH PROPERTY CONSULTANTS - Kampala, Uganda</p>
+    </div>
+</footer>
+
+<script>
+    let allVacantUnits = [];
+
+    function loadVacancies() {
+        allVacantUnits = getAllVacantUnits();
+        displayVacancies(allVacantUnits);
+    }
+
+    function displayVacancies(units) {
+        const container = document.getElementById('vacanciesList');
+        
+        if (units.length === 0) {
+            container.innerHTML = '<div class="no-results">🏠 No vacant rooms available at the moment. Check back later.</div>';
+            return;
+        }
+
+        let html = '';
+        units.forEach(unit => {
+            const whatsappMsg = `Hello BATTETECH, I'm interested in ${unit.propertyName} - Room ${unit.roomNumber} at UGX ${unit.rent.toLocaleString()}/month`;
+            const encodedMsg = encodeURIComponent(whatsappMsg);
+            
+            html += `
+                <div class="vacancy-card">
+                    <img src="${unit.roomImage || 'https://placehold.co/400x300?text=No+Image'}" class="vacancy-image" onerror="this.src='https://placehold.co/400x300?text=No+Image'">
+                    <div class="vacancy-details">
+                        <div class="property-name">🏢 ${escapeHtml(unit.propertyName)}</div>
+                        <div class="room-number">Room ${escapeHtml(unit.roomNumber)}</div>
+                        <div class="location">📍 ${escapeHtml(unit.location)}</div>
+                        <div class="rent-price">💰 UGX ${unit.rent.toLocaleString()} / month</div>
+                        <div class="room-description">
+                            📝 This room is ready for immediate occupation. Contact us for viewing.
+                        </div>
+                        <div class="contact-buttons">
+                            <a href="https://wa.me/256794115704?text=${encodedMsg}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
+                            <a href="tel:0794115704" class="btn-call">📞 Call MTN</a>
+                            <a href="tel:0756182284" class="btn-call">📞 Call AIRTEL</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function filterVacancies() {
+        const searchTerm = document.getElementById('locationFilter').value.toLowerCase().trim();
+        if (!searchTerm) {
+            displayVacancies(allVacantUnits);
+            return;
+        }
+        const filtered = allVacantUnits.filter(unit => 
+            unit.location.toLowerCase().includes(searchTerm) || 
+            unit.propertyName.toLowerCase().includes(searchTerm)
+        );
+        displayVacancies(filtered);
+    }
+
+    function clearFilter() {
+        document.getElementById('locationFilter').value = '';
+        displayVacancies(allVacantUnits);
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    window.addEventListener('load', async () => {
+        await window.supabaseDataLoaded;
+        loadVacancies();
+    });
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-data.js"></script>
+</body>
+</html>

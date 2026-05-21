@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, maximum-scale=1.0">
+    <title>Property Details - BATTETECH</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f0f4fa; min-height: 100vh; padding-bottom: 70px; }
+        
+        /* SINGLE BACKGROUND IMAGE */
+        .property-background { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 0; 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #1a1a2e;
+        }
+        .overlay-light { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.55); 
+            z-index: 1; 
+        }
+        
+        .dashboard-container { position: relative; z-index: 2; max-width: 100%; padding: 0.6rem; }
+        .back-link { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(108,117,125,0.9); color: white; text-decoration: none; padding: 8px 14px; border-radius: 40px; margin-bottom: 0.8rem; font-size: 0.8rem; backdrop-filter: blur(4px); }
+        
+        .property-header-card, .section-card, .stats-grid .stat-card, .fee-summary, .rooms-table-container {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        
+        header { background: rgba(10, 43, 78, 0.95); backdrop-filter: blur(10px); color: white; padding: 0.7rem; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .logo-container { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .logo-icon { font-size: 1.6rem; background: white; color: #0a2b4e; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+        .logo-text h1 { font-size: 1.1rem; letter-spacing: 1px; }
+        .logo-text span { font-size: 0.5rem; letter-spacing: 2px; opacity: 0.8; }
+        
+        .property-title { font-size: 1.3rem; color: #0a2b4e; margin-bottom: 0.3rem; }
+        .property-meta { color: #666; margin-bottom: 0.3rem; font-size: 0.75rem; }
+        
+        .action-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.8rem 0; }
+        button { 
+            background: #0a2b4e; 
+            color: white; 
+            border: none; 
+            padding: 10px 14px; 
+            border-radius: 40px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 0.7rem; 
+            transition: all 0.2s ease;
+        }
+        button:hover { background: #1a4a7a; transform: scale(1.02); }
+        button:active { transform: scale(0.98); }
+        button.danger { background: #dc2626; }
+        button.danger:hover { background: #b91c1c; }
+        button.warning { background: #f59e0b; color: #1a2a3e; }
+        button.warning:hover { background: #e67e22; }
+        button.success { background: #10b981; }
+        button.success:hover { background: #059669; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 0.8rem 0; }
+        .stat-card { background: rgba(248, 250, 252, 0.95); padding: 0.7rem; border-radius: 12px; text-align: center; }
+        .stat-number { font-size: 0.9rem; font-weight: bold; color: #0a2b4e; }
+        .stat-label { font-size: 0.55rem; color: #666; }
+        
+        .rooms-table-container { 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch;
+            margin-top: 1rem;
+        }
+        .rooms-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.75rem;
+            min-width: 900px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .rooms-table th, .rooms-table td { 
+            border: 1px solid #ddd; 
+            padding: 10px 8px; 
+            text-align: left; 
+            vertical-align: middle;
+        }
+        .rooms-table th { 
+            background: #0a2b4e; 
+            color: white; 
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .rooms-table td { background: rgba(255,255,255,0.95); }
+        .rooms-table button { padding: 5px 10px; font-size: 0.7rem; margin: 2px; border-radius: 20px; }
+        
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-align: center; min-width: 80px; }
+        .status-vacant { background: #f59e0b; color: white; }
+        .status-occupied { background: #2c7be5; color: white; }
+        .status-paid { background: #10b981; color: white; }
+        .status-unpaid { background: #dc2626; color: white; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 95%; max-width: 500px; border-radius: 20px; padding: 1.2rem; max-height: 90%; overflow-y: auto; }
+        .modal-content h2 { font-size: 1.2rem; margin-bottom: 1rem; color: #0a2b4e; }
+        .form-row { margin-bottom: 0.8rem; }
+        .form-row input, .form-row select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.85rem; }
+        .form-row-2 { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 0.8rem; }
+        .image-preview { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; margin-top: 0.3rem; }
+        .upload-btn { background: #f59e0b; margin-left: 0.5rem; padding: 8px 12px; font-size: 0.7rem; border: none; border-radius: 40px; cursor: pointer; }
+        
+        .payment-table { width: 100%; border-collapse: collapse; font-size: 0.6rem; }
+        .payment-table th, .payment-table td { border: 1px solid #ddd; padding: 4px; text-align: center; }
+        .payment-table th { background: #0a2b4e; color: white; }
+        .status-paid-bg { background: #d1fae5; color: #065f46; }
+        .status-partial-bg { background: #fed7aa; color: #92400e; }
+        .status-unpaid-bg { background: #fee2e2; color: #991b1b; }
+        
+        .history-list, .remittance-list, .statement-list { max-height: 200px; overflow-y: auto; }
+        .history-item, .remittance-item, .statement-item { background: #f8fafc; padding: 8px; margin: 4px 0; border-radius: 10px; border-left: 3px solid #f59e0b; font-size: 0.7rem; cursor: pointer; }
+        .remittance-item { border-left-color: #10b981; }
+        .statement-item { border-left-color: #2c7be5; }
+        
+        .fee-summary { background: rgba(238, 243, 252, 0.95); padding: 0.8rem; border-radius: 12px; margin: 0.8rem 0; font-size: 0.7rem; }
+        
+        .chat-messages { background: rgba(248, 250, 252, 0.95); border-radius: 14px; padding: 0.8rem; max-height: 200px; overflow-y: auto; margin-bottom: 0.8rem; }
+        .chat-message { margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 12px; max-width: 90%; font-size: 0.75rem; }
+        .chat-message.owner { background: #2c7be5; color: white; margin-left: auto; text-align: right; }
+        .chat-message.admin { background: #e5e7eb; }
+        .chat-message img { max-width: 100px; border-radius: 6px; margin-top: 4px; }
+        .chat-input-area { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+        .chat-input-area input { flex: 1; padding: 10px; border-radius: 25px; border: 1px solid #ccc; font-size: 0.8rem; background: rgba(255,255,255,0.9); }
+        .file-input-label { background: #6c757d; color: white; padding: 8px 14px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; }
+        
+        .bottom-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; justify-content: flex-start; }
+        
+        .main-footer { background: rgba(7, 30, 54, 0.95); backdrop-filter: blur(5px); color: white; padding: 0.8rem; text-align: center; position: fixed; bottom: 0; left: 0; right: 0; z-index: 90; }
+        .phones { display: flex; justify-content: center; gap: 0.8rem; margin: 0.2rem 0; flex-wrap: wrap; font-size: 0.65rem; }
+        .whatsapp-btn a { background: #25D366; color: white; padding: 4px 10px; border-radius: 40px; text-decoration: none; display: inline-block; font-size: 0.65rem; }
+        
+        .content-padding { padding-bottom: 80px; }
+        
+        @media (max-width: 768px) {
+            .rooms-table-container { display: none; }
+            .rooms-mobile-list { display: flex; flex-direction: column; gap: 1rem; }
+            .room-mobile-card { background: white; border-radius: 16px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+            .room-mobile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; }
+            .room-mobile-number { font-size: 1rem; font-weight: bold; color: #0a2b4e; }
+            .room-mobile-details { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.8rem; font-size: 0.8rem; }
+            .room-mobile-tenant { grid-column: span 2; background: #f8fafc; padding: 0.5rem; border-radius: 10px; }
+            .room-mobile-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        }
+        
+        @media (min-width: 769px) {
+            .rooms-mobile-list { display: none; }
+            .rooms-table-container { display: block; }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+            .form-row-2 { flex-direction: row; }
+            .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+            .main-footer { position: relative; margin-top: 1rem; }
+            .content-padding { padding-bottom: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="property-background" id="propertyBackground"></div>
+    <div class="overlay-light"></div>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">🏢</div>
+            <div class="logo-text"><h1>BATTETECH</h1><span>PROPERTY DETAILS</span></div>
+        </div>
+    </header>
+
+    <div class="dashboard-container content-padding">
+        <a href="admin-dashboard.html" class="back-link">← Back</a>
+        <div id="propertyContent"></div>
+    </div>
+
+    <!-- Add Room Modal -->
+    <div id="addRoomModal" class="modal">
+        <div class="modal-content">
+            <h2>➕ Add New Room</h2>
+            <div class="form-row"><input type="text" id="roomNumber" placeholder="Room Number (e.g., A101)"></div>
+            <div class="form-row"><input type="number" id="roomRent" placeholder="Monthly Rent (UGX)"></div>
+            <div class="form-row"><input type="number" id="paymentDueDate" placeholder="Due Date (day of month)" value="1" min="1" max="31"></div>
+            <div class="form-row"><label>Move In Date (when tenant moves in):</label><input type="date" id="moveInDate"></div>
+            <div class="form-row"><div style="display:flex; gap:0.5rem;"><input type="text" id="roomImage" placeholder="Room Image URL" style="flex:1;"><button type="button" class="upload-btn" onclick="uploadRoomImage()">📷</button></div><div id="roomImagePreview"></div></div>
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="addNewRoom()" style="background:#10b981;">Add Room</button><button onclick="closeAddRoomModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <!-- Edit Room Modal -->
+    <div id="editRoomModal" class="modal">
+        <div class="modal-content">
+            <h2>✏️ Edit Room</h2>
+            <div class="form-row"><input type="text" id="editRoomNumber" placeholder="Room Number"></div>
+            <div class="form-row"><input type="number" id="editRentAmount" placeholder="Rent (UGX)"></div>
+            <div class="form-row"><div style="display:flex; gap:0.5rem;"><input type="text" id="editRoomImage" style="flex:1;"><button type="button" class="upload-btn" onclick="uploadEditRoomImage()">📷</button></div><div id="editRoomImagePreview"></div></div>
+            <div class="form-row"><input type="number" id="editPaymentDueDate" placeholder="Due Date (day)"></div>
+            <div class="form-row"><label>Move In Date:</label><input type="date" id="editMoveInDate"></div>
+            <div class="form-row"><select id="editVacantStatus"><option value="vacant">🔓 VACANT</option><option value="occupied">👤 OCCUPIED</option></select></div>
+            <div class="form-row-2"><input type="text" id="editTenantName" placeholder="Tenant Name"><input type="text" id="editTenantPhone" placeholder="Tenant Phone"></div>
+            <div class="form-row"><select id="editPaymentStatus"><option value="unpaid">❌ UNPAID</option><option value="paid">✅ PAID</option></select></div>
+            <div class="form-row"><input type="text" id="editLateNote" placeholder="Late Note"></div>
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="saveEditRoom()" style="background:#10b981;">Save</button><button onclick="closeEditRoomModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <!-- Property Background Image Modal -->
+    <div id="propertyImageModal" class="modal">
+        <div class="modal-content">
+            <h2>🖼️ Property Background Image</h2>
+            <p style="font-size:0.7rem; margin-bottom:0.8rem;">Set a single background image for this property.</p>
+            <div class="form-row"><div style="display:flex; gap:0.5rem;"><input type="text" id="propertyBgImage" placeholder="Image URL" style="flex:1;"><button type="button" class="upload-btn" onclick="uploadPropertyBackgroundImage()">📷 Upload</button></div></div>
+            <div id="currentBgPreview" style="margin-top:0.8rem; text-align:center;"></div>
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+                <button onclick="setPropertyBackgroundImage()" style="background:#10b981;">Set Image</button>
+                <button onclick="removePropertyBackgroundImage()" style="background:#dc2626;">Remove Image</button>
+                <button onclick="closePropertyImageModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Broadcast Modal -->
+    <div id="broadcastModal" class="modal">
+        <div class="modal-content">
+            <h2>📱 WhatsApp Broadcast</h2>
+            <div id="tenantList" style="background:#f8fafc; padding:8px; border-radius:12px; margin-bottom:1rem; max-height:150px; overflow-y:auto; font-size:0.7rem;"></div>
+            <div class="form-row"><textarea id="broadcastMessage" rows="3" placeholder="Type message here..." style="width:100%; padding:8px; border-radius:12px; border:1px solid #ccc;"></textarea></div>
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="sendBroadcast()" style="background:#25D366;">📱 Send</button><button onclick="closeBroadcastModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <!-- Record Payment Modal -->
+    <div id="paymentModal" class="modal"><div class="modal-content"><h2>💰 Record Payment</h2><div class="form-row"><label>Room: <span id="paymentRoomName"></span></label></div><div class="form-row"><label>Tenant: <span id="paymentTenantName"></span></label></div><div class="form-row"><input type="number" id="paymentAmount" placeholder="Amount (UGX)"></div><div class="form-row"><select id="paymentMethod"><option value="Cash">Cash</option><option value="Mobile Money">Mobile Money</option><option value="Bank Transfer">Bank Transfer</option></select></div><div class="form-row"><input type="text" id="paymentReference" placeholder="Reference"></div><div class="form-row"><input type="date" id="paymentDate"></div><div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="confirmPayment()" style="background:#10b981;">Record</button><button onclick="closePaymentModal()">Cancel</button></div></div></div>
+
+    <!-- Add Penalty Modal -->
+    <div id="penaltyModal" class="modal"><div class="modal-content"><h2>⚠️ Add Penalty</h2><div class="form-row"><label>Room: <span id="penaltyRoomName"></span></label></div><div class="form-row"><label>Tenant: <span id="penaltyTenantName"></span></label></div><div class="form-row"><input type="month" id="penaltyMonth"></div><div class="form-row"><input type="number" id="penaltyAmount" placeholder="Penalty Amount (UGX)"></div><div class="form-row"><input type="text" id="penaltyReason" placeholder="Reason"></div><div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="confirmPenalty()" style="background:#f59e0b;">Add</button><button onclick="closePenaltyModal()">Cancel</button></div></div></div>
+
+    <!-- Bill Payment Modal -->
+    <div id="billModal" class="modal"><div class="modal-content"><h2>🧾 Pay Bill</h2><div class="form-row"><select id="billType"><option value="Electricity">⚡ Electricity</option><option value="Water">💧 Water</option><option value="Garbage">🗑️ Garbage</option></select></div><div class="form-row"><input type="number" id="billAmount" placeholder="Amount (UGX)"></div><div class="form-row"><input type="text" id="billDescription" placeholder="Description"></div><div class="form-row"><div style="display:flex; gap:0.5rem;"><input type="text" id="billReceipt" placeholder="Receipt URL" style="flex:1;"><button type="button" class="upload-btn" onclick="uploadBillReceipt()">📷</button></div><div id="billReceiptPreview"></div></div><div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="confirmBillPayment()" style="background:#10b981;">Pay</button><button onclick="closeBillModal()">Cancel</button></div></div></div>
+
+    <!-- Remit Modal -->
+    <div id="remitModal" class="modal"><div class="modal-content"><h2>💰 Remit to Owner</h2><div class="form-row"><label>Pending: <span id="pendingRemitAmount">UGX 0</span></label></div><div class="form-row"><input type="number" id="remitAmount" placeholder="Amount to Remit"></div><div class="form-row"><select id="remitMethod"><option value="Mobile Money">Mobile Money</option><option value="Bank Transfer">Bank Transfer</option><option value="Cash">Cash</option></select></div><div class="form-row"><input type="text" id="remitReference" placeholder="Reference"></div><div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="confirmRemit()" style="background:#10b981;">Remit</button><button onclick="closeRemitModal()">Cancel</button></div></div></div>
+
+    <!-- Statement Modal -->
+    <div id="statementModal" class="modal"><div class="modal-content"><h2>📄 Monthly Statement</h2><div class="form-row"><input type="month" id="statementMonth"></div><div class="form-row"><input type="text" id="ownerWhatsApp" placeholder="Owner WhatsApp"></div><div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="generateAndSendStatement()" style="background:#10b981;">Send</button><button onclick="generateAndPrintStatement()" style="background:#2c7be5;">Print</button><button onclick="closeStatementModal()">Cancel</button></div></div></div>
+
+    <!-- View Statements Modal -->
+    <div id="viewStatementsModal" class="modal"><div class="modal-content"><h2>📋 Previous Statements</h2><div id="statementsList" style="max-height: 250px; overflow-y: auto;"></div><button onclick="closeViewStatementsModal()" style="margin-top:1rem;">Close</button></div></div>
+
+    <div id="statementPrintArea" class="statement-print-area"></div>
+
+    <footer class="main-footer">
+        <div class="phones"><p><strong>📱 MTN: 0794115704</strong></p><p><strong>📱 AIRTEL: 0756182284</strong></p></div>
+        <p><strong>📧 battetech330@gmail.com</strong></p>
+        <div class="whatsapp-btn"><a href="https://wa.me/256794115704" target="_blank">💬 WhatsApp</a></div>
+    </footer>
+
+    <script>
+        let currentPropertyId = null;
+        let currentPaymentRoom = null;
+        let currentPaymentRoomIndex = null;
+        let currentPenaltyRoomIndex = null;
+        let currentEditRoomIndex = null;
+        let chatRefreshInterval = null;
+        
+        function checkAdminSession() {
+            const isLoggedIn = localStorage.getItem('battetech_admin_session');
+            if (isLoggedIn !== 'true') { window.location.href = 'login.html'; return false; }
+            return true;
+        }
+        
+        function updatePropertyBackground(imageUrl) {
+            const bgDiv = document.getElementById('propertyBackground');
+            if (bgDiv) {
+                if (imageUrl && imageUrl.trim() !== '') {
+                    bgDiv.style.backgroundImage = `url('${imageUrl}')`;
+                    bgDiv.style.backgroundSize = 'cover';
+                    bgDiv.style.backgroundPosition = 'center';
+                } else {
+                    bgDiv.style.backgroundImage = 'linear-gradient(135deg, #0a2b4e 0%, #1a4a7a 100%)';
+                }
+            }
+        }
+        
+        function uploadRoomImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('roomImage').value = event.target.result;
+                        document.getElementById('roomImagePreview').innerHTML = `<img src="${event.target.result}" class="image-preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+        
+        function uploadEditRoomImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('editRoomImage').value = event.target.result;
+                        document.getElementById('editRoomImagePreview').innerHTML = `<img src="${event.target.result}" class="image-preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+        
+        function uploadPropertyBackgroundImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('propertyBgImage').value = event.target.result;
+                        document.getElementById('currentBgPreview').innerHTML = `<img src="${event.target.result}" class="image-preview" style="width:100px; height:100px; object-fit:cover; border-radius:10px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+        
+        function setPropertyBackgroundImage() {
+            const imageUrl = document.getElementById('propertyBgImage').value.trim();
+            if (imageUrl) {
+                const prop = propertiesDB[currentPropertyId];
+                if (prop) {
+                    prop.propertyBackgroundImage = imageUrl;
+                    saveAllData();
+                    updatePropertyBackground(imageUrl);
+                    alert('✅ Background image updated!');
+                }
+            } else {
+                alert('Please select or enter an image URL');
+            }
+            closePropertyImageModal();
+        }
+        
+        function removePropertyBackgroundImage() {
+            const prop = propertiesDB[currentPropertyId];
+            if (prop) {
+                prop.propertyBackgroundImage = '';
+                saveAllData();
+                updatePropertyBackground('');
+                alert('✅ Background image removed.');
+            }
+            closePropertyImageModal();
+        }
+        
+        function uploadBillReceipt() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('billReceipt').value = event.target.result;
+                        document.getElementById('billReceiptPreview').innerHTML = `<img src="${event.target.result}" class="image-preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+        
+        function openPropertyImageModal() {
+            const prop = propertiesDB[currentPropertyId];
+            const currentImage = prop?.propertyBackgroundImage || '';
+            document.getElementById('propertyBgImage').value = currentImage;
+            document.getElementById('currentBgPreview').innerHTML = currentImage ? `<img src="${currentImage}" class="image-preview" style="width:100px; height:100px; object-fit:cover; border-radius:10px;">` : '<p>No background image set</p>';
+            document.getElementById('propertyImageModal').style.display = 'flex';
+        }
+        
+        function closePropertyImageModal() {
+            document.getElementById('propertyImageModal').style.display = 'none';
+        }
+        
+        function openBroadcastModal() {
+            const tenants = getTenantPhones(currentPropertyId);
+            const listContainer = document.getElementById('tenantList');
+            if (tenants.length === 0) { listContainer.innerHTML = '<p style="color:#dc2626;">No tenant phone numbers found.</p>'; }
+            else {
+                let listHtml = '<strong>Send to:</strong><ul style="margin-top:5px;">';
+                tenants.forEach(t => { listHtml += `<li>${t.name} (${t.room}) - ${t.phone}</li>`; });
+                listHtml += '</ul>';
+                listContainer.innerHTML = listHtml;
+            }
+            document.getElementById('broadcastMessage').value = '';
+            document.getElementById('broadcastModal').style.display = 'flex';
+        }
+        function closeBroadcastModal() { document.getElementById('broadcastModal').style.display = 'none'; }
+        
+        function sendBroadcast() {
+            const message = document.getElementById('broadcastMessage').value.trim();
+            if (!message) { alert('Enter a message'); return; }
+            const phones = getTenantPhones(currentPropertyId);
+            if (phones.length === 0) { alert('No tenant phones'); return; }
+            const encodedMsg = encodeURIComponent(message);
+            for (let i = 0; i < phones.length; i++) {
+                setTimeout(() => { window.open(`https://wa.me/${phones[i].phone}?text=${encodedMsg}`, '_blank'); }, i * 1000);
+            }
+            alert(`Opening WhatsApp for ${phones.length} tenants.`);
+            closeBroadcastModal();
+        }
+        
+        // ============ UPDATED EDIT PROPERTY FUNCTION - CAN EDIT EVERYTHING ============
+        async function editPropertyDetails() {
+            const prop = propertiesDB[currentPropertyId];
+            if (!prop) return;
+            
+            // Edit all property fields
+            const newName = prompt('Property Name:', prop.name);
+            if (newName !== null && newName !== prop.name) prop.name = newName;
+            
+            const newLocation = prompt('Location:', prop.location);
+            if (newLocation !== null && newLocation !== prop.location) prop.location = newLocation;
+            
+            const newPassword = prompt('Owner Password (give to owner for login):', prop.ownerPassword);
+            if (newPassword !== null && newPassword !== prop.ownerPassword) {
+                prop.ownerPassword = newPassword;
+                // Update in ownersDB as well
+                const ownerIndex = ownersDB.findIndex(o => o.propertyId === currentPropertyId);
+                console.log('ownerIndex for password update', ownerIndex);
+                if (ownerIndex !== -1) { ownersDB[ownerIndex].password = newPassword; console.log('updated ownersDB[ownerIndex]', ownersDB[ownerIndex]); }
+            }
+            
+            const newOwnerName = prompt('Owner Full Name:', prop.ownerName);
+            if (newOwnerName !== null && newOwnerName !== prop.ownerName) {
+                prop.ownerName = newOwnerName;
+                const ownerIndex = ownersDB.findIndex(o => o.propertyId === currentPropertyId);
+                console.log('ownerIndex for name update', ownerIndex);
+                if (ownerIndex !== -1) { ownersDB[ownerIndex].name = newOwnerName; console.log('updated ownersDB[ownerIndex]', ownersDB[ownerIndex]); }
+            }
+            
+            const newOwnerPhone = prompt('Owner Phone Number:', prop.ownerPhone);
+            if (newOwnerPhone !== null && newOwnerPhone !== prop.ownerPhone) {
+                prop.ownerPhone = newOwnerPhone;
+                const ownerIndex = ownersDB.findIndex(o => o.propertyId === currentPropertyId);
+                console.log('ownerIndex for phone update', ownerIndex);
+                if (ownerIndex !== -1) { ownersDB[ownerIndex].phone = newOwnerPhone; console.log('updated ownersDB[ownerIndex]', ownersDB[ownerIndex]); }
+            }
+            
+            const newFee = prompt('Management Fee (%):', prop.managementFee);
+            if (newFee !== null && !isNaN(parseFloat(newFee))) {
+                prop.managementFee = parseFloat(newFee);
+            }
+            
+            const newPenalty = prompt('Late Penalty (%):', prop.penaltyFee || 0);
+            if (newPenalty !== null && !isNaN(parseFloat(newPenalty))) {
+                prop.penaltyFee = parseFloat(newPenalty);
+            }
+            
+            const newElectricity = prompt('Electricity Bill (UGX):', prop.bills.electricity);
+            if (newElectricity !== null && !isNaN(parseInt(newElectricity))) {
+                prop.bills.electricity = parseInt(newElectricity) || 0;
+            }
+            
+            const newWater = prompt('Water Bill (UGX):', prop.bills.water);
+            if (newWater !== null && !isNaN(parseInt(newWater))) {
+                prop.bills.water = parseInt(newWater) || 0;
+            }
+            
+            const newGarbage = prompt('Garbage Bill (UGX):', prop.bills.garbage);
+            if (newGarbage !== null && !isNaN(parseInt(newGarbage))) {
+                prop.bills.garbage = parseInt(newGarbage) || 0;
+            }
+            
+            // Option to change status
+            const newStatus = confirm(`Current Status: ${prop.status.toUpperCase()}\n\nClick OK to change to ${prop.status === 'active' ? 'PENDING' : 'ACTIVE'}, Cancel to keep same.`);
+            if (newStatus) {
+                prop.status = prop.status === 'active' ? 'pending' : 'active';
+            }
+            
+            console.log('Saving edited property', currentPropertyId, prop);
+            const ok = await saveAllData();
+            console.log('saveAllData result', ok);
+            if (!ok) { alert('⚠️ Failed to save changes. Check console for errors.'); return; }
+            await loadProperty();
+            alert('✅ Property details updated successfully!');
+        }
+        // ============ END OF UPDATED EDIT PROPERTY FUNCTION ============
+        
+        async function loadProperty() {
+            currentPropertyId = localStorage.getItem('battetech_current_property');
+            if (!currentPropertyId) { window.location.href = 'admin-dashboard.html'; return; }
+            
+            if (window.supabaseDataLoaded) await window.supabaseDataLoaded;
+            const prop = propertiesDB[currentPropertyId];
+            if (!prop) { document.getElementById('propertyContent').innerHTML = '<div class="section-card"><p>Property not found.</p><a href="admin-dashboard.html">Back</a></div>'; return; }
+            
+            updatePropertyBackground(prop.propertyBackgroundImage || '');
+            
+            const vacant = getVacantCount(prop);
+            const occupied = getOccupiedCount(prop);
+            const financials = getFinancials(prop);
+            const feePercentage = prop.managementFee || 5;
+            
+            const currentMonthName = new Date().toLocaleString('default', { month: 'long' });
+            const currentYear = new Date().getFullYear();
+            
+            // Build rooms table
+            let roomsTableHtml = `
+                <div class="rooms-table-container">
+                    <table class="rooms-table">
+                        <thead>
+                            <tr>
+                                <th>Room #</th>
+                                <th>Rent (UGX)</th>
+                                <th>Due Date</th>
+                                <th>Move In Date</th>
+                                <th>Status</th>
+                                <th>Tenant Name</th>
+                                <th>Tenant Phone</th>
+                                <th>Payment</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            prop.units.forEach((unit, idx) => {
+                const statusClass = unit.vacant ? 'status-vacant' : (unit.paid ? 'status-paid' : 'status-occupied');
+                const statusText = unit.vacant ? 'VACANT' : (unit.paid ? 'PAID' : 'OCCUPIED');
+                const paymentText = !unit.vacant ? (unit.paid ? 'PAID' : 'UNPAID') : '-';
+                const moveInDateDisplay = unit.moveInDate ? new Date(unit.moveInDate).toLocaleDateString() : '-';
+                
+                roomsTableHtml += `
+                    <tr>
+                        <td><strong>${escapeHtml(unit.roomNumber)}</strong></td>
+                        <td>UGX ${(unit.rentAmount || 0).toLocaleString()}</td>
+                        <td>${unit.paymentDueDate || 1}th</td>
+                        <td>${moveInDateDisplay}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${unit.vacant ? '-' : escapeHtml(unit.tenant)}</td>
+                        <td>${unit.vacant ? '-' : unit.tenantPhone || '-'}</td>
+                        <td><span class="status-badge ${unit.paid ? 'status-paid' : 'status-unpaid'}">${paymentText}</span></td>
+                        <td>
+                            <button class="warning" onclick="openEditRoomModal(${idx})" style="padding:4px 10px;">Edit</button>
+                            ${!unit.vacant ? `<button class="success" onclick="openPaymentModal(${idx})" style="padding:4px 10px;">Pay</button>` : ''}
+                            <button class="success" onclick="viewPayments(${idx})" style="padding:4px 10px;">History</button>
+                            <button class="danger" onclick="deleteRoomConfirm(${idx})" style="padding:4px 10px;">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            roomsTableHtml += `
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bottom-actions">
+                    <button class="success" onclick="openAddRoomModal()">➕ Add Room</button>
+                    <button class="warning" onclick="openPropertyImageModal()">🖼️ Background Image</button>
+                    <button onclick="openBroadcastModal()" style="background:#25D366;">📱 WhatsApp Broadcast</button>
+                </div>
+            `;
+            
+            // Mobile card view
+            let mobileRoomsHtml = `<div class="rooms-mobile-list">`;
+            prop.units.forEach((unit, idx) => {
+                const statusClass = unit.vacant ? 'status-vacant' : (unit.paid ? 'status-paid' : 'status-occupied');
+                const statusText = unit.vacant ? 'VACANT' : (unit.paid ? 'PAID' : 'OCCUPIED');
+                const moveInDateDisplay = unit.moveInDate ? new Date(unit.moveInDate).toLocaleDateString() : '-';
+                
+                mobileRoomsHtml += `
+                    <div class="room-mobile-card">
+                        <div class="room-mobile-header">
+                            <span class="room-mobile-number">🏠 ${escapeHtml(unit.roomNumber)}</span>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="room-mobile-details">
+                            <div>💰 Rent: UGX ${(unit.rentAmount || 0).toLocaleString()}</div>
+                            <div>📅 Due: ${unit.paymentDueDate || 1}th</div>
+                            <div>📅 Move In: ${moveInDateDisplay}</div>
+                            <div>💳 Payment: ${unit.paid ? 'PAID' : 'UNPAID'}</div>
+                        </div>
+                        ${!unit.vacant ? `<div class="room-mobile-tenant">👤 ${escapeHtml(unit.tenant)} | 📞 ${unit.tenantPhone || '-'}</div>` : '<div class="room-mobile-tenant">🔓 Vacant Room</div>'}
+                        <div class="room-mobile-actions">
+                            <button class="warning" onclick="openEditRoomModal(${idx})">Edit</button>
+                            ${!unit.vacant ? `<button class="success" onclick="openPaymentModal(${idx})">Pay</button>` : ''}
+                            <button class="success" onclick="viewPayments(${idx})">History</button>
+                            <button class="danger" onclick="deleteRoomConfirm(${idx})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            mobileRoomsHtml += `<div class="bottom-actions" style="margin-top:1rem;">
+                    <button class="success" onclick="openAddRoomModal()">➕ Add Room</button>
+                    <button class="warning" onclick="openPropertyImageModal()">🖼️ Background Image</button>
+                    <button onclick="openBroadcastModal()" style="background:#25D366;">📱 WhatsApp Broadcast</button>
+                </div>`;
+            
+            let remittanceHtml = '';
+            if (financials.remittanceHistory && financials.remittanceHistory.length > 0) {
+                financials.remittanceHistory.forEach(r => { remittanceHtml += `<div class="remittance-item" onclick="alert('Amount: UGX ${r.amount.toLocaleString()}\nMethod: ${r.method}\nDate: ${new Date(r.date).toLocaleDateString()}')"><strong>UGX ${r.amount.toLocaleString()}</strong> - ${r.method}<br><small>${new Date(r.date).toLocaleDateString()}</small></div>`; });
+            } else { remittanceHtml = '<p>No remittances yet.</p>'; }
+            
+            let billsHtml = '';
+            if (financials.billsHistory && financials.billsHistory.length > 0) {
+                financials.billsHistory.forEach(bill => { billsHtml += `<div class="history-item" onclick="alert('${bill.billType}: UGX ${bill.amount.toLocaleString()}\n${bill.description || ''}\nDate: ${new Date(bill.date).toLocaleDateString()}')"><strong>${bill.billType}</strong>: UGX ${bill.amount.toLocaleString()}<br><small>${bill.description || ''}</small></div>`; });
+            } else { billsHtml = '<p>No bills recorded.</p>'; }
+            
+            let statementsHtml = '';
+            if (financials.statements && financials.statements.length > 0) {
+                financials.statements.forEach(stmt => { statementsHtml += `<div class="statement-item" onclick="viewStatementDetails('${stmt.id}')"><strong>${stmt.month}</strong><br><small>Collected: UGX ${stmt.summary.totalCollected.toLocaleString()} | Paid: ${stmt.summary.paidTenantsCount}</small></div>`; });
+            } else { statementsHtml = '<p>No statements generated.</p>'; }
+            
+            // Calculate current month overdue
+            const currentMonthOverdue = getCurrentMonthOverdue(prop);
+            
+            const html = `
+                <div class="property-header-card">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+                        <div>
+                            <div class="property-title">🏢 ${escapeHtml(prop.name)}</div>
+                            <div class="property-meta">📍 ${escapeHtml(prop.location)}</div>
+                            <div class="property-meta">👤 ${escapeHtml(prop.ownerName)} | 📞 ${prop.ownerPhone || '-'}</div>
+                            <div class="property-meta"><span style="background:#f59e0b; padding:2px 8px; border-radius:20px;">💰 Fee: ${feePercentage}%</span> <span style="background:#dc2626; padding:2px 8px; border-radius:20px;">⚠️ Penalty: ${prop.penaltyFee || 0}%</span></div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="warning" onclick="editPropertyDetails()">✏️ Edit Property</button>
+                            <button class="warning" onclick="editManagementFee()">💰 Edit Fee</button>
+                            <button class="warning" onclick="openBillModal()">🧾 Pay Bill</button>
+                            <button class="success" onclick="openRemitModal()">💰 Remit to Owner</button>
+                            <button class="success" onclick="openStatementModal()">📄 Month Statement</button>
+                            <button class="warning" onclick="openViewStatementsModal()">📋 History</button>
+                            <button class="danger" onclick="deletePropertyConfirm()">🗑 Delete</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-number">UGX ${(financials.currentMonthRentDue || 0).toLocaleString()}</div><div class="stat-label">Due This Month (${currentMonthName})</div></div>
+                    <div class="stat-card"><div class="stat-number">UGX ${(financials.currentMonthCollected || 0).toLocaleString()}</div><div class="stat-label">Collected This Month</div></div>
+                    <div class="stat-card"><div class="stat-number" style="color:#dc2626;">UGX ${(financials.currentMonthPending || 0).toLocaleString()}</div><div class="stat-label">Pending This Month</div></div>
+                    <div class="stat-card"><div class="stat-number" style="color:#f59e0b;">UGX ${currentMonthOverdue.toLocaleString()}</div><div class="stat-label">Overdue This Month</div></div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-number">UGX ${(financials.totalCollected || 0).toLocaleString()}</div><div class="stat-label">Total Collected</div></div>
+                    <div class="stat-card"><div class="stat-number">UGX ${(financials.totalFeeDeducted || 0).toLocaleString()}</div><div class="stat-label">Total Fee</div></div>
+                    <div class="stat-card"><div class="stat-number">UGX ${(financials.pendingRemittance || 0).toLocaleString()}</div><div class="stat-label">Pending Remit</div></div>
+                    <div class="stat-card"><div class="stat-number">UGX ${(financials.alreadyRemitted || 0).toLocaleString()}</div><div class="stat-label">Already Remitted</div></div>
+                </div>
+                
+                <div class="fee-summary">
+                    <strong>📊 Summary for ${currentMonthName} ${currentYear}</strong><br>
+                    Total Rent Due: UGX ${(financials.currentMonthRentDue || 0).toLocaleString()}<br>
+                    Collected: UGX ${(financials.currentMonthCollected || 0).toLocaleString()}<br>
+                    <span style="color:#dc2626;">Pending: UGX ${(financials.currentMonthPending || 0).toLocaleString()}</span><br>
+                    <span style="color:#f59e0b;">Overdue: UGX ${currentMonthOverdue.toLocaleString()}</span><br>
+                    <hr style="margin:0.3rem 0;">
+                    Fee (${feePercentage}%): <span style="color:#dc2626;">- UGX ${(financials.totalFeeDeducted || 0).toLocaleString()}</span><br>
+                    <strong>💰 Pending to Remit: UGX ${(financials.pendingRemittance || 0).toLocaleString()}</strong>
+                </div>
+                
+                <div class="section-card">
+                    <div class="section-title">📋 Rooms Management</div>
+                    ${roomsTableHtml}
+                    ${mobileRoomsHtml}
+                </div>
+                
+                <div class="section-card"><div class="section-title">📋 Remittance History</div>${remittanceHtml}</div>
+                <div class="section-card"><div class="section-title">🧾 Bills Paid</div>${billsHtml}</div>
+                <div class="section-card"><div class="section-title">📄 Past Statements</div>${statementsHtml}</div>
+                
+                <div class="section-card">
+                    <div class="section-title">💬 Chat with Owner</div>
+                    <div id="chatMessages" style="background:rgba(248,250,252,0.95); border-radius:14px; padding:0.8rem; max-height:200px; overflow-y:auto; margin-bottom:0.8rem;"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="adminMsgInput" placeholder="Type message...">
+                        <button class="success" onclick="sendAdminMessage()">Send</button>
+                        <input type="file" id="adminImageInput" accept="image/*" style="display:none;" onchange="sendAdminImage()">
+                        <label class="file-input-label" onclick="document.getElementById('adminImageInput').click()">📷</label>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('propertyContent').innerHTML = html;
+            loadChat();
+            if (chatRefreshInterval) clearInterval(chatRefreshInterval);
+            chatRefreshInterval = setInterval(loadChat, 5000);
+        }
+        
+        function getCurrentMonthOverdue(property) {
+            const currentYear = new Date().getFullYear();
+            const currentMonth = new Date().getMonth() + 1;
+            const monthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+            let overdue = 0;
+            for (let room of property.units) {
+                if (!room.vacant && room.payments[monthKey] && room.payments[monthKey].status !== 'paid') {
+                    overdue += room.payments[monthKey].balance;
+                }
+            }
+            return overdue;
+        }
+        
+        // [All remaining functions - openEditRoomModal, closeEditRoomModal, saveEditRoom, openAddRoomModal, closeAddRoomModal, addNewRoom, openPaymentModal, closePaymentModal, confirmPayment, openPenaltyModal, closePenaltyModal, confirmPenalty, viewPayments, loadChat, sendAdminMessage, sendAdminImage, openStatementModal, closeStatementModal, generateAndSendStatement, generateAndPrintStatement, openViewStatementsModal, closeViewStatementsModal, viewStatementDetails, openBillModal, closeBillModal, confirmBillPayment, openRemitModal, closeRemitModal, confirmRemit, editManagementFee, deleteRoomConfirm, deletePropertyConfirm, escapeHtml]
+        
+        function openEditRoomModal(roomIndex) {
+            currentEditRoomIndex = roomIndex;
+            const prop = propertiesDB[currentPropertyId];
+            const room = prop.units[roomIndex];
+            
+            document.getElementById('editRoomNumber').value = room.roomNumber || '';
+            document.getElementById('editRentAmount').value = room.rentAmount || 0;
+            document.getElementById('editRoomImage').value = room.roomImage || '';
+            document.getElementById('editPaymentDueDate').value = room.paymentDueDate || 1;
+            document.getElementById('editMoveInDate').value = room.moveInDate ? room.moveInDate.split('T')[0] : '';
+            document.getElementById('editVacantStatus').value = room.vacant ? 'vacant' : 'occupied';
+            document.getElementById('editTenantName').value = room.tenant || '';
+            document.getElementById('editTenantPhone').value = room.tenantPhone || '';
+            document.getElementById('editPaymentStatus').value = room.paid ? 'paid' : 'unpaid';
+            document.getElementById('editLateNote').value = room.lateNote || '';
+            document.getElementById('editRoomImagePreview').innerHTML = room.roomImage ? `<img src="${room.roomImage}" class="image-preview">` : '';
+            
+            document.getElementById('editRoomModal').style.display = 'flex';
+        }
+        
+        function closeEditRoomModal() { document.getElementById('editRoomModal').style.display = 'none'; currentEditRoomIndex = null; }
+        
+        async function saveEditRoom() {
+            if (currentEditRoomIndex === null) return;
+            const prop = propertiesDB[currentPropertyId];
+            const room = prop.units[currentEditRoomIndex];
+            
+            const newRoomNumber = document.getElementById('editRoomNumber').value;
+            const newRent = parseInt(document.getElementById('editRentAmount').value);
+            const newRoomImage = document.getElementById('editRoomImage').value;
+            const newDueDate = parseInt(document.getElementById('editPaymentDueDate').value) || 1;
+            const newMoveInDate = document.getElementById('editMoveInDate').value;
+            const newVacant = document.getElementById('editVacantStatus').value === 'vacant';
+            const newTenant = document.getElementById('editTenantName').value;
+            const newTenantPhone = document.getElementById('editTenantPhone').value;
+            const newPaid = document.getElementById('editPaymentStatus').value === 'paid';
+            const newLateNote = document.getElementById('editLateNote').value;
+            
+            room.roomNumber = newRoomNumber;
+            room.rentAmount = newRent;
+            room.roomImage = newRoomImage;
+            room.paymentDueDate = newDueDate;
+            if (newMoveInDate) room.moveInDate = newMoveInDate;
+            room.vacant = newVacant;
+            room.tenant = newTenant;
+            room.tenantPhone = newTenantPhone;
+            room.lateNote = newLateNote;
+            
+            if (newVacant) {
+                room.tenant = "";
+                room.tenantPhone = "";
+                room.paid = false;
+            } else if (newPaid !== room.paid) {
+                const feePercentage = prop.managementFee || 5;
+                if (newPaid) {
+                    const currentMonthKey = `${prop.currentYear}-${String(prop.currentMonth).padStart(2, '0')}`;
+                    if (room.payments[currentMonthKey]) {
+                        const payment = room.payments[currentMonthKey];
+                        const feeAmount = (room.rentAmount * feePercentage) / 100;
+                        payment.paid = room.rentAmount;
+                        payment.balance = 0;
+                        payment.status = "paid";
+                        payment.feeDeducted = feeAmount;
+                        payment.amountToOwner = room.rentAmount - feeAmount;
+                        payment.locked = true;
+                        prop.totalCollected += room.rentAmount;
+                        prop.totalFeeDeducted += feeAmount;
+                        prop.pendingRemittance += (room.rentAmount - feeAmount);
+                    }
+                    room.paid = true;
+                } else {
+                    const currentMonthKey = `${prop.currentYear}-${String(prop.currentMonth).padStart(2, '0')}`;
+                    if (room.payments[currentMonthKey] && room.payments[currentMonthKey].paid > 0) {
+                        const payment = room.payments[currentMonthKey];
+                        prop.totalCollected -= room.rentAmount;
+                        prop.totalFeeDeducted -= payment.feeDeducted;
+                        prop.pendingRemittance -= payment.amountToOwner;
+                        payment.paid = 0;
+                        payment.balance = room.rentAmount;
+                        payment.status = "unpaid";
+                        payment.feeDeducted = 0;
+                        payment.amountToOwner = 0;
+                        payment.locked = false;
+                    }
+                    room.paid = false;
+                }
+            }
+            
+            await saveAllData();
+            closeEditRoomModal();
+            await loadProperty();
+            alert('✅ Room updated!');
+        }
+        
+        function openAddRoomModal() { document.getElementById('addRoomModal').style.display = 'flex'; }
+        function closeAddRoomModal() { 
+            document.getElementById('addRoomModal').style.display = 'none';
+            document.getElementById('roomNumber').value = '';
+            document.getElementById('roomRent').value = '';
+            document.getElementById('paymentDueDate').value = '1';
+            document.getElementById('moveInDate').value = '';
+            document.getElementById('roomImage').value = '';
+            document.getElementById('roomImagePreview').innerHTML = '';
+        }
+        
+        async function addNewRoom() {
+            const roomNumber = document.getElementById('roomNumber').value.trim();
+            const rentAmount = parseInt(document.getElementById('roomRent').value);
+            const paymentDueDate = parseInt(document.getElementById('paymentDueDate').value) || 1;
+            const moveInDate = document.getElementById('moveInDate').value;
+            const roomImage = document.getElementById('roomImage').value.trim();
+            if (!roomNumber) { alert('Enter Room Number'); return; }
+            if (!rentAmount || rentAmount <= 0) { alert('Enter valid Rent'); return; }
+            await addRoom(currentPropertyId, { roomNumber, rentAmount, roomImage, paymentDueDate, moveInDate });
+            closeAddRoomModal();
+            await loadProperty();
+            alert(`✅ Room "${roomNumber}" added!`);
+        }
+        
+        function openPaymentModal(roomIndex) {
+            const prop = propertiesDB[currentPropertyId];
+            const room = prop.units[roomIndex];
+            if (room.vacant) { alert('Cannot record payment for vacant room.'); return; }
+            currentPaymentRoom = room;
+            currentPaymentRoomIndex = roomIndex;
+            document.getElementById('paymentRoomName').innerText = room.roomNumber;
+            document.getElementById('paymentTenantName').innerText = room.tenant;
+            document.getElementById('paymentAmount').value = '';
+            document.getElementById('paymentMethod').value = 'Cash';
+            document.getElementById('paymentReference').value = '';
+            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+        function closePaymentModal() { document.getElementById('paymentModal').style.display = 'none'; }
+        
+        async function confirmPayment() {
+            const amount = parseInt(document.getElementById('paymentAmount').value);
+            const method = document.getElementById('paymentMethod').value;
+            const reference = document.getElementById('paymentReference').value;
+            const paidDate = document.getElementById('paymentDate').value;
+            if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
+            if (!confirm(`Record UGX ${amount.toLocaleString()} for ${currentPaymentRoom.tenant}?`)) return;
+            const result = await recordPayment(currentPropertyId, currentPaymentRoomIndex, amount, method, reference, paidDate);
+            if (result && result.success) {
+                alert(`✅ Payment recorded!\nPaid: UGX ${result.totalPaid.toLocaleString()}\nFee: UGX ${result.totalFee.toLocaleString()}\nTo Owner: UGX ${result.totalToOwner.toLocaleString()}`);
+                closePaymentModal();
+                await loadProperty();
+            } else { alert('Failed'); }
+        }
+        
+        function openPenaltyModal(roomIndex) {
+            const prop = propertiesDB[currentPropertyId];
+            const room = prop.units[roomIndex];
+            if (room.vacant) { alert('Cannot add penalty to vacant room.'); return; }
+            currentPenaltyRoomIndex = roomIndex;
+            document.getElementById('penaltyRoomName').innerText = room.roomNumber;
+            document.getElementById('penaltyTenantName').innerText = room.tenant;
+            document.getElementById('penaltyMonth').value = new Date().toISOString().slice(0,7);
+            document.getElementById('penaltyAmount').value = '';
+            document.getElementById('penaltyReason').value = '';
+            document.getElementById('penaltyModal').style.display = 'flex';
+        }
+        function closePenaltyModal() { document.getElementById('penaltyModal').style.display = 'none'; }
+        
+        async function confirmPenalty() {
+            const month = document.getElementById('penaltyMonth').value;
+            const amount = parseInt(document.getElementById('penaltyAmount').value);
+            const reason = document.getElementById('penaltyReason').value;
+            if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
+            await addPenalty(currentPropertyId, currentPenaltyRoomIndex, month, amount, reason);
+            alert(`✅ Penalty UGX ${amount.toLocaleString()} added`);
+            closePenaltyModal();
+            await loadProperty();
+        }
+        
+        function viewPayments(roomIndex) {
+            const prop = propertiesDB[currentPropertyId];
+            const room = prop.units[roomIndex];
+            let paymentTable = `<div style="overflow-x:auto;"><table class="payment-table"><thead><tr><th>Month</th><th>Due</th><th>Paid</th><th>Balance</th><th>Fee</th><th>To Owner</th><th>Penalty</th><th>Status</th></tr></thead><tbody>`;
+            const months = Object.keys(room.payments).sort();
+            for (let month of months) {
+                const p = room.payments[month];
+                let statusClass = '';
+                if (p.status === 'paid') statusClass = 'status-paid-bg';
+                else if (p.status === 'partial') statusClass = 'status-partial-bg';
+                else statusClass = 'status-unpaid-bg';
+                paymentTable += `<tr class="${statusClass}"><td>${month}</td><td>UGX ${p.rentDue.toLocaleString()}</td><td>UGX ${p.paid.toLocaleString()}</td><td>UGX ${p.balance.toLocaleString()}</td><td>UGX ${p.feeDeducted.toLocaleString()}</td><td>UGX ${p.amountToOwner.toLocaleString()}</td><td>UGX ${(p.penaltyAmount || 0).toLocaleString()}</td><td>${p.status.toUpperCase()}</td></tr>`;
+            }
+            paymentTable += `</tbody></table></div>`;
+            const modalHtml = `<div id="yearlyModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:flex; align-items:center; justify-content:center;"><div style="background:white; max-width:95%; width:95%; border-radius:16px; padding:1rem; max-height:80%; overflow-y:auto;"><h3 style="margin-bottom:1rem;">📅 Payment History - ${room.roomNumber}</h3>${paymentTable}<button onclick="document.getElementById('yearlyModal').remove()" style="margin-top:1rem;">Close</button></div></div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function loadChat() {
+            const chatContainer = document.getElementById('chatMessages');
+            if (!chatContainer) return;
+            const messages = getMessages(currentPropertyId);
+            if (messages.length === 0) { chatContainer.innerHTML = '<p style="text-align:center;">No messages yet.</p>'; return; }
+            let html = '';
+            messages.slice(-20).forEach(msg => {
+                const isAdmin = msg.sender === 'admin';
+                html += `<div class="chat-message ${isAdmin ? 'owner' : 'admin'}">
+                            <small>${isAdmin ? 'You' : 'Owner'} • ${new Date(msg.timestamp).toLocaleString()}</small>
+                            <div>${msg.message}</div>
+                            ${msg.image ? `<img src="${msg.image}">` : ''}
+                         </div>`;
+            });
+            chatContainer.innerHTML = html;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function sendAdminMessage() {
+            const input = document.getElementById('adminMsgInput');
+            const message = input.value.trim();
+            if (!message) return;
+            sendMessage(currentPropertyId, 'admin', message, null);
+            input.value = '';
+            loadChat();
+        }
+        
+        function sendAdminImage() {
+            const fileInput = document.getElementById('adminImageInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                sendMessage(currentPropertyId, 'admin', '(Image)', e.target.result);
+                loadChat();
+            };
+            reader.readAsDataURL(file);
+            fileInput.value = '';
+        }
+        
+        function openStatementModal() {
+            document.getElementById('statementMonth').value = new Date().toISOString().slice(0,7);
+            document.getElementById('ownerWhatsApp').value = propertiesDB[currentPropertyId]?.ownerPhone || '';
+            document.getElementById('statementModal').style.display = 'flex';
+        }
+        function closeStatementModal() { document.getElementById('statementModal').style.display = 'none'; }
+        
+        function generateAndSendStatement() {
+            const monthYear = document.getElementById('statementMonth').value;
+            if (!monthYear) { alert('Select month/year'); return; }
+            const [year, month] = monthYear.split('-');
+            const whatsapp = document.getElementById('ownerWhatsApp').value;
+            const statement = generateMonthlyStatement(currentPropertyId, parseInt(month), parseInt(year));
+            if (!statement) { alert('Failed'); return; }
+            let message = `🏢 BATTETECH\n📄 STATEMENT - ${statement.month}\n\n💰 SUMMARY\nTotal Collected: UGX ${statement.summary.totalCollected.toLocaleString()}\nFee: UGX ${statement.summary.totalFeeDeducted.toLocaleString()}\nTo Owner: UGX ${statement.summary.totalToOwner.toLocaleString()}\n\n✅ PAID:\n`;
+            statement.paidTenants.forEach(t => { message += `• ${t.name} (${t.room}): UGX ${t.amount.toLocaleString()}\n`; });
+            message += `\n❌ UNPAID:\n`;
+            statement.unpaidTenants.forEach(t => { message += `• ${t.name} (${t.room}): UGX ${t.balance.toLocaleString()}\n`; });
+            const encodedMsg = encodeURIComponent(message);
+            window.open(`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodedMsg}`, '_blank');
+            if (confirm(`Start new month for ${monthYear}?`)) {
+                const newDate = new Date();
+                resetMonth(currentPropertyId, newDate.getFullYear(), newDate.getMonth() + 1);
+                alert(`✅ New month started!`);
+                loadProperty();
+            }
+            closeStatementModal();
+        }
+        
+        function generateAndPrintStatement() {
+            const monthYear = document.getElementById('statementMonth').value;
+            if (!monthYear) { alert('Select month/year'); return; }
+            const [year, month] = monthYear.split('-');
+            const statement = generateMonthlyStatement(currentPropertyId, parseInt(month), parseInt(year));
+            if (!statement) { alert('Failed'); return; }
+            let printHtml = `<div style="padding:20px;"><h2 style="text-align:center;">BATTETECH</h2><h3 style="text-align:center;">Monthly Statement - ${statement.month}</h3><hr><p>Total Collected: UGX ${statement.summary.totalCollected.toLocaleString()}</p><p>Fee: UGX ${statement.summary.totalFeeDeducted.toLocaleString()}</p><p><strong>To Owner: UGX ${statement.summary.totalToOwner.toLocaleString()}</strong></p><h4>Paid Tenants:</h4><ul>`;
+            statement.paidTenants.forEach(t => { printHtml += `<li>${t.name} (${t.room}): UGX ${t.amount.toLocaleString()}</li>`; });
+            printHtml += `</ul><h4>Unpaid Tenants:</h4><ul>`;
+            statement.unpaidTenants.forEach(t => { printHtml += `<li>${t.name} (${t.room}): UGX ${t.balance.toLocaleString()}</li>`; });
+            printHtml += `</ul><p>Thank you!</p></div>`;
+            const printArea = document.getElementById('statementPrintArea');
+            printArea.innerHTML = printHtml;
+            window.print();
+            printArea.innerHTML = '';
+            if (confirm(`Start new month for ${monthYear}?`)) {
+                const newDate = new Date();
+                resetMonth(currentPropertyId, newDate.getFullYear(), newDate.getMonth() + 1);
+                alert(`✅ New month started!`);
+                loadProperty();
+            }
+            closeStatementModal();
+        }
+        
+        function openViewStatementsModal() {
+            const financials = getFinancials(propertiesDB[currentPropertyId]);
+            const statements = financials.statements || [];
+            const container = document.getElementById('statementsList');
+            if (statements.length === 0) { container.innerHTML = '<p>No statements generated yet.</p>'; }
+            else {
+                let html = '';
+                statements.forEach(stmt => {
+                    html += `<div class="statement-item" onclick="viewStatementDetails('${stmt.id}')"><strong>${stmt.month}</strong><br><small>${new Date(stmt.generatedDate).toLocaleDateString()}</small></div>`;
+                });
+                container.innerHTML = html;
+            }
+            document.getElementById('viewStatementsModal').style.display = 'flex';
+        }
+        function closeViewStatementsModal() { document.getElementById('viewStatementsModal').style.display = 'none'; }
+        
+        function viewStatementDetails(statementId) {
+            const financials = getFinancials(propertiesDB[currentPropertyId]);
+            const statement = financials.statements.find(s => s.id == statementId);
+            if (!statement) return;
+            let details = `<div style="padding:10px;"><h3>Statement - ${statement.month}</h3><p><strong>Total Collected:</strong> UGX ${statement.summary.totalCollected.toLocaleString()}</p><p><strong>Fee:</strong> UGX ${statement.summary.totalFeeDeducted.toLocaleString()}</p><p><strong>To Owner:</strong> UGX ${statement.summary.totalToOwner.toLocaleString()}</p><h4>Paid:</h4><ul>`;
+            statement.paidTenants.forEach(t => { details += `<li>${t.name} (${t.room}): UGX ${t.amount.toLocaleString()}</li>`; });
+            details += `</ul><h4>Unpaid:</h4><ul>`;
+            statement.unpaidTenants.forEach(t => { details += `<li>${t.name} (${t.room}): UGX ${t.balance.toLocaleString()}</li>`; });
+            details += `</ul><button onclick="this.parentElement.remove()">Close</button></div>`;
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:3000;';
+            modal.innerHTML = `<div style="background:white; width:90%; max-width:400px; border-radius:16px; padding:1rem; max-height:80%; overflow-y:auto;">${details}</div>`;
+            document.body.appendChild(modal);
+            modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+        }
+        
+        function openBillModal() { document.getElementById('billModal').style.display = 'flex'; }
+        function closeBillModal() { document.getElementById('billModal').style.display = 'none'; }
+        
+        async function confirmBillPayment() {
+            const billType = document.getElementById('billType').value;
+            const amount = parseInt(document.getElementById('billAmount').value);
+            const description = document.getElementById('billDescription').value.trim();
+            const receiptImage = document.getElementById('billReceipt').value;
+            if (!amount || amount <= 0) { alert('Enter amount'); return; }
+            await addBillPayment(currentPropertyId, billType, amount, receiptImage, description);
+            alert(`✅ ${billType} bill UGX ${amount.toLocaleString()} recorded`);
+            closeBillModal();
+            await loadProperty();
+        }
+        
+        function openRemitModal() {
+            const prop = propertiesDB[currentPropertyId];
+            const pending = prop.pendingRemittance || 0;
+            if (pending <= 0) { alert('No pending remittance'); return; }
+            document.getElementById('pendingRemitAmount').innerHTML = `UGX ${pending.toLocaleString()}`;
+            document.getElementById('remitAmount').value = pending;
+            document.getElementById('remitMethod').value = 'Mobile Money';
+            document.getElementById('remitReference').value = '';
+            document.getElementById('remitModal').style.display = 'flex';
+        }
+        function closeRemitModal() { document.getElementById('remitModal').style.display = 'none'; }
+        
+        async function confirmRemit() {
+            const amount = parseInt(document.getElementById('remitAmount').value);
+            const method = document.getElementById('remitMethod').value;
+            const reference = document.getElementById('remitReference').value.trim();
+            if (!amount || amount <= 0) { alert('Enter amount'); return; }
+            const ok = await remitToOwner(currentPropertyId, amount, method, reference);
+            if (ok) {
+                alert(`✅ UGX ${amount.toLocaleString()} remitted`);
+                closeRemitModal();
+                await loadProperty();
+            } else { alert('Failed'); }
+        }
+        
+        async function editManagementFee() {
+            const prop = propertiesDB[currentPropertyId];
+            const newFee = prompt(`Current Fee: ${prop.managementFee}%\nNew fee:`, prop.managementFee);
+            if (newFee !== null && !isNaN(parseFloat(newFee))) {
+                prop.managementFee = parseFloat(newFee);
+                await saveAllData();
+                await loadProperty();
+                alert(`✅ Fee updated to ${newFee}%`);
+            }
+            const newPenalty = prompt(`Current Penalty: ${prop.penaltyFee || 0}%\nNew penalty:`, prop.penaltyFee || 0);
+            if (newPenalty !== null && !isNaN(parseFloat(newPenalty))) {
+                prop.penaltyFee = parseFloat(newPenalty);
+                await saveAllData();
+                await loadProperty();
+                alert(`✅ Penalty updated to ${newPenalty}%`);
+            }
+        }
+        
+        async function deleteRoomConfirm(roomIndex) {
+            if (confirm('Delete this room permanently?')) {
+                await deleteRoom(currentPropertyId, roomIndex);
+                await loadProperty();
+                alert('✅ Room deleted');
+            }
+        }
+        
+        async function deletePropertyConfirm() {
+            if (confirm('DELETE property permanently? This cannot be undone!')) {
+                await deleteProperty(currentPropertyId);
+                localStorage.removeItem('battetech_current_property');
+                window.location.href = 'admin-dashboard.html';
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        window.addEventListener('load', async () => {
+            await window.supabaseDataLoaded;
+            if (checkAdminSession()) await loadProperty();
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-data.js"></script>
+</body>
+</html>

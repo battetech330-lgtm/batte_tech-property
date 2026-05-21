@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Admin Login - BATTETECH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a2b4e 0%, #1a4a7a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-login-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 32px;
+            width: 400px;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .admin-login-card h1 {
+            color: #0a2b4e;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-login-card .sub {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .admin-login-card input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+        }
+
+        .admin-login-card button {
+            width: 100%;
+            background: #0a2b4e;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .admin-login-card button:hover {
+            background: #1a4a7a;
+        }
+
+        .error-msg {
+            color: #dc2626;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .back-link:hover {
+            color: #0a2b4e;
+        }
+
+        .setup-note {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            font-size: 0.7rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-login-card">
+        <h1>🔐 ADMIN PORTAL</h1>
+        <div class="sub">BATTETECH Property Consultants</div>
+        
+        <input type="password" id="adminPassword" placeholder="Enter admin password">
+        <button onclick="doAdminLogin()">Access Admin Panel</button>
+        <div id="errorMsg" class="error-msg"></div>
+        
+        <a href="index.html" class="back-link">← Back to Homepage</a>
+        
+        <div class="setup-note">
+            ⚠️ First time? Set your admin password below.
+        </div>
+    </div>
+
+    <script>
+        // Check if admin password is already set
+        let ADMIN_PASSWORD = localStorage.getItem('battetech_admin_password');
+        
+        // If no password set, prompt to create one
+        if (!ADMIN_PASSWORD) {
+            const newPassword = prompt("🔐 FIRST TIME SETUP\n\nCreate your admin password (keep it safe!):");
+            if (newPassword && newPassword.length >= 4) {
+                localStorage.setItem('battetech_admin_password', newPassword);
+                ADMIN_PASSWORD = newPassword;
+                alert("✅ Admin password created! Use it to login next time.");
+            } else if (newPassword) {
+                alert("Password must be at least 4 characters. Refresh to try again.");
+            }
+        }
+        
+        function doAdminLogin() {
+            const enteredPassword = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('errorMsg');
+            
+            if (!ADMIN_PASSWORD) {
+                errorDiv.innerHTML = "❌ No admin password set. Please refresh and create one.";
+                return;
+            }
+            
+            if (enteredPassword === ADMIN_PASSWORD) {
+                // Store admin session
+                localStorage.setItem('battetech_admin_logged_in', 'true');
+                localStorage.setItem('battetech_admin_login_time', Date.now());
+                window.location.href = 'admin-panel.html';
+            } else {
+                errorDiv.innerHTML = "❌ Incorrect password. Access denied.";
+            }
+        }
+        
+        // Check if already logged in (from another tab)
+        if (localStorage.getItem('battetech_admin_logged_in') === 'true') {
+            const loginTime = parseInt(localStorage.getItem('battetech_admin_login_time') || '0');
+            // Session expires after 24 hours
+            if (Date.now() - loginTime < 86400000) {
+                window.location.href = 'admin-panel.html';
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-data.js"></script>
+</body>
+</html>
