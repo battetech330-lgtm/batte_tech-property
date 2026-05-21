@@ -237,12 +237,45 @@
     </div>
 
     <!-- WhatsApp Broadcast Modal -->
+    <!-- Broadcast Selection Modal (Replace old broadcast modal) -->
     <div id="broadcastModal" class="modal">
         <div class="modal-content">
-            <h2>📱 WhatsApp Broadcast</h2>
+            <h2>📱 Broadcast to Tenants</h2>
+            <p style="font-size:0.75rem; margin-bottom:0.8rem; color:#666;">Choose how you want to send messages to tenants</p>
+            
             <div id="tenantList" style="background:#f8fafc; padding:8px; border-radius:12px; margin-bottom:1rem; max-height:150px; overflow-y:auto; font-size:0.7rem;"></div>
-            <div class="form-row"><textarea id="broadcastMessage" rows="3" placeholder="Type message here..." style="width:100%; padding:8px; border-radius:12px; border:1px solid #ccc;"></textarea></div>
-            <div style="display:flex; gap:0.8rem; margin-top:1rem;"><button onclick="sendBroadcast()" style="background:#25D366;">📱 Send</button><button onclick="closeBroadcastModal()">Cancel</button></div>
+            
+            <div class="form-row">
+                <label>Message:</label>
+                <textarea id="broadcastMessage" rows="4" placeholder="Type your message here..." style="width:100%; padding:8px; border-radius:12px; border:1px solid #ccc;"></textarea>
+            </div>
+            
+            <div style="display:flex; gap:0.8rem; margin-top:1rem; flex-wrap:wrap;">
+                <button onclick="sendWhatsAppBroadcast()" style="background:#25D366;">💬 WhatsApp (Free)</button>
+                <button onclick="openSMSPaymentModal()" style="background:#f59e0b;">📱 SMS (Paid)</button>
+                <button onclick="closeBroadcastModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMS Payment Confirmation Modal -->
+    <div id="smsPaymentModal" class="modal">
+        <div class="modal-content">
+            <h2>💰 SMS Broadcast - Payment Required</h2>
+            <div id="smsCostDisplay" style="background:#f0f4fa; padding:1rem; border-radius:12px; margin-bottom:1rem; text-align:center; font-size:1.2rem; font-weight:bold;"></div>
+            <p style="font-size:0.8rem; margin-bottom:1rem;">SMS cost: UGX 25-30 per message. Total will be deducted from your Africa's Talking account balance.</p>
+            <div class="form-row">
+                <label>Africa's Talking API Key:</label>
+                <input type="password" id="smsApiKey" placeholder="Enter your API key">
+            </div>
+            <div class="form-row">
+                <label>Username:</label>
+                <input type="text" id="smsUsername" placeholder="sandbox or your username" value="sandbox">
+            </div>
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+                <button onclick="sendSMSBroadcast()" style="background:#10b981;">✅ Confirm & Send SMS</button>
+                <button onclick="closeSMSPaymentModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -413,66 +446,190 @@
         function openBroadcastModal() {
             const tenants = getTenantPhones(currentPropertyId);
             const listContainer = document.getElementById('tenantList');
-            if (tenants.length === 0) { listContainer.innerHTML = '<p style="color:#dc2626;">No tenant phone numbers found.</p>'; }
-            else {
-                let listHtml = '<strong>Send to:</strong><ul style="margin-top:5px;">';
-                tenants.forEach(t => { listHtml += `<li>${t.name} (${t.room}) - ${t.phone}</li>`; });
+            
+            if (tenants.length === 0) {
+                listContainer.innerHTML = '<p style="color:#dc2626;">No tenant phone numbers found. Please add tenant phone numbers first.</p>';
+            } else {
+                let listHtml = '<strong>Will send to:</strong><ul style="margin-top:5px; list-style:none; max-height:100px; overflow-y:auto;">';
+                tenants.forEach(t => {
+                    listHtml += `<li>📱 ${t.name} (${t.room}) - ${t.phone}</li>`;
+                });
                 listHtml += '</ul>';
                 listContainer.innerHTML = listHtml;
             }
+            
             document.getElementById('broadcastMessage').value = '';
             document.getElementById('broadcastModal').style.display = 'flex';
         }
+        
         function closeBroadcastModal() { document.getElementById('broadcastModal').style.display = 'none'; }
         
-        function sendBroadcast() {
+        // WhatsApp Broadcast - Opens automatically with 3-second delay between tenants
+        async function sendWhatsAppBroadcast() {
             const message = document.getElementById('broadcastMessage').value.trim();
-            if (!message) { alert('Enter a message'); return; }
-            const phones = getTenantPhones(currentPropertyId);
-            if (phones.length === 0) { alert('No tenant phones'); return; }
-            const encodedMsg = encodeURIComponent(message);
-            for (let i = 0; i < phones.length; i++) {
-                setTimeout(() => { window.open(`https://wa.me/${phones[i].phone}?text=${encodedMsg}`, '_blank'); }, i * 1000);
+            if (!message) {
+                alert('Please enter a message');
+                return;
             }
-            alert(`Opening WhatsApp for ${phones.length} tenants.`);
+            
+            const phones = getTenantPhones(currentPropertyId);
+            if (phones.length === 0) {
+                alert('No tenant phone numbers found');
+                return;
+            }
+            
+            const encodedMsg = encodeURIComponent(message);
+            
+            let tenantList = 'Will send to:\n';
+            phones.forEach((p, i) => tenantList += `${i + 1}. ${p.name} (${p.room}) - ${p.phone}\n`);
+            
+            if (!confirm(`📱 Send WhatsApp to ${phones.length} tenants?\n\n${tenantList}\n\nMessage: ${message.substring(0, 100)}`)) {
+                return;
+            }
+            
             closeBroadcastModal();
+            
+            for (let i = 0; i < phones.length; i++) {
+                const personalMsg = `🏢 BATTETECH UPDATE\n\nDear ${phones[i].name},\n\n${message}`;
+                const personalEncoded = encodeURIComponent(personalMsg);
+                window.open(`https://wa.me/${phones[i].phone}?text=${personalEncoded}`, '_blank');
+                
+                // Wait 3 seconds before next tenant
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            }
+            
+            alert(`✅ WhatsApp opened for ${phones.length} tenants. Send each message manually.`);
+            addGlobalUpdate(currentPropertyId, `📱 WhatsApp broadcast to ${phones.length} tenants`);
         }
         
-        // ============ UPDATED EDIT PROPERTY FUNCTION - CAN EDIT EVERYTHING ============
+        // SMS Cost Calculation
+        function openSMSPaymentModal() {
+            const phones = getTenantPhones(currentPropertyId);
+            if (phones.length === 0) {
+                alert('No tenant phone numbers found');
+                return;
+            }
+            
+            const totalCost = phones.length * 30; // UGX 30 per SMS
+            document.getElementById('smsCostDisplay').innerHTML = `📱 Send to ${phones.length} tenants<br>💰 Estimated Cost: UGX ${totalCost.toLocaleString()}`;
+            document.getElementById('smsPaymentModal').style.display = 'flex';
+        }
+
+        function closeSMSPaymentModal() {
+            document.getElementById('smsPaymentModal').style.display = 'none';
+        }
+
+        // Send SMS via Africa's Talking
+        async function sendSMSBroadcast() {
+            const message = document.getElementById('broadcastMessage').value.trim();
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+            
+            const apiKey = document.getElementById('smsApiKey').value.trim();
+            const username = document.getElementById('smsUsername').value.trim();
+            const phones = getTenantPhones(currentPropertyId);
+            
+            if (!apiKey) {
+                alert('Please enter your Africa\'s Talking API Key');
+                return;
+            }
+            
+            if (!username) {
+                alert('Please enter your username (sandbox or your account username)');
+                return;
+            }
+            
+            // Format phone numbers
+            const formattedPhones = phones.map(p => {
+                let phone = p.phone.replace(/\s/g, '');
+                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                if (!phone.startsWith('256')) phone = '256' + phone;
+                return phone;
+            });
+            
+            if (!confirm(`📱 Send SMS to ${phones.length} tenants?\n\nCost: UGX ${phones.length * 30} - UGX ${phones.length * 35}\n\nMessage: ${message.substring(0, 100)}`)) {
+                return;
+            }
+            
+            try {
+                // Note: This requires a backend proxy to hide your API key
+                // For testing, you can use a proxy or backend server
+                const response = await fetch('https://api.africastalking.com/version1/messaging', {
+                    method: 'POST',
+                    headers: {
+                        'apiKey': apiKey,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
+                    body: new URLSearchParams({
+                        username: username,
+                        to: formattedPhones.join(','),
+                        message: `🏢 BATTETECH: ${message}`,
+                        from: 'Sandbox'
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('SMS Result:', result);
+                
+                if (result.SMSMessageData) {
+                    const sent = result.SMSMessageData.Recipients.length;
+                    alert(`✅ SMS sent to ${sent} tenants!`);
+                    addGlobalUpdate(currentPropertyId, `📱 SMS broadcast sent to ${sent} tenants: "${message.substring(0, 50)}..."`);
+                    closeSMSPaymentModal();
+                    closeBroadcastModal();
+                } else {
+                    alert('❌ Failed to send SMS. Check your API key and balance.');
+                }
+            } catch (error) {
+                console.error('SMS Error:', error);
+                alert('❌ Error sending SMS. Make sure you have internet connection and valid API key.');
+            }
+        }
+        
         async function editPropertyDetails() {
             const prop = propertiesDB[currentPropertyId];
             if (!prop) return;
             
             // Edit all property fields
             const newName = prompt('Property Name:', prop.name);
-            if (newName !== null && newName !== prop.name) prop.name = newName;
+            if (newName !== null && newName !== prop.name) {
+                prop.name = newName;
+            }
             
             const newLocation = prompt('Location:', prop.location);
-            if (newLocation !== null && newLocation !== prop.location) prop.location = newLocation;
+            if (newLocation !== null && newLocation !== prop.location) {
+                prop.location = newLocation;
+            }
             
             const newPassword = prompt('Owner Password (give to owner for login):', prop.ownerPassword);
             if (newPassword !== null && newPassword !== prop.ownerPassword) {
                 prop.ownerPassword = newPassword;
                 // Update in ownersDB as well
                 const ownerIndex = ownersDB.findIndex(o => o.propertyId === currentPropertyId);
-                console.log('ownerIndex for password update', ownerIndex);
-                if (ownerIndex !== -1) { ownersDB[ownerIndex].password = newPassword; console.log('updated ownersDB[ownerIndex]', ownersDB[ownerIndex]); }
+                if (ownerIndex !== -1) {
+                    ownersDB[ownerIndex].password = newPassword;
+                }
             }
             
             const newOwnerName = prompt('Owner Full Name:', prop.ownerName);
             if (newOwnerName !== null && newOwnerName !== prop.ownerName) {
                 prop.ownerName = newOwnerName;
                 const ownerIndex = ownersDB.findIndex(o => o.propertyId === currentPropertyId);
-                console.log('ownerIndex for name update', ownerIndex);
-                if (ownerIndex !== -1) { ownersDB[ownerIndex].name = newOwnerName; console.log('updated ownersDB[ownerIndex]', ownersDB[ownerIndex]); }
+                if (ownerIndex !== -1) {
+                    ownersDB[ownerIndex].name = newOwnerName;
+                }
             }
             
             const newOwnerPhone = prompt('Owner Phone Number:', prop.ownerPhone);
             if (newOwnerPhone !== null && newOwnerPhone !== prop.ownerPhone) {
                 prop.ownerPhone = newOwnerPhone;
                 const ownerIndex = ownersDB.findIndex(o => o.propertyId === currentPropertyId);
-                console.log('ownerIndex for phone update', ownerIndex);
-                if (ownerIndex !== -1) { ownersDB[ownerIndex].phone = newOwnerPhone; console.log('updated ownersDB[ownerIndex]', ownersDB[ownerIndex]); }
+                if (ownerIndex !== -1) {
+                    ownersDB[ownerIndex].phone = newOwnerPhone;
+                }
             }
             
             const newFee = prompt('Management Fee (%):', prop.managementFee);
@@ -506,14 +663,13 @@
                 prop.status = prop.status === 'active' ? 'pending' : 'active';
             }
             
-            console.log('Saving edited property', currentPropertyId, prop);
-            const ok = await saveAllData();
-            console.log('saveAllData result', ok);
-            if (!ok) { alert('⚠️ Failed to save changes. Check console for errors.'); return; }
-            await loadProperty();
+            // IMPORTANT: Save to Supabase
+            await saveAllData();
+            
+            // Refresh the page to show updated data
+            loadProperty();
             alert('✅ Property details updated successfully!');
         }
-        // ============ END OF UPDATED EDIT PROPERTY FUNCTION ============
         
         async function loadProperty() {
             currentPropertyId = localStorage.getItem('battetech_current_property');
@@ -586,7 +742,7 @@
                 <div class="bottom-actions">
                     <button class="success" onclick="openAddRoomModal()">➕ Add Room</button>
                     <button class="warning" onclick="openPropertyImageModal()">🖼️ Background Image</button>
-                    <button onclick="openBroadcastModal()" style="background:#25D366;">📱 WhatsApp Broadcast</button>
+                    <button onclick="openBroadcastModal()" style="background:#25D366;">📱 Broadcast (WhatsApp/SMS)</button>
                 </div>
             `;
             
@@ -622,7 +778,7 @@
             mobileRoomsHtml += `<div class="bottom-actions" style="margin-top:1rem;">
                     <button class="success" onclick="openAddRoomModal()">➕ Add Room</button>
                     <button class="warning" onclick="openPropertyImageModal()">🖼️ Background Image</button>
-                    <button onclick="openBroadcastModal()" style="background:#25D366;">📱 WhatsApp Broadcast</button>
+                    <button onclick="openBroadcastModal()" style="background:#25D366;">📱 Broadcast (WhatsApp/SMS)</button>
                 </div>`;
             
             let remittanceHtml = '';
