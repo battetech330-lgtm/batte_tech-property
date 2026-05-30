@@ -4,360 +4,578 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Login - BATTETECH</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            min-height: 100vh; 
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
+            position: relative;
+            overflow-x: hidden;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0a2b4e 0%, #1a4a7a 100%);
-            display: flex;
-            flex-direction: column;
+        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.03)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x bottom;
+            background-size: 1440px 80px;
+            opacity: 0.5;
+            pointer-events: none;
         }
-
-        /* Header */
-        header {
+        
+        /* Slideshow Background */
+        .slideshow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        
+        .slide.active {
+            opacity: 1;
+        }
+        
+        .overlay-dark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        
+        header { 
+            position: relative;
+            z-index: 2;
             background: rgba(10, 43, 78, 0.95);
             backdrop-filter: blur(10px);
             padding: 1rem;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.8rem;
+        
+        .logo-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.8rem; 
         }
-
-        .logo-icon {
-            font-size: 2rem;
-            background: white;
-            color: #0a2b4e;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
+        
+        .logo-icon { 
+            font-size: 2rem; 
+            background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%);
+            color: #0a2b4e; 
+            width: 50px; 
+            height: 50px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-
-        .logo-text h1 {
-            font-size: 1.5rem;
+        
+        .logo-text h1 { 
+            font-size: 1.5rem; 
             letter-spacing: 2px;
-            color: white;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #bbd4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
-        .logo-text span {
-            font-size: 0.7rem;
-            letter-spacing: 3px;
+        
+        .logo-text span { 
+            font-size: 0.7rem; 
+            letter-spacing: 3px; 
             color: #bbd4ff;
-            display: block;
+            display: block; 
         }
-
-        /* Login Card */
-        .login-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        
+        .login-container { 
+            position: relative;
+            z-index: 2;
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
             padding: 2rem 1rem;
+            min-height: calc(100vh - 200px);
         }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.96);
+        
+        .login-card { 
+            background: rgba(255, 255, 255, 0.97);
             backdrop-filter: blur(10px);
-            max-width: 420px;
-            width: 100%;
-            padding: 2rem;
-            border-radius: 32px;
-            text-align: center;
+            max-width: 450px; 
+            width: 100%; 
+            padding: 2.5rem;
+            border-radius: 32px; 
+            text-align: center; 
             box-shadow: 0 25px 50px rgba(0,0,0,0.2);
             border: 1px solid rgba(255,255,255,0.3);
+            animation: fadeInUp 0.6s ease;
         }
-
-        .login-card h2 {
-            color: #0a2b4e;
-            font-size: 1.8rem;
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-card h2 { 
+            color: #0a2b4e; 
+            font-size: 1.8rem; 
             margin-bottom: 0.5rem;
-        }
-
-        .login-card .sub {
-            color: #666;
-            margin-bottom: 1.5rem;
-            font-size: 0.85rem;
-        }
-
-        .login-card input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 50px;
-            font-size: 1rem;
-            background: white;
-            transition: 0.2s;
-        }
-
-        .login-card input:focus {
-            outline: none;
-            border-color: #0a2b4e;
-            box-shadow: 0 0 0 3px rgba(10,43,78,0.1);
-        }
-
-        .login-card button {
-            width: 100%;
-            background: #0a2b4e;
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.2s;
-        }
-
-        .login-card button:hover {
-            background: #1a4a7a;
-        }
-
-        .stay-logged {
-            text-align: left;
-            margin: 15px 0;
-            font-size: 0.85rem;
-        }
-
-        .stay-logged label {
-            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: #555;
+            justify-content: center;
+            gap: 0.5rem;
         }
-
-        .error-msg {
-            color: #dc2626;
+        
+        .login-card .sub { 
+            color: #64748b; 
+            margin-bottom: 1.5rem; 
+            font-size: 0.85rem; 
+        }
+        
+        .input-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 50px; 
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #2c7be5;
+            box-shadow: 0 0 0 3px rgba(44,123,229,0.1);
+        }
+        
+        .login-card button { 
+            width: 100%; 
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
+            color: white; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 50px; 
+            font-weight: 600; 
+            font-size: 1rem; 
+            cursor: pointer; 
             margin-top: 10px;
-            font-size: 0.8rem;
-        }
-
-        .demo-note {
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #eee;
-            font-size: 0.7rem;
-            color: #888;
-        }
-
-        /* Navigation Buttons */
-        .nav-buttons {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-            z-index: 10;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .back-home {
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            padding: 8px 16px;
-            border-radius: 40px;
-            text-decoration: none;
-            color: white;
-            font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            transition: 0.2s;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
         }
-
-        .back-home:hover {
-            background: #0a2b4e;
+        
+        .login-card button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(10,43,78,0.3);
         }
-
-        .contact-bar {
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            padding: 8px 16px;
-            border-radius: 40px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .contact-bar a, .contact-bar .email-item {
-            color: white;
-            text-decoration: none;
+        
+        .error-msg { 
+            color: #dc2626; 
+            margin-top: 12px; 
             font-size: 0.8rem;
-            font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 5px;
-            padding: 4px 10px;
-            border-radius: 40px;
-            transition: 0.2s;
+            justify-content: center;
+            gap: 0.3rem;
         }
-
-        .contact-bar .whatsapp {
-            background: #25D366;
+        
+        /* Navigation Buttons */
+        .nav-buttons { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 20px; 
+            right: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            z-index: 10; 
+            flex-wrap: wrap; 
+            gap: 10px; 
         }
-
-        .contact-bar .call {
+        
+        .back-home { 
+            background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(5px);
+            padding: 10px 20px; 
+            border-radius: 40px; 
+            text-decoration: none; 
+            color: white; 
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .back-home:hover {
             background: #0a2b4e;
+            transform: translateX(-3px);
         }
-
-        .contact-bar .email-item {
-            background: #dc2626;
+        
+        .contact-bar { 
+            background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(5px);
+            padding: 8px 20px; 
+            border-radius: 40px; 
+            display: flex; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+        }
+        
+        .contact-bar a, .contact-bar .email-item { 
+            color: white; 
+            text-decoration: none; 
+            font-size: 0.8rem; 
+            font-weight: 500; 
+            padding: 6px 14px; 
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+        }
+        
+        .contact-bar .whatsapp { 
+            background: #25D366; 
+        }
+        
+        .contact-bar .whatsapp:hover {
+            background: #128C7E;
+            transform: scale(1.05);
+        }
+        
+        .contact-bar .call { 
+            background: #0a2b4e; 
+        }
+        
+        .contact-bar .call:hover {
+            background: #1e3a5f;
+            transform: scale(1.05);
+        }
+        
+        .contact-bar .email-item { 
+            background: #dc2626; 
             cursor: pointer;
         }
-
+        
+        .contact-bar .email-item:hover {
+            background: #b91c1c;
+            transform: scale(1.05);
+        }
+        
+        footer {
+            position: relative;
+            z-index: 2;
+            margin-top: 2rem;
+            text-align: center;
+            padding: 1rem;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.7rem;
+        }
+        
         @media (max-width: 600px) {
-            .login-card { padding: 1.5rem; margin: 0 1rem; }
-            .nav-buttons { bottom: 10px; left: 10px; right: 10px; }
-            .back-home, .contact-bar { padding: 6px 12px; }
-            .contact-bar a, .contact-bar .email-item { font-size: 0.7rem; padding: 3px 8px; }
+            .login-card { padding: 1.8rem; margin: 0 1rem; }
+            .login-card h2 { font-size: 1.5rem; }
+            .nav-buttons { flex-direction: column; align-items: center; }
+            .back-home { width: 100%; justify-content: center; }
+            .contact-bar { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
+    <div class="slideshow-container" id="slideshowContainer"></div>
+    <div class="overlay-dark"></div>
 
-<header>
-    <div class="logo-container">
-        <div class="logo-icon">🏢</div>
-        <div class="logo-text">
-            <h1>BATTETECH</h1>
-            <span>PROPERTY CONSULTANTS</span>
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon"><i class="fas fa-building"></i></div>
+            <div class="logo-text">
+                <h1>BATTETECH</h1>
+                <span>PROPERTY CONSULTANTS</span>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<div class="login-container">
-    <div class="login-card">
-        <h2>🔐 Welcome Back</h2>
-        <div class="sub">Enter your password to continue</div>
-        
-        <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="off">
-        
-        <div class="stay-logged">
-            <label>
-                <input type="checkbox" id="stayLoggedIn"> Remember me on this device
-            </label>
-        </div>
-        
-        <button onclick="doLogin()">Login</button>
-        <div id="loginError" class="error-msg"></div>
-        
-        <div class="demo-note">
-            <strong>🔑 How to login:</strong><br>
-            • Property owners: Use the password given by BattleTech<br>
-            • Admin: Use your secret admin password
-        </div>
-    </div>
-</div>
-
-<div class="nav-buttons">
-    <a href="index.html" class="back-home">← Back to Home</a>
-    <div class="contact-bar">
-        <a href="tel:0794115704" class="call">📞 MTN</a>
-        <a href="tel:0756182284" class="call">📞 AIRTEL</a>
-        <a href="https://wa.me/256794115704" target="_blank" class="whatsapp">💬 WhatsApp</a>
-        <div class="email-item" onclick="copyEmail()">📧 battetech330@gmail.com</div>
-    </div>
-</div>
-
-<script>
-    // ============================================
-    // YOUR ADMIN PASSWORD - CHANGE THIS TO YOUR SECRET PASSWORD
-    const ADMIN_PASSWORD = "wendy200?";
-    // ============================================
-    
-    function copyEmail() {
-        const email = "battetech330@gmail.com";
-        navigator.clipboard.writeText(email).then(function() {
-            alert("📧 Email copied: " + email);
-        }).catch(function() {
-            alert("⚠️ Could not copy email. Please select manually.");
-        });
-    }
-    
-    async function doLogin() {
-        if (window.supabaseDataLoaded) await window.supabaseDataLoaded;
-        const password = document.getElementById('loginPassword').value.trim();
-        const stayLogged = document.getElementById('stayLoggedIn').checked;
-        const errorDiv = document.getElementById('loginError');
-        
-        if (!password) {
-            errorDiv.textContent = '❌ Please enter your password';
-            return;
-        }
-        
-        // FIRST CHECK: Is this the ADMIN password?
-        if (password === ADMIN_PASSWORD) {
-            localStorage.setItem('battetech_admin_session', 'true');
-            localStorage.setItem('battetech_admin_session_time', Date.now());
+    <div class="login-container">
+        <div class="login-card">
+            <h2><i class="fas fa-lock"></i> Enter Password</h2>
+            <div class="sub">Use your secure password to access your dashboard</div>
             
-            // Auto-logout after 5 minutes of inactivity (handled in admin pages)
-            window.location.href = 'admin-dashboard.html';
-            return;
+            <div class="input-group">
+                <label><i class="fas fa-key"></i> PASSWORD</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="off">
+            </div>
+            
+            <button onclick="doLogin()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <div id="loginError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        <div class="contact-bar">
+            <a href="tel:0794115704" class="call"><i class="fas fa-phone-alt"></i> MTN</a>
+            <a href="tel:0756182284" class="call"><i class="fas fa-phone-alt"></i> AIRTEL</a>
+            <a href="https://wa.me/256794115704" target="_blank" class="whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <div class="email-item" onclick="copyEmail()"><i class="fas fa-envelope"></i> battetech330@gmail.com</div>
+        </div>
+    </div>
+
+    <footer>
+        <p><i class="far fa-copyright"></i> 2026 BATTETECH PROPERTY CONSULTANTS - Kampala, Uganda</p>
+    </footer>
+
+    <script>
+        function copyEmail() {
+            navigator.clipboard.writeText("battetech330@gmail.com").then(() => alert("📧 Email copied"));
         }
         
-        // SECOND CHECK: Is this an OWNER password?
-        const owner = getOwnerByPassword(password);
-        if (owner && propertiesDB[owner.propertyId]) {
-            const ownerData = {
-                id: owner.id,
-                name: owner.name,
-                phone: owner.phone,
-                propertyId: owner.propertyId
-            };
-            localStorage.setItem('battetech_logged_owner', JSON.stringify(ownerData));
-            setAutoLogin(ownerData, stayLogged);
-            window.location.href = 'owner-dashboard.html';
-            return;
+        // Slideshow background images
+        let imageList = [], currentIndex = 0;
+        const container = document.getElementById("slideshowContainer");
+        
+        function startSlideshow() {
+            if (window.slideshowInterval) clearInterval(window.slideshowInterval);
+            window.slideshowInterval = setInterval(() => {
+                if (imageList.length === 0) return;
+                imageList[currentIndex].classList.remove("active");
+                currentIndex = (currentIndex + 1) % imageList.length;
+                imageList[currentIndex].classList.add("active");
+            }, 5000);
         }
         
-        // No match
-        errorDiv.textContent = '❌ Invalid password. Please check and try again.';
-    }
-    
-    // Check for existing session (auto-login)
-    window.onload = async function() {
-        if (window.supabaseDataLoaded) await window.supabaseDataLoaded;
-        // Check admin session
-        const adminSession = localStorage.getItem('battetech_admin_session');
-        if (adminSession === 'true') {
-            const sessionTime = parseInt(localStorage.getItem('battetech_admin_session_time') || '0');
-            if (Date.now() - sessionTime < 300000) { // 5 minutes
-                window.location.href = 'admin-dashboard.html';
-                return;
-            } else {
-                localStorage.removeItem('battetech_admin_session');
-                localStorage.removeItem('battetech_admin_session_time');
-            }
+        function loadImages() {
+            container.innerHTML = "";
+            imageList = [];
+            let savedImages = localStorage.getItem("battetech_slideshow_images");
+            let imagesToUse = savedImages ? JSON.parse(savedImages) : [
+                "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+                "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1200&q=80",
+                "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80"
+            ];
+            imagesToUse.forEach((imgUrl, idx) => {
+                const div = document.createElement("div");
+                div.className = "slide";
+                if (idx === 0) div.classList.add("active");
+                div.style.backgroundImage = `url('${imgUrl}')`;
+                container.appendChild(div);
+                imageList.push(div);
+            });
+            startSlideshow();
         }
         
-        // Check owner auto-login
-        const autoOwner = checkAutoLogin();
-        if (autoOwner) {
-            localStorage.setItem('battetech_logged_owner', JSON.stringify(autoOwner));
-            window.location.href = 'owner-dashboard.html';
-        }
-    };
-</script>
+        loadImages();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-data.js"></script>
+    
+    <script>
+        // Get owner by password from Supabase - DIRECT LOOKUP
+        async function getOwnerByPassword(password) {
+            console.log('🔍 Looking for property with owner_password:', password);
+            
+            const { data, error } = await window.supabaseClient
+                .from('properties')
+                .select('id, name, location, owner_name, owner_phone, owner_password, management_fee, data')
+                .eq('owner_password', password);
+            
+            if (error) {
+                console.error('❌ Database error:', error);
+                return null;
+            }
+            
+            console.log('📊 Query returned:', data?.length || 0, 'properties');
+            
+            if (data && data.length > 0) {
+                const property = data[0];
+                console.log('✅ MATCH FOUND!');
+                console.log('   Property ID:', property.id);
+                console.log('   Property Name:', property.name);
+                console.log('   Owner Name:', property.owner_name);
+                
+                return {
+                    propertyId: property.id,
+                    propertyName: property.name,
+                    name: property.owner_name || 'Property Owner',
+                    phone: property.owner_phone || '',
+                    password: property.owner_password,
+                    managementFee: property.management_fee || 5,
+                    propertyData: property.data || { units: [] }
+                };
+            }
+            
+            console.log('❌ No property found with that password');
+            return null;
+        }
+        
+        async function doLogin() {
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!password) {
+                errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter your password';
+                return;
+            }
+            
+            // FIRST: Check if this is a property owner (from Supabase)
+            const owner = await getOwnerByPassword(password);
+            if (owner) {
+                console.log('✅ OWNER LOGIN SUCCESSFUL!');
+                console.log('   Property ID:', owner.propertyId);
+                console.log('   Property Name:', owner.propertyName);
+                console.log('   Owner Name:', owner.name);
+                
+                const ownerData = {
+                    id: owner.propertyId,
+                    name: owner.name,
+                    phone: owner.phone,
+                    propertyId: owner.propertyId,
+                    propertyName: owner.propertyName
+                };
+                
+                localStorage.setItem('battetech_logged_owner', JSON.stringify(ownerData));
+                localStorage.setItem('battetech_owner_session_time', Date.now());
+                localStorage.setItem('battetech_owner_property_id', owner.propertyId);
+                
+                console.log('📦 Stored owner data:', ownerData);
+                console.log('🚀 Redirecting to owner dashboard...');
+                
+                window.location.href = 'owner-dashboard.html';
+                return;
+            }
+            
+            // SECOND: Check Super Admin, Property Admins, Workers (existing system)
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('password_hash', password);
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    errorDiv.innerHTML = '<i class="fas fa-database"></i> Database error. Please try again.';
+                    return;
+                }
+                
+                if (!data || data.length === 0) {
+                    errorDiv.innerHTML = '<i class="fas fa-times-circle"></i> Invalid password. Please try again.';
+                    return;
+                }
+                
+                const user = data[0];
+                
+                if (user.status === 'frozen') {
+                    errorDiv.innerHTML = '<i class="fas fa-snowflake"></i> Your account has been frozen. Contact Super Admin.';
+                    return;
+                }
+                
+                // Store session
+                localStorage.setItem('battetech_user_id', user.id);
+                localStorage.setItem('battetech_user_role', user.role);
+                localStorage.setItem('battetech_user_name', user.full_name);
+                localStorage.setItem('battetech_user_phone', user.phone || '');
+                localStorage.setItem('battetech_user_photo', user.photo_url || '');
+                localStorage.setItem('battetech_parent_id', user.parent_id || '');
+                localStorage.setItem('battetech_property_id', user.property_id || '');
+                localStorage.setItem('battetech_session_time', Date.now());
+                
+                // Redirect based on role
+                if (user.role === 'super_admin') {
+                    window.location.href = 'super-admin-dashboard.html';
+                } else if (user.role === 'property_admin') {
+                    window.location.href = 'property-admin-dashboard.html';
+                } else if (user.role === 'worker') {
+                    window.location.href = 'worker-dashboard.html';
+                }
+                
+            } catch (err) {
+                console.error('Login error:', err);
+                errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Login failed. Please try again.';
+            }
+        }
+        
+        // Check for existing sessions
+        window.onload = async function() {
+            // Check admin/worker session
+            const userId = localStorage.getItem('battetech_user_id');
+            const sessionTime = parseInt(localStorage.getItem('battetech_session_time') || '0');
+            const SESSION_TIMEOUT = 8 * 60 * 60 * 1000;
+            
+            if (userId && Date.now() - sessionTime < SESSION_TIMEOUT) {
+                const role = localStorage.getItem('battetech_user_role');
+                if (role === 'super_admin') window.location.href = 'super-admin-dashboard.html';
+                else if (role === 'property_admin') window.location.href = 'property-admin-dashboard.html';
+                else if (role === 'worker') window.location.href = 'worker-dashboard.html';
+                return;
+            }
+            
+            // Check owner session
+            const savedLogin = localStorage.getItem('battetech_auto_login');
+            if (savedLogin) {
+                const ownerData = JSON.parse(savedLogin);
+                const savedProperties = localStorage.getItem('battetech_properties');
+                if (savedProperties) {
+                    const properties = JSON.parse(savedProperties);
+                    if (properties[ownerData.propertyId]) {
+                        localStorage.setItem('battetech_logged_owner', JSON.stringify(ownerData));
+                        window.location.href = 'owner-dashboard.html';
+                    }
+                }
+            }
+        };
+    </script>
 </body>
 </html>

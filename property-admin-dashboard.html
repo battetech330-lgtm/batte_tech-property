@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Property Admin - BATTETECH</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f0f4fa; min-height: 100vh; padding-bottom: 70px; }
+        
+        header { background: #0a2b4e; color: white; padding: 0.8rem 1rem; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .logo-container { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+        .logo-icon { font-size: 1.6rem; background: white; color: #0a2b4e; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+        .logo-text h1 { font-size: 1.2rem; letter-spacing: 1px; }
+        .logo-text span { font-size: 0.55rem; letter-spacing: 2px; opacity: 0.8; }
+        
+        .dashboard-container { max-width: 1200px; margin: 1rem auto; padding: 0 1rem; }
+        .welcome-card { background: white; border-radius: 24px; padding: 2rem; margin-bottom: 1.5rem; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .welcome-greeting { font-size: 1.8rem; font-weight: 800; color: #0a2b4e; margin-bottom: 0.5rem; }
+        .welcome-greeting span { color: #2c7be5; }
+        .session-timer { background: #f59e0b; color: #1a2a3e; padding: 6px 12px; border-radius: 40px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-top: 1rem; }
+        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; border-radius: 40px; cursor: pointer; margin-left: 1rem; }
+        
+        .section-card { background: white; border-radius: 20px; padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .section-title { font-size: 1.2rem; color: #0a2b4e; margin-bottom: 1rem; border-left: 4px solid #2c7be5; padding-left: 0.8rem; font-weight: bold; }
+        
+        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .form-row input, .form-row select, .form-row textarea { padding: 12px; border-radius: 10px; border: 1px solid #ddd; flex: 1; min-width: 200px; font-size: 0.9rem; }
+        .photo-preview { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-top: 5px; }
+        .upload-btn { background: #f59e0b; color: white; border: none; padding: 10px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
+        
+        button { background: #0a2b4e; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { transform: scale(1.02); }
+        button.danger { background: #dc2626; }
+        button.warning { background: #f59e0b; color: #1a2a3e; }
+        button.success { background: #10b981; }
+        button.small { padding: 4px 12px; font-size: 0.7rem; }
+        
+        .property-card, .worker-card, .activity-item, .approval-card { background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 0.8rem; border-left: 4px solid #2c7be5; cursor: pointer; transition: 0.2s; }
+        .property-card:hover, .worker-card:hover { transform: translateX(5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .property-name { font-weight: bold; color: #0a2b4e; font-size: 1rem; }
+        .password-badge { background: #eef3fc; padding: 4px 10px; border-radius: 20px; font-family: monospace; font-size: 0.75rem; display: inline-block; margin: 4px 0; }
+        
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1rem; }
+        
+        .notification-bell { position: relative; display: inline-block; margin-right: 15px; }
+        .notification-btn { background: #2c7be5; position: relative; padding: 8px 16px; border-radius: 40px; cursor: pointer; border: none; color: white; font-weight: bold; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: none; align-items: center; justify-content: center; }
+        .notification-dropdown { display: none; position: absolute; right: 0; top: 45px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-height: 400px; overflow-y: auto; }
+        .notification-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .notification-item.unread { background: #fff3cd; }
+        .notification-item:hover { background: #f0f4fa; }
+        .mark-all-read { width: 100%; background: #f59e0b; border: none; padding: 10px; border-radius: 0 0 12px 12px; cursor: pointer; font-weight: bold; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 20px; padding: 1.5rem; max-height: 80%; overflow-y: auto; }
+        
+        .main-footer { background: #071e36; color: white; margin-top: 2rem; padding: 1rem; text-align: center; }
+        .phones { display: flex; justify-content: center; gap: 1rem; margin: 0.3rem 0; flex-wrap: wrap; font-size: 0.7rem; }
+        .whatsapp-btn a { background: #25D366; color: white; padding: 6px 14px; border-radius: 40px; text-decoration: none; font-size: 0.7rem; display: inline-block; }
+        
+        .history-btn { background: #8b5cf6; margin-left: 0.5rem; }
+        
+        @media (max-width: 700px) { 
+            .grid-2 { grid-template-columns: 1fr; } 
+            .welcome-greeting { font-size: 1.5rem; } 
+            .form-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <div class="logo-icon">🏢</div>
+        <div class="logo-text">
+            <h1>BATTETECH</h1>
+            <span>MANAGEMENT</span>
+        </div>
+    </div>
+</header>
+
+<div class="dashboard-container">
+    <div class="welcome-card">
+        <div class="welcome-greeting">WELCOME, <span id="adminNameDisplay">ADMIN</span></div>
+        <div>
+            <div class="notification-bell">
+                <button class="notification-btn" id="notificationBell">
+                    🔔 Notifications
+                    <span id="notificationBadge" class="notification-badge">0</span>
+                </button>
+                <div id="notificationDropdown" class="notification-dropdown">
+                    <div id="notificationList"></div>
+                    <button class="mark-all-read" onclick="markAllNotificationsAsRead()">Mark All Read</button>
+                </div>
+            </div>
+            <button class="history-btn" onclick="requestHistoryAccess()">📜 Request History Access</button>
+            <span class="session-timer" id="sessionTimer">Session: 5:00</span>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+    
+    <div class="section-card">
+        <div class="section-title">📋 MY PROPERTIES</div>
+        <div id="propertiesList" class="grid-2"></div>
+    </div>
+    
+    <div class="section-card">
+        <div class="section-title">📢 BROADCAST MESSAGES</div>
+        <div class="form-row">
+            <select id="broadcastPropertySelect" style="flex:1;">
+                <option value="">-- Select Property First --</option>
+            </select>
+        </div>
+        <div id="broadcastOptions" style="display: none;">
+            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem;">
+                <button onclick="openBroadcastModal('workers')" style="background:#0a2b4e;">👷 Broadcast to Workers</button>
+                <button onclick="openBroadcastModal('unpaid_tenants')" style="background:#dc2626;">⚠️ Broadcast to Unpaid Tenants</button>
+                <button onclick="openBroadcastModal('paid_tenants')" style="background:#10b981;">✅ Broadcast to Paid Tenants</button>
+                <button onclick="openBroadcastModal('all_tenants')" style="background:#1a4a7a;">🏠 Broadcast to ALL Tenants</button>
+                <button onclick="openBroadcastModal('property_owners')" style="background:#8b5cf6;">👤 Broadcast to Property Owner (Approval Required)</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section-card">
+        <div class="section-title">⏳ PENDING PAYMENT APPROVALS</div>
+        <div id="pendingApprovalsList"></div>
+    </div>
+    
+    <div class="section-card">
+        <div class="section-title">🚪 PENDING EVACUATION REQUESTS</div>
+        <div id="pendingEvacuationsList"></div>
+    </div>
+    
+    <div class="section-card">
+        <div class="section-title">📢 PENDING WORKER BROADCAST APPROVALS</div>
+        <div id="pendingWorkerBroadcasts"></div>
+    </div>
+    
+    <div class="section-card">
+        <div class="section-title">👷 CREATE NEW WORKER</div>
+        <div class="form-row">
+            <input type="text" id="workerName" placeholder="Worker Full Name">
+            <input type="tel" id="workerPhone" placeholder="Phone Number">
+        </div>
+        <div class="form-row">
+            <input type="password" id="workerPassword" placeholder="Create Secure Password">
+            <select id="workerPropertySelect">
+                <option value="">-- Select Property --</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <button type="button" class="upload-btn" onclick="uploadWorkerPhoto()">📷 Upload Worker Photo</button>
+            <input type="file" id="workerPhotoInput" accept="image/*" style="display:none;" onchange="previewWorkerPhoto(event)">
+            <div id="workerPhotoPreview"></div>
+        </div>
+        <button onclick="createWorker()">✅ Create Worker</button>
+    </div>
+    
+    <div class="section-card">
+        <div class="section-title">👷 MY WORKERS & PASSWORDS</div>
+        <div id="workersList" class="grid-2"></div>
+    </div>
+    
+    <div class="section-card">
+        <div class="section-title">📋 ACTIVITY LOG</div>
+        <div id="activityLogList"></div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="editWorkerModal" class="modal">
+    <div class="modal-content">
+        <h3>✏️ Edit / Reset Worker</h3>
+        <div class="form-row">
+            <input type="text" id="editWorkerName" placeholder="Full Name">
+            <input type="tel" id="editWorkerPhone" placeholder="Phone">
+        </div>
+        <div class="form-row">
+            <input type="password" id="editWorkerPassword" placeholder="New Password (leave blank to keep same)">
+            <select id="editWorkerPropertySelect"><option value="">-- Select Property --</option></select>
+        </div>
+        <div class="form-row">
+            <button type="button" class="upload-btn" onclick="uploadEditWorkerPhoto()">📷 Change Worker Photo</button>
+            <input type="file" id="editWorkerPhotoInput" accept="image/*" style="display:none;" onchange="previewEditWorkerPhoto(event)">
+            <div id="editWorkerPhotoPreview"></div>
+        </div>
+        <div class="form-row">
+            <div style="background:#f0f4fa; padding:10px; border-radius:10px; width:100%;">
+                <strong>🔑 Current Password:</strong> 
+                <span id="currentWorkerPassword" style="font-family:monospace; background:white; padding:4px 8px; border-radius:8px; display:inline-block;"></span>
+                <button onclick="copyWorkerPassword()" class="warning small" style="margin-left:8px;">📋 Copy</button>
+            </div>
+        </div>
+        <input type="hidden" id="editWorkerId">
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button onclick="saveWorkerEdit()" class="success">💾 Save Changes</button>
+            <button onclick="closeEditWorkerModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="broadcastModal" class="modal">
+    <div class="modal-content">
+        <h3 id="broadcastModalTitle">📢 Broadcast Message</h3>
+        <div id="broadcastRecipientsList" style="max-height:200px; overflow-y:auto; border:1px solid #ddd; border-radius:10px; padding:10px; margin:10px 0;"></div>
+        <textarea id="broadcastMessageText" rows="4" placeholder="Type your message here..." style="width:100%; padding:10px; border-radius:10px;"></textarea>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button onclick="sendBroadcast()" style="background:#25D366;">📱 Send Broadcast</button>
+            <button onclick="closeBroadcastModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="historyAccessModal" class="modal">
+    <div class="modal-content">
+        <h2>📜 Request History Access</h2>
+        <p>Your request will be sent to Super Admin for approval.</p>
+        <div class="form-row">
+            <select id="historyPropertySelect">
+                <option value="">-- Select Property --</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <textarea id="historyAccessReason" placeholder="Reason for requesting history access..."></textarea>
+        </div>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button onclick="submitHistoryAccessRequest()" style="background:#8b5cf6;">📤 Request Access</button>
+            <button onclick="closeHistoryAccessModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<footer class="main-footer">
+    <div class="phones"><p><strong>📱 MTN: 0794115704</strong></p><p><strong>📱 AIRTEL: 0756182284</strong></p></div>
+    <p><strong>📧 battetech330@gmail.com</strong></p>
+    <div class="whatsapp-btn"><a href="https://wa.me/256756182282" target="_blank">💬 WhatsApp</a></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="supabase-data.js"></script>
+<script src="activity-log.js"></script>
+<script src="notifications.js"></script>
+<script src="chat-system.js"></script>
+
+<script>
+    let selectedWorkerPhotoBase64 = '';
+    let selectedEditWorkerPhotoBase64 = '';
+    let timerInterval;
+    let currentEditingWorkerId = null;
+    let currentEditingWorkerPassword = '';
+    let currentWorkersList = [];
+    let currentUnpaidTenantsList = [];
+    let currentPaidTenantsList = [];
+    let currentAllTenantsList = [];
+    let currentPropertyOwnersList = [];
+    let currentBroadcastType = '';
+    let superAdminData = null;
+    let currentBroadcastPropertyId = null;
+    let hasHistoryAccess = false;
+    let allProperties = [];
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+    
+    // ============ SESSION MANAGEMENT ============
+    
+    function checkAdminSession() {
+        const role = localStorage.getItem('battetech_user_role');
+        const sessionTime = parseInt(localStorage.getItem('battetech_session_time') || '0');
+        if (role !== 'property_admin') { window.location.href = 'login.html'; return false; }
+        if (Date.now() - sessionTime > 300000) { 
+            localStorage.clear(); 
+            window.location.replace('login.html'); 
+            return false; 
+        }
+        refreshSession(); 
+        return true;
+    }
+    
+    function refreshSession() { localStorage.setItem('battetech_session_time', Date.now()); startTimer(); }
+    function resetInactivityTimer() { refreshSession(); }
+    
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            const sessionTime = parseInt(localStorage.getItem('battetech_session_time') || '0');
+            const remaining = Math.max(0, 300000 - (Date.now() - sessionTime));
+            const minutes = Math.floor(remaining / 60000);
+            const secs = Math.floor((remaining % 60000) / 1000);
+            const timerDisplay = document.getElementById('sessionTimer');
+            if (timerDisplay) {
+                timerDisplay.textContent = `Session: ${minutes}:${secs.toString().padStart(2, '0')}`;
+            }
+            if (remaining <= 0) { 
+                clearInterval(timerInterval); 
+                localStorage.clear(); 
+                window.location.replace('login.html'); 
+            }
+        }, 1000);
+    }
+    
+    // ============ PHOTO UPLOAD ============
+    
+    function uploadWorkerPhoto() { document.getElementById('workerPhotoInput').click(); }
+    
+    function previewWorkerPhoto(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedWorkerPhotoBase64 = e.target.result;
+                document.getElementById('workerPhotoPreview').innerHTML = `<img src="${e.target.result}" class="photo-preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    function uploadEditWorkerPhoto() { document.getElementById('editWorkerPhotoInput').click(); }
+    
+    function previewEditWorkerPhoto(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedEditWorkerPhotoBase64 = e.target.result;
+                document.getElementById('editWorkerPhotoPreview').innerHTML = `<img src="${e.target.result}" class="photo-preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // ============ LOAD DATA ============
+    
+    async function loadPropertyAdminData() {
+        if (!checkAdminSession()) return;
+        const adminName = localStorage.getItem('battetech_user_name') || 'Admin';
+        document.getElementById('adminNameDisplay').innerText = adminName.toUpperCase();
+        const events = ['click', 'keypress', 'scroll', 'mousemove', 'touchstart'];
+        events.forEach(event => document.addEventListener(event, resetInactivityTimer));
+        startTimer();
+        await loadProperties();
+        await loadWorkers();
+        await loadPendingApprovals();
+        await loadPendingEvacuations();
+        await loadPendingWorkerBroadcasts();
+        await populatePropertySelect();
+        await loadActivityLog();
+        await initNotificationSystem();
+        initChatPanel();
+        
+        const { data: superAdmin } = await window.supabaseClient.from('users').select('id, full_name, phone').eq('role', 'super_admin').single();
+        superAdminData = superAdmin;
+        
+        const user = getCurrentUser();
+        if (user) {
+            hasHistoryAccess = await checkHistoryAccess(null, user.id);
+        }
+    }
+    
+    // ============ LOAD PROPERTIES ============
+    
+    async function loadProperties() {
+        const adminId = localStorage.getItem('battetech_user_id');
+        const { data, error } = await window.supabaseClient
+            .from('properties')
+            .select('*')
+            .eq('admin_id', adminId)
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Error loading properties:', error);
+            return;
+        }
+        
+        allProperties = data || [];
+        
+        if (!data || data.length === 0) {
+            document.getElementById('propertiesList').innerHTML = '<div class="property-card">No properties assigned to you yet.</div>';
+            return;
+        }
+        
+        const broadcastSelect = document.getElementById('broadcastPropertySelect');
+        broadcastSelect.innerHTML = '<option value="">-- Select Property First --</option>';
+        
+        let html = '';
+        for (let prop of data) {
+            const propData = prop.data || { units: [] };
+            const occupied = propData.units ? propData.units.filter(u => !u.vacant).length : 0;
+            const vacant = propData.units ? propData.units.filter(u => u.vacant).length : 0;
+            
+            broadcastSelect.innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
+            
+            html += `<div class="property-card" onclick="goToPropertyDetail('${prop.id}')">
+                <div class="property-name">🏢 ${escapeHtml(prop.name)}</div>
+                <div>📍 ${escapeHtml(prop.location)}</div>
+                <div>📊 ${occupied} occupied | ${vacant} vacant</div>
+                <div>💰 Fee: ${prop.management_fee || 5}%</div>
+                <div style="margin-top:8px;">
+                    <button onclick="event.stopPropagation(); goToPropertyDetail('${prop.id}')" style="font-size:0.7rem; background:#10b981;">📋 Manage Property</button>
+                </div>
+            </div>`;
+        }
+        document.getElementById('propertiesList').innerHTML = html;
+        
+        broadcastSelect.addEventListener('change', function() {
+            const broadcastOptions = document.getElementById('broadcastOptions');
+            if (this.value) {
+                currentBroadcastPropertyId = this.value;
+                broadcastOptions.style.display = 'block';
+                loadBroadcastDataForProperty(this.value);
+            } else {
+                currentBroadcastPropertyId = null;
+                broadcastOptions.style.display = 'none';
+            }
+        });
+    }
+    
+    async function loadBroadcastDataForProperty(propertyId) {
+        const { data: property } = await window.supabaseClient
+            .from('properties')
+            .select('data, name')
+            .eq('id', propertyId)
+            .single();
+        
+        if (!property) return;
+        
+        const currentYear = new Date().getFullYear();
+        const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+        const monthKey = `${currentYear}-${currentMonth}`;
+        
+        const units = property.data?.units || [];
+        let unpaidTenants = [];
+        let paidTenants = [];
+        let allTenants = [];
+        let propertyOwners = [];
+        
+        const { data: fullProp } = await window.supabaseClient
+            .from('properties')
+            .select('owner_name, owner_phone')
+            .eq('id', propertyId)
+            .single();
+        
+        if (fullProp && fullProp.owner_name && fullProp.owner_phone) {
+            propertyOwners.push({
+                name: fullProp.owner_name,
+                phone: fullProp.owner_phone,
+                property: property.name
+            });
+        }
+        
+        for (let room of units) {
+            if (!room.vacant && room.tenantPhone) {
+                const payment = room.payments?.[monthKey] || { paid: 0, rentDue: room.rentAmount };
+                const isPaid = payment.paid >= payment.rentDue;
+                const tenantInfo = {
+                    name: room.tenant,
+                    phone: room.tenantPhone,
+                    room: room.roomNumber,
+                    property: property.name,
+                    balance: isPaid ? 0 : (payment.balance || room.rentAmount)
+                };
+                allTenants.push(tenantInfo);
+                if (!isPaid) {
+                    unpaidTenants.push(tenantInfo);
+                } else {
+                    paidTenants.push(tenantInfo);
+                }
+            }
+        }
+        
+        currentUnpaidTenantsList = unpaidTenants;
+        currentPaidTenantsList = paidTenants;
+        currentAllTenantsList = allTenants;
+        currentPropertyOwnersList = propertyOwners;
+    }
+    
+    function goToPropertyDetail(propertyId) {
+        localStorage.setItem('battetech_current_property', propertyId);
+        window.location.href = 'admin-property-detail.html';
+    }
+    
+    // ============ BROADCAST MODAL ============
+    
+    function openBroadcastModal(type) {
+        if (!currentBroadcastPropertyId) {
+            alert('Please select a property first');
+            return;
+        }
+        
+        currentBroadcastType = type;
+        let title = '';
+        let recipientsHtml = '';
+        
+        if (type === 'workers') {
+            title = '📢 Broadcast to Workers';
+            if (currentWorkersList.length === 0) {
+                recipientsHtml = '<p style="color:#dc2626;">No workers found under your management for this property.</p>';
+            } else {
+                recipientsHtml = '<div><strong>Select Workers:</strong></div>';
+                currentWorkersList.forEach(worker => {
+                    recipientsHtml += `
+                        <label style="display:block; margin:8px 0;">
+                            <input type="checkbox" value="${worker.id}" class="broadcastRecipient">
+                            👷 ${escapeHtml(worker.full_name)} - 📞 ${worker.phone || 'No phone'}
+                        </label>
+                    `;
+                });
+                recipientsHtml += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllWorkers"> Select All Workers</label>';
+            }
+        } 
+        else if (type === 'unpaid_tenants') {
+            title = '⚠️ Broadcast to Unpaid Tenants';
+            if (currentUnpaidTenantsList.length === 0) {
+                recipientsHtml = '<p style="color:#10b981;">No unpaid tenants! All tenants have paid.</p>';
+            } else {
+                recipientsHtml = '<div><strong>Select Unpaid Tenants:</strong></div>';
+                currentUnpaidTenantsList.forEach(tenant => {
+                    recipientsHtml += `
+                        <label style="display:block; margin:8px 0;">
+                            <input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}" data-balance="${tenant.balance}">
+                            🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - Balance: UGX ${tenant.balance.toLocaleString()} - 📞 ${tenant.phone}
+                        </label>
+                    `;
+                });
+                recipientsHtml += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllUnpaid"> Select All Unpaid Tenants</label>';
+            }
+        }
+        else if (type === 'paid_tenants') {
+            title = '✅ Broadcast to Paid Tenants (Next Month Reminder)';
+            if (currentPaidTenantsList.length === 0) {
+                recipientsHtml = '<p style="color:#dc2626;">No paid tenants found.</p>';
+            } else {
+                recipientsHtml = '<div><strong>Select Paid Tenants:</strong></div>';
+                currentPaidTenantsList.forEach(tenant => {
+                    recipientsHtml += `
+                        <label style="display:block; margin:8px 0;">
+                            <input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}">
+                            🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - 📞 ${tenant.phone}
+                        </label>
+                    `;
+                });
+                recipientsHtml += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllPaid"> Select All Paid Tenants</label>';
+            }
+        }
+        else if (type === 'all_tenants') {
+            title = '🏠 Broadcast to ALL Tenants';
+            if (currentAllTenantsList.length === 0) {
+                recipientsHtml = '<p style="color:#dc2626;">No tenants found in this property.</p>';
+            } else {
+                recipientsHtml = `<div><strong>This will send to ${currentAllTenantsList.length} tenant(s) in this property.</strong></div>`;
+                window.pendingAllTenants = currentAllTenantsList;
+            }
+        }
+        else if (type === 'property_owners') {
+            title = '👤 Broadcast to Property Owner (Requires Super Admin Approval)';
+            if (currentPropertyOwnersList.length === 0) {
+                recipientsHtml = '<p style="color:#dc2626;">No property owner found with phone number.</p>';
+            } else {
+                recipientsHtml = `<div><strong>This will send to the property owner. Super Admin must approve.</strong></div>`;
+                window.pendingPropertyOwners = currentPropertyOwnersList;
+            }
+        }
+        
+        document.getElementById('broadcastModalTitle').innerHTML = title;
+        document.getElementById('broadcastRecipientsList').innerHTML = recipientsHtml;
+        document.getElementById('broadcastMessageText').value = getDefaultMessageForType(type);
+        document.getElementById('broadcastModal').style.display = 'flex';
+        
+        setTimeout(() => {
+            const selectAllWorkers = document.getElementById('selectAllWorkers');
+            if (selectAllWorkers) selectAllWorkers.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+            const selectAllUnpaid = document.getElementById('selectAllUnpaid');
+            if (selectAllUnpaid) selectAllUnpaid.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+            const selectAllPaid = document.getElementById('selectAllPaid');
+            if (selectAllPaid) selectAllPaid.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+        }, 100);
+    }
+    
+    function getDefaultMessageForType(type) {
+        if (type === 'unpaid_tenants') {
+            return `REMINDER: Your rent payment is overdue. Please clear your balance as soon as possible to avoid penalties.\n\nThank you for your cooperation.\n- BattleTech Management`;
+        } else if (type === 'paid_tenants') {
+            return `REMINDER: Your next month's rent will be due on the 1st of next month. Please prepare your payment.\n\nThank you for being a good tenant.\n- BattleTech Management`;
+        } else if (type === 'workers') {
+            return `NOTICE: Please ensure all rent collections are completed by the end of this week. Report any issues to the admin.\n\n- BattleTech Management`;
+        } else if (type === 'all_tenants') {
+            return `NOTICE: This is an important update from BattleTech Management regarding your tenancy.\n\nPlease read carefully and contact us if you have any questions.\n\n- BattleTech Management`;
+        } else if (type === 'property_owners') {
+            return `REPORT: Monthly property performance update for your review.\n\nPlease find attached summary of collections, vacancies, and maintenance activities.\n\n- BattleTech Management`;
+        }
+        return '';
+    }
+    
+    function closeBroadcastModal() {
+        document.getElementById('broadcastModal').style.display = 'none';
+    }
+    
+    async function sendBroadcast() {
+        const message = document.getElementById('broadcastMessageText').value.trim();
+        const adminUser = getCurrentUser();
+        
+        if (!message) {
+            alert('Please enter a message');
+            return;
+        }
+        
+        if (currentBroadcastType === 'property_owners') {
+            const recipients = window.pendingPropertyOwners || [];
+            if (recipients.length === 0) {
+                alert('No property owner found');
+                return;
+            }
+            
+            const { data, error } = await window.supabaseClient.from('approval_requests').insert({
+                property_id: currentBroadcastPropertyId,
+                action_type: 'broadcast_approval',
+                action_data: {
+                    broadcast_type: 'property_owners',
+                    message: message,
+                    recipients: recipients,
+                    sender_id: adminUser.id,
+                    sender_name: adminUser.name,
+                    sender_role: adminUser.role
+                },
+                status: 'pending',
+                created_at: new Date().toISOString()
+            });
+            
+            if (error) {
+                alert('Failed to send approval request: ' + error.message);
+            } else {
+                alert('✅ Broadcast request sent to Super Admin for approval.');
+                await addActivityLog('broadcast_requested', `Requested approval to broadcast to Property Owner.`);
+                if (superAdminData) {
+                    await addNotification(
+                        superAdminData.id,
+                        'super_admin',
+                        '📢 Broadcast Approval Needed',
+                        `${adminUser.name} requested approval to broadcast to Property Owner`,
+                        'broadcast',
+                        data[0]?.id,
+                        currentBroadcastPropertyId
+                    );
+                }
+            }
+            closeBroadcastModal();
+            return;
+        }
+        
+        let recipients = [];
+        
+        if (currentBroadcastType === 'workers') {
+            const checkboxes = document.querySelectorAll('.broadcastRecipient:checked');
+            for (let cb of checkboxes) {
+                const worker = currentWorkersList.find(w => w.id === cb.value);
+                if (worker && worker.phone) {
+                    recipients.push({ name: worker.full_name, phone: worker.phone, type: 'worker' });
+                }
+            }
+        }
+        else if (currentBroadcastType === 'unpaid_tenants') {
+            const checkboxes = document.querySelectorAll('.broadcastRecipient:checked');
+            for (let cb of checkboxes) {
+                const tenant = currentUnpaidTenantsList.find(t => t.phone === cb.value);
+                if (tenant && tenant.phone) {
+                    let personalizedMsg = message.replace('[amount]', tenant.balance.toLocaleString());
+                    recipients.push({ name: tenant.name, phone: tenant.phone, room: tenant.room, type: 'tenant', message: personalizedMsg });
+                }
+            }
+        }
+        else if (currentBroadcastType === 'paid_tenants') {
+            const checkboxes = document.querySelectorAll('.broadcastRecipient:checked');
+            for (let cb of checkboxes) {
+                const tenant = currentPaidTenantsList.find(t => t.phone === cb.value);
+                if (tenant && tenant.phone) {
+                    recipients.push({ name: tenant.name, phone: tenant.phone, room: tenant.room, type: 'tenant', message: message });
+                }
+            }
+        }
+        else if (currentBroadcastType === 'all_tenants') {
+            recipients = window.pendingAllTenants || [];
+            for (let tenant of recipients) {
+                tenant.type = 'tenant';
+            }
+        }
+        
+        if (recipients.length === 0) {
+            alert('No recipients selected');
+            return;
+        }
+        
+        if (!confirm(`Send broadcast to ${recipients.length} recipient(s) for this property?`)) return;
+        
+        let sentCount = 0;
+        let recipientNames = [];
+        
+        for (let i = 0; i < recipients.length; i++) {
+            const r = recipients[i];
+            let finalMessage = r.message || message;
+            let prefix = '';
+            
+            if (r.type === 'tenant') {
+                prefix = `🏢 BATTETECH NOTICE\n\nDear ${r.name} (Room ${r.room}),\n\n`;
+                finalMessage = prefix + finalMessage + `\n\n- ${adminUser.name}\nBattleTech Management`;
+            } else if (r.type === 'worker') {
+                prefix = `🏢 BATTETECH WORKER NOTICE\n\nDear ${r.name},\n\n`;
+                finalMessage = prefix + finalMessage + `\n\n- ${adminUser.name}\nBattleTech Management`;
+            }
+            
+            if (r.phone) {
+                let phone = r.phone.replace(/\s/g, '');
+                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(finalMessage)}`, '_blank');
+                sentCount++;
+                recipientNames.push(r.name);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+        }
+        
+        const activityDetails = `Sent ${currentBroadcastType} broadcast to ${sentCount} recipient(s)`;
+        await addActivityLog('broadcast_sent', activityDetails, currentBroadcastPropertyId);
+        
+        alert(`✅ Broadcast sent to ${sentCount} recipient(s)!`);
+        closeBroadcastModal();
+        await loadActivityLog();
+    }
+    
+    // ============ WORKERS MANAGEMENT ============
+    
+    async function loadWorkers() {
+        const adminId = localStorage.getItem('battetech_user_id');
+        
+        const { data, error } = await window.supabaseClient
+            .from('users')
+            .select('*')
+            .eq('parent_id', adminId)
+            .eq('role', 'worker')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Error loading workers:', error);
+            return;
+        }
+        
+        currentWorkersList = data || [];
+        
+        if (currentWorkersList.length === 0) {
+            document.getElementById('workersList').innerHTML = '<div class="worker-card">No workers created yet.</div>';
+            return;
+        }
+        
+        let html = '';
+        for (let worker of currentWorkersList) {
+            let propertyName = 'Not assigned';
+            if (worker.property_id) {
+                const { data: prop } = await window.supabaseClient
+                    .from('properties')
+                    .select('name')
+                    .eq('id', worker.property_id)
+                    .single();
+                if (prop) propertyName = prop.name;
+            }
+            
+            html += `<div class="worker-card">
+                <div><strong>👤 ${escapeHtml(worker.full_name)}</strong> ${worker.photo_url ? `<img src="${worker.photo_url}" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-left:8px;">` : ''}</div>
+                <div>📞 ${worker.phone || '-'}</div>
+                <div>🏢 Property: <strong style="color:#2c7be5;">${escapeHtml(propertyName)}</strong></div>
+                <div class="password-badge">🔑 Password: <strong>${escapeHtml(worker.password_hash)}</strong></div>
+                <div class="${worker.status === 'frozen' ? 'status-frozen' : 'status-active'}">${worker.status === 'frozen' ? '❄️ FROZEN' : '✅ ACTIVE'}</div>
+                <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                    <button onclick="openEditWorkerModal('${worker.id}', '${escapeHtml(worker.full_name)}', '${worker.phone || ''}', '${worker.property_id || ''}', '${escapeHtml(worker.password_hash)}', '${worker.photo_url || ''}')" class="warning small">✏️ Edit / Reset Password</button>
+                    <button onclick="freezeWorker('${worker.id}', '${worker.status}')" class="warning small">${worker.status === 'frozen' ? '❄️ Unfreeze' : '🔒 Freeze'}</button>
+                    <button onclick="fireWorker('${worker.id}', '${escapeHtml(worker.full_name)}')" class="danger small">🔥 Fire</button>
+                </div>
+            </div>`;
+        }
+        document.getElementById('workersList').innerHTML = html;
+    }
+    
+    function openEditWorkerModal(workerId, name, phone, propertyId, passwordHash, photoUrl) {
+        currentEditingWorkerId = workerId;
+        currentEditingWorkerPassword = passwordHash;
+        document.getElementById('editWorkerName').value = name;
+        document.getElementById('editWorkerPhone').value = phone;
+        document.getElementById('editWorkerPassword').value = '';
+        document.getElementById('editWorkerPropertySelect').value = propertyId || '';
+        document.getElementById('currentWorkerPassword').innerText = passwordHash;
+        document.getElementById('editWorkerPhotoPreview').innerHTML = photoUrl ? `<img src="${photoUrl}" class="photo-preview">` : '';
+        selectedEditWorkerPhotoBase64 = '';
+        document.getElementById('editWorkerModal').style.display = 'flex';
+    }
+    
+    function copyWorkerPassword() {
+        const password = document.getElementById('currentWorkerPassword').innerText;
+        navigator.clipboard.writeText(password);
+        alert('✅ Password copied to clipboard');
+    }
+    
+    async function saveWorkerEdit() {
+        const newName = document.getElementById('editWorkerName').value.trim();
+        const newPhone = document.getElementById('editWorkerPhone').value.trim();
+        const newPassword = document.getElementById('editWorkerPassword').value;
+        const newPropertyId = document.getElementById('editWorkerPropertySelect').value;
+        const newPhoto = selectedEditWorkerPhotoBase64;
+        
+        if (!newName) {
+            alert('Name is required');
+            return;
+        }
+        
+        const updateData = { 
+            full_name: newName, 
+            phone: newPhone, 
+            property_id: newPropertyId || null,
+            updated_at: new Date() 
+        };
+        if (newPhoto) updateData.photo_url = newPhoto;
+        
+        let passwordChanged = false;
+        if (newPassword && newPassword.trim()) {
+            updateData.password_hash = newPassword;
+            passwordChanged = true;
+        }
+        
+        const { error } = await window.supabaseClient.from('users').update(updateData).eq('id', currentEditingWorkerId);
+        
+        if (error) {
+            alert('Failed to update worker: ' + error.message);
+        } else {
+            const message = passwordChanged ? 
+                `✅ Worker updated with new password: ${newPassword}` : 
+                '✅ Worker updated successfully';
+            alert(message);
+            
+            await addActivityLog('worker_updated', 
+                passwordChanged ? 
+                `Updated worker ${newName} - Password changed` : 
+                `Updated worker ${newName}${newPhoto ? ' and updated photo' : ''}`, 
+                newPropertyId);
+            
+            closeEditWorkerModal();
+            await loadWorkers();
+            resetInactivityTimer();
+        }
+    }
+    
+    function closeEditWorkerModal() {
+        document.getElementById('editWorkerModal').style.display = 'none';
+        currentEditingWorkerId = null;
+        currentEditingWorkerPassword = '';
+        selectedEditWorkerPhotoBase64 = '';
+    }
+    
+    async function populatePropertySelect() {
+        const adminId = localStorage.getItem('battetech_user_id');
+        const { data, error } = await window.supabaseClient.from('properties').select('id, name').eq('admin_id', adminId);
+        if (error) return;
+        const select = document.getElementById('workerPropertySelect');
+        select.innerHTML = '<option value="">-- Select Property --</option>';
+        (data || []).forEach(prop => { select.innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`; });
+        
+        const editSelect = document.getElementById('editWorkerPropertySelect');
+        editSelect.innerHTML = '<option value="">-- Select Property --</option>';
+        (data || []).forEach(prop => { editSelect.innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`; });
+    }
+    
+    async function createWorker() {
+        const adminId = localStorage.getItem('battetech_user_id');
+        const name = document.getElementById('workerName').value.trim();
+        const phone = document.getElementById('workerPhone').value.trim();
+        const password = document.getElementById('workerPassword').value;
+        const photo = selectedWorkerPhotoBase64;
+        const propertyId = document.getElementById('workerPropertySelect').value;
+        
+        if (!name || !password) { 
+            alert('Please fill Name and Password'); 
+            return; 
+        }
+        
+        if (!propertyId) { 
+            alert('Please select a property for this worker'); 
+            return; 
+        }
+        
+        const email = name.toLowerCase().replace(/\s/g, '.') + '@worker.battetech.local';
+        
+        const { data, error } = await window.supabaseClient.from('users').insert({
+            email: email,
+            password_hash: password,
+            full_name: name,
+            phone: phone,
+            photo_url: photo,
+            role: 'worker',
+            parent_id: adminId,
+            property_id: propertyId,
+            status: 'active'
+        }).select();
+        
+        if (error) {
+            console.error('Worker creation error:', error);
+            alert('Failed to create worker: ' + error.message);
+        } else {
+            alert(`✅ Worker "${name}" created!\nPassword: ${password}`);
+            
+            document.getElementById('workerName').value = '';
+            document.getElementById('workerPhone').value = '';
+            document.getElementById('workerPassword').value = '';
+            document.getElementById('workerPhotoPreview').innerHTML = '';
+            selectedWorkerPhotoBase64 = '';
+            
+            await loadWorkers();
+            await addActivityLog('worker_created', `Created worker: ${name}`, propertyId);
+        }
+    }
+    
+    async function freezeWorker(workerId, currentStatus) {
+        const newStatus = currentStatus === 'frozen' ? 'active' : 'frozen';
+        const action = newStatus === 'frozen' ? 'freeze' : 'unfreeze';
+        if (confirm(`${action.toUpperCase()} this worker?`)) {
+            await window.supabaseClient.from('users').update({ status: newStatus }).eq('id', workerId);
+            alert(`✅ Worker ${action}d successfully`);
+            await loadWorkers();
+            await addActivityLog('worker_status_changed', `${action}d worker`);
+        }
+    }
+    
+    async function fireWorker(workerId, workerName) {
+        if (confirm(`🔥 PERMANENTLY FIRE ${workerName}?`)) {
+            await window.supabaseClient.from('users').delete().eq('id', workerId);
+            alert(`✅ Worker ${workerName} fired`);
+            await loadWorkers();
+            await addActivityLog('worker_fired', `Fired worker: ${workerName}`);
+        }
+    }
+    
+    // ============ PENDING EVACUATIONS ============
+    
+    async function loadPendingEvacuations() {
+        const adminId = localStorage.getItem('battetech_user_id');
+        const { data: properties } = await window.supabaseClient.from('properties').select('id').eq('admin_id', adminId);
+        const propertyIds = properties?.map(p => p.id) || [];
+        
+        if (propertyIds.length === 0) {
+            document.getElementById('pendingEvacuationsList').innerHTML = '<div class="approval-card">No pending evacuations.</div>';
+            return;
+        }
+        
+        const { data: requests, error } = await window.supabaseClient
+            .from('approval_requests')
+            .select('*')
+            .in('property_id', propertyIds)
+            .eq('action_type', 'evacuate_tenant')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Error loading evacuations:', error);
+            document.getElementById('pendingEvacuationsList').innerHTML = '<div class="approval-card">Error loading evacuations.</div>';
+            return;
+        }
+        
+        if (!requests || requests.length === 0) {
+            document.getElementById('pendingEvacuationsList').innerHTML = '<div class="approval-card">No pending evacuation requests.</div>';
+            return;
+        }
+        
+        let html = '';
+        for (let req of requests) {
+            html += `<div class="approval-card" style="border-left-color:#f59e0b; margin-bottom:15px;">
+                <div><strong>🚪 EVACUATION REQUEST</strong></div>
+                <div>👤 Worker: ${escapeHtml(req.worker_name)}</div>
+                <div>🏠 Room: ${escapeHtml(req.action_data?.roomNumber)}</div>
+                <div>👥 Tenant: ${escapeHtml(req.action_data?.tenantName)}</div>
+                <div>💰 Written Off Amount: UGX ${req.action_data?.writtenOffAmount?.toLocaleString() || 0}</div>
+                <div>📝 Reason: ${escapeHtml(req.action_data?.reason)}</div>
+                <div>📅 Requested: ${new Date(req.created_at).toLocaleString()}</div>
+                <div style="margin-top:12px; display:flex; gap:10px;">
+                    <button onclick="approveEvacuation('${req.id}')" class="success small" style="background:#10b981; padding:8px 16px;">✅ Approve Evacuation</button>
+                    <button onclick="rejectEvacuation('${req.id}')" class="danger small" style="background:#dc2626; padding:8px 16px;">❌ Reject</button>
+                </div>
+            </div>`;
+        }
+        
+        document.getElementById('pendingEvacuationsList').innerHTML = html;
+    }
+    
+    async function approveEvacuation(requestId) {
+        if (!confirm(`Approve this tenant evacuation? This will write off any unpaid balance.`)) return;
+        
+        const { data: request, error: reqError } = await window.supabaseClient
+            .from('approval_requests')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+        
+        if (reqError || !request) {
+            alert('Request not found');
+            return;
+        }
+        
+        const result = await evacuateTenant(
+            request.property_id,
+            request.action_data.roomIndex,
+            request.action_data.reason
+        );
+        
+        if (result.success) {
+            await window.supabaseClient
+                .from('approval_requests')
+                .update({ 
+                    status: 'approved', 
+                    approved_by: localStorage.getItem('battetech_user_id'), 
+                    approved_at: new Date().toISOString()
+                })
+                .eq('id', requestId);
+            
+            if (request.worker_id) {
+                await addNotification(
+                    request.worker_id,
+                    'worker',
+                    '✅ Evacuation Approved',
+                    `Your evacuation request for ${request.action_data.roomNumber} has been approved. Written off: UGX ${result.writtenOffAmount.toLocaleString()}`,
+                    'evacuation',
+                    requestId,
+                    request.property_id
+                );
+            }
+            
+            await logTenantEvacuated(request.property_id, request.action_data.roomNumber, request.action_data.tenantName, result.writtenOffAmount);
+            
+            alert(`✅ Tenant evacuated. Written off amount: UGX ${result.writtenOffAmount.toLocaleString()}`);
+            
+            await loadPendingEvacuations();
+            await loadProperties();
+            await loadActivityLog();
+        } else {
+            alert('❌ Failed to evacuate tenant.');
+        }
+    }
+    
+    async function rejectEvacuation(requestId) {
+        const reason = prompt('Reason for rejection:');
+        if (!reason) return;
+        
+        const { data: request } = await window.supabaseClient
+            .from('approval_requests')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+        
+        await window.supabaseClient
+            .from('approval_requests')
+            .update({ 
+                status: 'rejected', 
+                rejection_reason: reason, 
+                approved_by: localStorage.getItem('battetech_user_id'), 
+                approved_at: new Date().toISOString() 
+            })
+            .eq('id', requestId);
+        
+        if (request && request.worker_id) {
+            await addNotification(
+                request.worker_id,
+                'worker',
+                '❌ Evacuation Rejected',
+                `Your evacuation request was rejected. Reason: ${reason}`,
+                'evacuation',
+                requestId,
+                request.property_id
+            );
+        }
+        
+        await addActivityLog('evacuation_rejected', `Rejected evacuation request. Reason: ${reason}`, request?.property_id);
+        
+        alert('❌ Evacuation rejected');
+        await loadPendingEvacuations();
+        await loadActivityLog();
+    }
+    
+    // ============ PENDING APPROVALS ============
+    
+    async function loadPendingApprovals() {
+        const adminId = localStorage.getItem('battetech_user_id');
+        const { data: properties } = await window.supabaseClient.from('properties').select('id').eq('admin_id', adminId);
+        const propertyIds = properties?.map(p => p.id) || [];
+        
+        if (propertyIds.length === 0) {
+            document.getElementById('pendingApprovalsList').innerHTML = '<div class="approval-card">No pending approvals.</div>';
+            return;
+        }
+        
+        const { data: requests, error } = await window.supabaseClient
+            .from('approval_requests')
+            .select('*')
+            .in('property_id', propertyIds)
+            .eq('action_type', 'payment_approval')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Error loading approvals:', error);
+            document.getElementById('pendingApprovalsList').innerHTML = '<div class="approval-card">Error loading approvals.</div>';
+            return;
+        }
+        
+        if (!requests || requests.length === 0) {
+            document.getElementById('pendingApprovalsList').innerHTML = '<div class="approval-card">No pending payment approvals.</div>';
+            return;
+        }
+        
+        let html = '';
+        for (let req of requests) {
+            html += `<div class="approval-card" style="border-left-color:#f59e0b; margin-bottom:15px;">
+                <div><strong>💰 PAYMENT APPROVAL REQUEST</strong></div>
+                <div>👤 Worker: ${escapeHtml(req.worker_name)}</div>
+                <div>🏠 Room: ${escapeHtml(req.action_data?.roomNumber)}</div>
+                <div>👥 Tenant: ${escapeHtml(req.action_data?.tenantName)}</div>
+                <div>💰 Amount: UGX ${req.action_data?.amount?.toLocaleString()}</div>
+                <div>📅 Month: ${req.action_data?.month}</div>
+                <div>💳 Method: ${req.action_data?.method}</div>
+                <div>🆔 Reference: ${req.action_data?.reference || 'N/A'}</div>
+                <div>📅 Requested: ${new Date(req.created_at).toLocaleString()}</div>
+                <div style="margin-top:12px; display:flex; gap:10px;">
+                    <button onclick="approvePayment('${req.id}', ${req.action_data?.amount}, '${req.action_data?.month}', ${req.action_data?.roomIndex}, '${req.action_data?.method}', '${req.action_data?.reference}')" class="success small" style="background:#10b981; padding:8px 16px;">✅ Approve Payment</button>
+                    <button onclick="rejectPayment('${req.id}')" class="danger small" style="background:#dc2626; padding:8px 16px;">❌ Reject</button>
+                </div>
+            </div>`;
+        }
+        
+        if (html === '') {
+            html = '<div class="approval-card">No pending approvals.</div>';
+        }
+        
+        document.getElementById('pendingApprovalsList').innerHTML = html;
+    }
+    
+    // ============ APPROVE PAYMENT (FIXED) ============
+    
+    async function approvePayment(requestId, amount, month, roomIndex, method, reference) {
+        console.log("=== approvePayment START ===");
+        
+        if (!confirm(`Approve payment of UGX ${amount?.toLocaleString()} for ${month}?`)) return;
+        
+        try {
+            const { data: request, error: reqError } = await window.supabaseClient
+                .from('approval_requests')
+                .select('*')
+                .eq('id', requestId)
+                .single();
+            
+            if (reqError || !request) {
+                alert('Request not found');
+                return;
+            }
+            
+            console.log("Request found. Property ID:", request.property_id);
+            
+            const transactionId = 'TXN-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+            
+            const actualRoomIndex = roomIndex !== undefined ? roomIndex : request.action_data?.roomIndex;
+            const actualMonth = month || request.action_data?.month;
+            const actualAmount = amount || request.action_data?.amount;
+            const actualMethod = method || request.action_data?.method || 'Cash';
+            const actualReference = reference || request.action_data?.reference || '';
+            const paymentDate = request.action_data?.paymentDate || new Date().toISOString().split('T')[0];
+            
+            console.log("Processing payment for room index:", actualRoomIndex);
+            console.log("Payment date:", paymentDate);
+            
+            const success = await window.processApprovedPayment(
+                request.property_id,
+                actualRoomIndex,
+                actualAmount,
+                actualMonth,
+                actualMethod,
+                actualReference,
+                transactionId,
+                paymentDate
+            );
+            
+            if (success) {
+                await window.supabaseClient
+                    .from('approval_requests')
+                    .update({ 
+                        status: 'approved', 
+                        approved_by: localStorage.getItem('battetech_user_id'), 
+                        approved_at: new Date().toISOString()
+                    })
+                    .eq('id', requestId);
+                
+                if (request.worker_id) {
+                    await addNotification(
+                        request.worker_id,
+                        'worker',
+                        '✅ Payment Approved',
+                        `Your payment of UGX ${actualAmount?.toLocaleString()} has been approved. Transaction ID: ${transactionId}`,
+                        'payment',
+                        requestId,
+                        request.property_id
+                    );
+                }
+                
+                await addActivityLog('payment_approved', `Approved payment of UGX ${actualAmount?.toLocaleString()} - Transaction: ${transactionId}`, request.property_id, transactionId);
+                
+                alert(`✅ Payment approved!\nAmount: UGX ${actualAmount?.toLocaleString()}\nTransaction ID: ${transactionId}`);
+                
+                await loadPendingApprovals();
+                await loadProperties();
+                await loadActivityLog();
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                alert('❌ Failed to process payment. Please try again.');
+            }
+            
+        } catch (err) {
+            console.error("Error in approvePayment:", err);
+            alert('❌ Error: ' + err.message);
+        }
+    }
+    
+    async function rejectPayment(requestId) {
+        const reason = prompt('Reason for rejection:');
+        if (!reason) return;
+        
+        try {
+            const { data: request, error: reqError } = await window.supabaseClient
+                .from('approval_requests')
+                .select('*')
+                .eq('id', requestId)
+                .single();
+            
+            if (reqError || !request) {
+                alert('Request not found');
+                return;
+            }
+            
+            await window.supabaseClient
+                .from('approval_requests')
+                .update({ 
+                    status: 'rejected', 
+                    rejection_reason: reason, 
+                    approved_by: localStorage.getItem('battetech_user_id'), 
+                    approved_at: new Date().toISOString() 
+                })
+                .eq('id', requestId);
+            
+            if (request.worker_id) {
+                await addNotification(
+                    request.worker_id,
+                    'worker',
+                    '❌ Payment Rejected',
+                    `Your payment request was rejected. Reason: ${reason}`,
+                    'payment',
+                    requestId,
+                    request.property_id
+                );
+            }
+            
+            await addActivityLog('payment_rejected', `Rejected payment request. Reason: ${reason}`, request.property_id);
+            
+            alert('❌ Payment rejected');
+            await loadPendingApprovals();
+            await loadActivityLog();
+            
+        } catch (err) {
+            console.error("Error in rejectPayment:", err);
+            alert('Failed to reject payment: ' + err.message);
+        }
+    }
+    
+    // ============ PENDING WORKER BROADCASTS ============
+    
+    async function loadPendingWorkerBroadcasts() {
+        const adminId = localStorage.getItem('battetech_user_id');
+        const { data: properties } = await window.supabaseClient.from('properties').select('id').eq('admin_id', adminId);
+        const propertyIds = properties?.map(p => p.id) || [];
+        
+        const { data: requests, error } = await window.supabaseClient
+            .from('approval_requests')
+            .select('*')
+            .in('property_id', propertyIds)
+            .eq('action_type', 'broadcast_approval')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
+        
+        const container = document.getElementById('pendingWorkerBroadcasts');
+        if (error || !requests || requests.length === 0) {
+            container.innerHTML = '<div class="approval-card">No pending worker broadcasts.</div>';
+            return;
+        }
+        
+        let html = '';
+        for (let req of requests) {
+            if (req.action_data?.broadcast_type === 'worker_tenant_notice') {
+                html += `<div class="approval-card" style="border-left-color:#25D366;">
+                    <div><strong>📢 WORKER BROADCAST APPROVAL REQUEST</strong></div>
+                    <div>👤 Worker: ${escapeHtml(req.worker_name)}</div>
+                    <div>👥 Recipients: ${req.action_data?.recipients?.length || 0} tenant(s)</div>
+                    <div>📝 Message: ${escapeHtml(req.action_data?.message?.substring(0, 200))}</div>
+                    <div style="margin-top:8px; display:flex; gap:8px;">
+                        <button onclick="approveWorkerBroadcast('${req.id}')" class="success small">✅ Approve & Send</button>
+                        <button onclick="rejectWorkerBroadcast('${req.id}')" class="danger small">❌ Reject</button>
+                    </div>
+                </div>`;
+            }
+        }
+        if (html === '') html = '<div class="approval-card">No pending worker broadcasts.</div>';
+        container.innerHTML = html;
+    }
+    
+    async function approveWorkerBroadcast(requestId) {
+        if (!confirm(`Approve and send this broadcast to tenants?`)) return;
+        
+        const { data: request } = await window.supabaseClient
+            .from('approval_requests')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+        
+        if (!request) return;
+        
+        const recipients = request.action_data?.recipients || [];
+        const message = request.action_data?.message;
+        const workerName = request.worker_name;
+        
+        let sentCount = 0;
+        for (let i = 0; i < recipients.length; i++) {
+            const r = recipients[i];
+            let phone = r.phone;
+            if (phone) {
+                let cleanPhone = phone.replace(/\s/g, '');
+                if (cleanPhone.startsWith('0')) cleanPhone = '256' + cleanPhone.substring(1);
+                const personalMsg = `🏢 BATTETECH RENT REMINDER\n\nDear ${r.name} (Room ${r.room}),\n\n${message}\n\n- ${workerName}\nBattleTech Management`;
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(personalMsg)}`, '_blank');
+                sentCount++;
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+        
+        await window.supabaseClient
+            .from('approval_requests')
+            .update({ status: 'approved', approved_by: localStorage.getItem('battetech_user_id'), approved_at: new Date() })
+            .eq('id', requestId);
+        
+        await addNotification(
+            request.worker_id,
+            'worker',
+            '✅ Broadcast Approved',
+            `Your broadcast request has been approved and sent to ${sentCount} tenant(s).`,
+            'broadcast',
+            requestId
+        );
+        
+        await addActivityLog('broadcast_approved', `Approved worker broadcast to ${sentCount} tenants`);
+        
+        alert(`✅ Broadcast approved and sent to ${sentCount} tenant(s)!`);
+        await loadPendingWorkerBroadcasts();
+        await loadActivityLog();
+    }
+    
+    async function rejectWorkerBroadcast(requestId) {
+        const reason = prompt('Reason for rejection:');
+        if (!reason) return;
+        
+        const { data: request } = await window.supabaseClient
+            .from('approval_requests')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+        
+        await window.supabaseClient
+            .from('approval_requests')
+            .update({ status: 'rejected', rejection_reason: reason, approved_by: localStorage.getItem('battetech_user_id'), approved_at: new Date() })
+            .eq('id', requestId);
+        
+        if (request) {
+            await addNotification(
+                request.worker_id,
+                'worker',
+                '❌ Broadcast Rejected',
+                `Your broadcast request was rejected. Reason: ${reason}`,
+                'broadcast',
+                requestId
+            );
+        }
+        
+        await addActivityLog('broadcast_rejected', `Rejected worker broadcast. Reason: ${reason}`);
+        alert('❌ Broadcast rejected');
+        await loadPendingWorkerBroadcasts();
+    }
+    
+    // ============ ACTIVITY LOG ============
+    
+    async function loadActivityLog() {
+        const adminId = localStorage.getItem('battetech_user_id');
+        const { data: workers } = await window.supabaseClient.from('users').select('id').eq('parent_id', adminId).eq('role', 'worker');
+        const workerIds = workers?.map(w => w.id) || [];
+        const userIds = [adminId, ...workerIds];
+        
+        const { data, error } = await window.supabaseClient
+            .from('activity_logs')
+            .select('*')
+            .in('user_id', userIds)
+            .order('created_at', { ascending: false })
+            .limit(50);
+        
+        const container = document.getElementById('activityLogList');
+        
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '<div class="activity-item">No activities yet.</div>';
+            return;
+        }
+        
+        let html = '';
+        for (let log of data) {
+            const date = new Date(log.created_at);
+            html += `<div class="activity-item">
+                <small>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small><br>
+                <strong>👤 ${escapeHtml(log.user_name)}</strong> - ${escapeHtml(log.action)}<br>
+                ${escapeHtml(log.details || '')}
+                ${log.transaction_id ? `<br><small>Transaction ID: ${escapeHtml(log.transaction_id)}</small>` : ''}
+            </div>`;
+        }
+        container.innerHTML = html;
+    }
+    
+    // ============ HISTORY ACCESS ============
+    
+    function requestHistoryAccess() {
+        document.getElementById('historyPropertySelect').innerHTML = '<option value="">-- Select Property --</option>';
+        for (let prop of allProperties) {
+            document.getElementById('historyPropertySelect').innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
+        }
+        document.getElementById('historyAccessModal').style.display = 'flex';
+    }
+    
+    function closeHistoryAccessModal() {
+        document.getElementById('historyAccessModal').style.display = 'none';
+    }
+    
+    async function submitHistoryAccessRequest() {
+        const propertyId = document.getElementById('historyPropertySelect').value;
+        const reason = document.getElementById('historyAccessReason').value;
+        const user = getCurrentUser();
+        
+        if (!propertyId) {
+            alert('Please select a property');
+            return;
+        }
+        
+        const success = await requestHistoryViewAccess(propertyId, user.id, user.name);
+        if (success) {
+            alert('✅ History access request sent to Super Admin. You will be notified when approved.');
+            closeHistoryAccessModal();
+        } else {
+            alert('Failed to send request. Please try again.');
+        }
+    }
+    
+    function logout() { 
+        if (confirm('Logout from Dashboard?')) { 
+            localStorage.clear(); 
+            window.location.href = 'login.html'; 
+        } 
+    }
+    
+    window.addEventListener('load', () => { loadPropertyAdminData(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Worker Dashboard - BATTETECH</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: linear-gradient(135deg, #f0f4fa 0%, #dce3ec 100%);
+            min-height: 100vh; 
+            padding-bottom: 70px;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        header { 
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
+            color: white; 
+            padding: 0.8rem 1rem; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .logo-container { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+        .logo-icon { 
+            font-size: 1.6rem; 
+            background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%);
+            color: #0a2b4e; 
+            width: 45px; 
+            height: 45px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .logo-text h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        .logo-text span { font-size: 0.55rem; letter-spacing: 2px; opacity: 0.8; }
+        
+        .dashboard-container { max-width: 1400px; margin: 1rem auto; padding: 0 1rem; }
+        .worker-header { 
+            background: white; 
+            padding: 1.2rem 1.5rem; 
+            border-radius: 24px; 
+            margin-bottom: 1.5rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .property-name { font-size: 1.2rem; font-weight: bold; color: #0a2b4e; display: flex; align-items: center; gap: 0.5rem; }
+        .session-timer { 
+            background: #f59e0b; 
+            color: #1a2a3e; 
+            padding: 5px 12px; 
+            border-radius: 40px; 
+            font-size: 0.7rem; 
+            font-weight: bold; 
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-left: 10px;
+        }
+        .logout-btn { 
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white; 
+            border: none; 
+            padding: 8px 20px; 
+            border-radius: 40px; 
+            cursor: pointer; 
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 3px 10px rgba(220,38,38,0.3);
+        }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { 
+            background: white; 
+            padding: 1rem; 
+            border-radius: 20px; 
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-number { font-size: 1.3rem; font-weight: 800; color: #0a2b4e; display: flex; align-items: center; justify-content: center; gap: 0.3rem; }
+        .stat-label { font-size: 0.7rem; color: #64748b; margin-top: 0.3rem; font-weight: 500; }
+        
+        .action-buttons { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .action-btn {
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .action-btn.notice { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; }
+        .action-btn.message { background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%); color: white; }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        .table-container { 
+            overflow-x: auto; 
+            background: white; 
+            border-radius: 24px; 
+            padding: 1.2rem; 
+            margin-top: 1rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 800px; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px 10px; text-align: left; vertical-align: middle; }
+        th { background: #0a2b4e; color: white; font-weight: 600; }
+        th i { margin-right: 0.3rem; }
+        tr:hover { background: #f8fafc; }
+        
+        .btn-pay { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white; 
+            border: none; 
+            padding: 6px 14px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.2s ease;
+        }
+        .btn-pay:hover { transform: scale(1.02); }
+        
+        .btn-evacuate { 
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #1a2a3e; 
+            border: none; 
+            padding: 6px 14px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-left: 5px;
+            transition: all 0.2s ease;
+        }
+        .btn-evacuate:hover { transform: scale(1.02); }
+        
+        .btn-statement { 
+            background: linear-gradient(135deg, #2c7be5 0%, #1a68d1 100%);
+            color: white; 
+            border: none; 
+            padding: 6px 14px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-left: 5px;
+            transition: all 0.2s ease;
+        }
+        .btn-statement:hover { transform: scale(1.02); }
+        
+        .status-paid { color: #10b981; font-weight: 600; }
+        .status-unpaid { color: #dc2626; font-weight: 600; }
+        .days-overdue { font-size: 0.7rem; color: #dc2626; margin-top: 3px; display: flex; align-items: center; gap: 0.2rem; }
+        
+        .activity-item { 
+            background: #f8fafc; 
+            border-radius: 14px; 
+            padding: 0.8rem 1rem; 
+            margin-bottom: 0.6rem; 
+            border-left: 3px solid #2c7be5; 
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .activity-item:hover { background: #f1f5f9; transform: translateX(3px); }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .modal-content { 
+            background: white; 
+            width: 90%; 
+            max-width: 500px; 
+            border-radius: 28px; 
+            padding: 1.5rem; 
+            max-height: 85%; 
+            overflow-y: auto;
+        }
+        .modal-content h3 { 
+            font-size: 1.3rem; 
+            margin-bottom: 1rem; 
+            color: #0a2b4e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus {
+            outline: none;
+            border-color: #2c7be5;
+            box-shadow: 0 0 0 3px rgba(44,123,229,0.1);
+        }
+        .modal-btn { 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        .modal-btn.request { background: #f59e0b; color: #1a2a3e; }
+        .modal-btn.cancel { background: #6c757d; color: white; }
+        .modal-btn:hover { transform: scale(1.02); }
+        
+        .main-footer { 
+            background: linear-gradient(135deg, #071e36 0%, #0a2b4e 100%);
+            backdrop-filter: blur(10px);
+            color: white; 
+            margin-top: 2rem; 
+            padding: 1rem; 
+            text-align: center; 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            z-index: 90;
+        }
+        .phones { display: flex; justify-content: center; gap: 1.5rem; margin: 0.3rem 0; flex-wrap: wrap; font-size: 0.75rem; }
+        .whatsapp-btn a { 
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white; 
+            padding: 6px 16px; 
+            border-radius: 40px; 
+            text-decoration: none; 
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            transition: all 0.3s ease;
+        }
+        .whatsapp-btn a:hover { transform: scale(1.05); }
+        
+        .content-padding { padding-bottom: 85px; }
+        
+        @media (min-width: 768px) { 
+            .main-footer { position: relative; } 
+            .content-padding { padding-bottom: 0; }
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .worker-header { flex-direction: column; text-align: center; gap: 1rem; }
+            .action-buttons { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <div class="logo-icon"><i class="fas fa-hard-hat"></i></div>
+        <div class="logo-text">
+            <h1>BATTETECH</h1>
+            <span>WORKER PORTAL</span>
+        </div>
+    </div>
+</header>
+
+<div class="dashboard-container content-padding">
+    <div class="worker-header">
+        <div>
+            <div class="property-name">
+                <i class="fas fa-building"></i> <span id="propertyName">Loading...</span>
+            </div>
+            <div style="font-size:0.85rem; color:#475569; margin-top:5px;">
+                <i class="fas fa-user-check"></i> Welcome, <strong id="workerName"></strong>
+                <span class="session-timer" id="sessionTimer"><i class="fas fa-clock"></i> Session: 5:00</span>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="totalCollected"><i class="fas fa-coins"></i> UGX 0</div>
+            <div class="stat-label">Collected This Month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalPending" style="color:#dc2626;"><i class="fas fa-hourglass-half"></i> UGX 0</div>
+            <div class="stat-label">Pending This Month</div>
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <button class="action-btn notice" onclick="openSendNoticeModal()"><i class="fas fa-bullhorn"></i> Send Notice to Unpaid Tenants</button>
+        <button class="action-btn message" onclick="openSendToAdminModal()"><i class="fas fa-envelope"></i> Send Message to Admin</button>
+    </div>
+    
+    <div class="table-container">
+        <h3 style="margin-bottom:1rem;"><i class="fas fa-users"></i> Tenants & Payment Status</h3>
+        <table id="roomsTable">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-door-open"></i> Room</th>
+                    <th><i class="fas fa-user"></i> Tenant</th>
+                    <th><i class="fas fa-phone"></i> Phone</th>
+                    <th><i class="fas fa-coins"></i> Monthly Rent</th>
+                    <th><i class="fas fa-chart-simple"></i> Status</th>
+                    <th><i class="fas fa-calendar-check"></i> Paid Until</th>
+                    <th><i class="fas fa-tools"></i> Actions</th>
+                </thead>
+            </thead>
+            <tbody id="roomsTableBody">
+                <tr><td colspan="7" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="section-card" style="background:white; border-radius:24px; padding:1.2rem; margin-top:1.5rem; box-shadow:0 5px 20px rgba(0,0,0,0.05);">
+        <div class="section-title" style="font-size:1rem; margin-bottom:0.8rem; font-weight:700; display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-list-check"></i> MY ACTIVITY LOG
+        </div>
+        <div id="activityLogList">
+            <div class="activity-item"><i class="fas fa-spinner fa-spin"></i> Loading activities...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Notice Modal -->
+<div id="noticeModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-bullhorn"></i> Send Notice to Unpaid Tenants</h3>
+        <div id="tenantChecklist" style="max-height:200px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:12px; padding:10px; margin:10px 0;"></div>
+        <textarea id="noticeMessage" rows="3" placeholder="Type your message here..."></textarea>
+        <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:12px;">
+            <small><i class="fas fa-shield-alt"></i> This notice will be sent to your admin for approval.</small>
+        </div>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button onclick="requestNoticeApproval()" class="modal-btn request"><i class="fas fa-paper-plane"></i> Request Approval</button>
+            <button onclick="closeNoticeModal()" class="modal-btn cancel"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message to Admin Modal -->
+<div id="adminMessageModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-envelope"></i> Send Message to Admin</h3>
+        <textarea id="adminMessage" rows="4" placeholder="Type your message..."></textarea>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button onclick="sendMessageToAdmin()" class="modal-btn request" style="background:#0a2b4e;"><i class="fas fa-paper-plane"></i> Send</button>
+            <button onclick="closeAdminMessageModal()" class="modal-btn cancel"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Request Modal -->
+<div id="paymentModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-money-bill-wave"></i> Request Payment</h3>
+        <div><strong><i class="fas fa-door-open"></i> Room:</strong> <span id="paymentRoom"></span></div>
+        <div><strong><i class="fas fa-user"></i> Tenant:</strong> <span id="paymentTenant"></span></div>
+        <div><strong><i class="fas fa-coins"></i> Amount Due:</strong> <span id="paymentAmountDue"></span></div>
+        <label><i class="fas fa-calendar-alt"></i> Payment Date:</label>
+        <input type="date" id="paymentDate">
+        <input type="number" id="paymentAmount" placeholder="Amount to Pay (UGX)">
+        <select id="paymentMethod">
+            <option><i class="fas fa-money-bill-wave"></i> Cash</option>
+            <option><i class="fas fa-mobile-alt"></i> Mobile Money</option>
+        </select>
+        <input type="text" id="paymentReference" placeholder="Reference">
+        <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:12px;">
+            <small><i class="fas fa-shield-alt"></i> This payment request will be sent to your admin for approval.</small>
+        </div>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button onclick="requestPaymentApproval()" class="modal-btn request"><i class="fas fa-paper-plane"></i> Request Approval</button>
+            <button onclick="closePaymentModal()" class="modal-btn cancel"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Evacuate Tenant Modal -->
+<div id="evacuateModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-door-open"></i> Tenant Evacuation</h3>
+        <div><strong><i class="fas fa-door-open"></i> Room:</strong> <span id="evacuateRoom"></span></div>
+        <div><strong><i class="fas fa-user"></i> Tenant:</strong> <span id="evacuateTenant"></span></div>
+        <div><strong><i class="fas fa-coins"></i> Current Balance:</strong> <span id="evacuateBalance" style="color:#dc2626;"></span></div>
+        <textarea id="evacuateReason" rows="2" placeholder="Reason for evacuation..."></textarea>
+        <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:12px;">
+            <small><i class="fas fa-shield-alt"></i> This will mark the room as VACANT. Any unpaid balance will be written off. Requires admin approval.</small>
+        </div>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button onclick="requestEvacuateApproval()" class="modal-btn request"><i class="fas fa-paper-plane"></i> Request Approval</button>
+            <button onclick="closeEvacuateModal()" class="modal-btn cancel"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Payment History Modal -->
+<div id="paymentHistoryModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-clock-rotate-left"></i> Payment History</h3>
+        <div id="paymentHistoryContent" style="max-height:300px; overflow-y:auto;"></div>
+        <button onclick="closePaymentHistoryModal()" class="modal-btn cancel" style="margin-top:1rem; width:100%;"><i class="fas fa-times"></i> Close</button>
+    </div>
+</div>
+
+<footer class="main-footer">
+    <div class="phones">
+        <p><i class="fas fa-phone-alt"></i> <strong>MTN: 0794115704</strong></p>
+        <p><i class="fas fa-phone-alt"></i> <strong>AIRTEL: 0756182284</strong></p>
+    </div>
+    <p><i class="fas fa-envelope"></i> <strong>battetech330@gmail.com</strong></p>
+    <div class="whatsapp-btn">
+        <a href="https://wa.me/256756182282" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="supabase-data.js"></script>
+<script src="activity-log.js"></script>
+<script src="notifications.js"></script>
+<script src="chat-system.js"></script>
+
+<script>
+    let currentPropertyId = null;
+    let currentPropertyData = null;
+    let roomsData = [];
+    let timerInterval;
+    let currentPaymentRoomIndex = null;
+    let currentEvacuateRoomIndex = null;
+    let unpaidTenantsList = [];
+    
+    function getTodayDate() {
+        return new Date().toISOString().split('T')[0];
+    }
+    
+    function calculateDaysOverdue(paidUntilDate) {
+        if (!paidUntilDate) return 0;
+        const today = getTodayDate();
+        const paidUntil = new Date(paidUntilDate);
+        const currentDate = new Date(today);
+        const diffTime = currentDate - paidUntil;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
+    }
+    
+    function checkSession() {
+        const role = localStorage.getItem('battetech_user_role');
+        const sessionTime = parseInt(localStorage.getItem('battetech_session_time') || '0');
+        if (role !== 'worker') { 
+            window.location.href = 'login.html'; 
+            return false; 
+        }
+        if (Date.now() - sessionTime > 300000) { 
+            localStorage.clear(); 
+            window.location.replace('login.html'); 
+            return false; 
+        }
+        refreshSession(); 
+        return true;
+    }
+    
+    function refreshSession() { localStorage.setItem('battetech_session_time', Date.now()); startTimer(); }
+    function resetInactivityTimer() { refreshSession(); }
+    
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            const sessionTime = parseInt(localStorage.getItem('battetech_session_time') || '0');
+            const remaining = Math.max(0, 300000 - (Date.now() - sessionTime));
+            const minutes = Math.floor(remaining / 60000);
+            const secs = Math.floor((remaining % 60000) / 1000);
+            const timerDisplay = document.getElementById('sessionTimer');
+            if (timerDisplay) {
+                timerDisplay.innerHTML = `<i class="fas fa-clock"></i> Session: ${minutes}:${secs.toString().padStart(2, '0')}`;
+            }
+            if (remaining <= 0) { 
+                clearInterval(timerInterval); 
+                localStorage.clear(); 
+                window.location.replace('login.html'); 
+            }
+        }, 1000);
+    }
+    
+    async function loadWorkerData() {
+        console.log('=== loadWorkerData START ===');
+        
+        if (!checkSession()) return;
+        
+        const user = getCurrentUser();
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        document.getElementById('workerName').innerText = user.name || 'Worker';
+        
+        const { data: workerRecord, error: workerError } = await window.supabaseClient
+            .from('users')
+            .select('property_id')
+            .eq('id', user.id)
+            .single();
+        
+        if (workerError || !workerRecord || !workerRecord.property_id) {
+            document.getElementById('propertyName').innerText = 'No property assigned';
+            document.getElementById('roomsTableBody').innerHTML = '<tr><td colspan="7"><i class="fas fa-exclamation-triangle"></i> No property assigned. Contact your admin.</td></tr>';
+            return;
+        }
+        
+        currentPropertyId = workerRecord.property_id;
+        
+        const { data: property, error: propError } = await window.supabaseClient
+            .from('properties')
+            .select('*')
+            .eq('id', currentPropertyId)
+            .single();
+        
+        if (propError || !property) {
+            document.getElementById('propertyName').innerText = 'Property not found';
+            return;
+        }
+        
+        currentPropertyData = property;
+        document.getElementById('propertyName').innerText = property.name;
+        
+        await loadRoomsTable(property);
+        await loadMyActivityLog();
+        
+        initChatPanel();
+        
+        const events = ['click', 'keypress', 'scroll', 'mousemove', 'touchstart'];
+        events.forEach(event => document.addEventListener(event, resetInactivityTimer));
+        startTimer();
+    }
+    
+    async function loadRoomsTable(property) {
+        const propData = property.data || { units: [] };
+        roomsData = propData.units;
+        
+        const today = getTodayDate();
+        let totalCollectedThisMonth = 0;
+        let totalPendingThisMonth = 0;
+        let html = '';
+        unpaidTenantsList = [];
+        
+        const occupiedRooms = roomsData.filter(room => !room.vacant);
+        
+        if (occupiedRooms.length === 0) {
+            document.getElementById('roomsTableBody').innerHTML = '<tr><td colspan="7"><i class="fas fa-info-circle"></i> No occupied rooms found.</td></tr>';
+            document.getElementById('totalCollected').innerHTML = '<i class="fas fa-coins"></i> UGX 0';
+            document.getElementById('totalPending').innerHTML = '<i class="fas fa-hourglass-half"></i> UGX 0';
+            return;
+        }
+        
+        const displayYear = property.current_display_year || new Date().getFullYear();
+        const displayMonth = property.current_display_month || new Date().getMonth() + 1;
+        const monthKey = `${displayYear}-${String(displayMonth).padStart(2, '0')}`;
+        
+        for (let i = 0; i < roomsData.length; i++) {
+            const room = roomsData[i];
+            if (room.vacant) continue;
+            
+            let isPaid = false;
+            let paidUntilDate = null;
+            let daysOverdue = 0;
+            
+            if (room.paymentHistory && room.paymentHistory.length > 0) {
+                const sortedPayments = [...room.paymentHistory].sort((a, b) => new Date(b.paidUntilDate) - new Date(a.paidUntilDate));
+                for (let payment of sortedPayments) {
+                    if (payment.paidUntilDate && payment.paidUntilDate >= today) {
+                        isPaid = true;
+                        paidUntilDate = payment.paidUntilDate;
+                        break;
+                    }
+                }
+            }
+            
+            if (!isPaid && room.paymentsByMonth) {
+                const monthPayment = room.paymentsByMonth[monthKey];
+                if (monthPayment && monthPayment.status === 'paid') isPaid = true;
+            }
+            
+            if (!isPaid && paidUntilDate) {
+                daysOverdue = calculateDaysOverdue(paidUntilDate);
+            } else if (!isPaid) {
+                daysOverdue = calculateDaysOverdue(room.paidUntilDate);
+            }
+            
+            const statusText = isPaid ? 'PAID' : 'UNPAID';
+            const statusClass = isPaid ? 'status-paid' : 'status-unpaid';
+            
+            if (isPaid) {
+                totalCollectedThisMonth += room.rentAmount;
+            } else {
+                totalPendingThisMonth += room.rentAmount;
+                unpaidTenantsList.push({
+                    index: i,
+                    roomNumber: room.roomNumber,
+                    tenantName: room.tenant,
+                    phone: room.tenantPhone,
+                    balance: room.rentAmount,
+                    daysOverdue: daysOverdue
+                });
+            }
+            
+            const paidUntilDisplay = paidUntilDate ? new Date(paidUntilDate).toLocaleDateString() : 'Expired';
+            const overdueDisplay = daysOverdue > 0 ? `<div class="days-overdue"><i class="fas fa-exclamation-triangle"></i> ${daysOverdue} days overdue</div>` : '';
+            
+            html += `
+                <tr>
+                    <td><strong><i class="fas fa-door-open"></i> ${escapeHtml(room.roomNumber)}</strong></td>
+                    <td><i class="fas fa-user"></i> ${escapeHtml(room.tenant)}</td>
+                    <td><i class="fas fa-phone"></i> ${escapeHtml(room.tenantPhone || '-')}</td>
+                    <td><i class="fas fa-coins"></i> UGX ${(room.rentAmount || 0).toLocaleString()}</td>
+                    <td class="${statusClass}">${isPaid ? '<i class="fas fa-check-circle"></i> PAID' : '<i class="fas fa-times-circle"></i> UNPAID'}</td>
+                    <td>
+                        ${paidUntilDisplay}
+                        ${overdueDisplay}
+                    </td>
+                    <td>
+                        ${!isPaid ? `<button class="btn-pay" onclick="openPaymentModal(${i})"><i class="fas fa-money-bill-wave"></i> Request Payment</button>` : ''}
+                        <button class="btn-evacuate" onclick="openEvacuateModal(${i})"><i class="fas fa-door-open"></i> Evacuate</button>
+                        <button class="btn-statement" onclick="showPaymentHistory(${i})"><i class="fas fa-clock-rotate-left"></i> History</button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        if (html === '') {
+            html = '<tr><td colspan="7"><i class="fas fa-check-circle"></i> All tenants have valid payments!</td></tr>';
+        }
+        
+        document.getElementById('roomsTableBody').innerHTML = html;
+        document.getElementById('totalCollected').innerHTML = `<i class="fas fa-coins"></i> UGX ${totalCollectedThisMonth.toLocaleString()}`;
+        document.getElementById('totalPending').innerHTML = `<i class="fas fa-hourglass-half"></i> UGX ${totalPendingThisMonth.toLocaleString()}`;
+    }
+    
+    function openEvacuateModal(roomIndex) {
+        const room = roomsData[roomIndex];
+        if (room.vacant) { alert('This room is already vacant'); return; }
+        currentEvacuateRoomIndex = roomIndex;
+        document.getElementById('evacuateRoom').innerText = room.roomNumber;
+        document.getElementById('evacuateTenant').innerText = room.tenant;
+        document.getElementById('evacuateBalance').innerHTML = `UGX ${room.rentAmount.toLocaleString()}`;
+        document.getElementById('evacuateReason').value = '';
+        document.getElementById('evacuateModal').style.display = 'flex';
+    }
+    
+    function closeEvacuateModal() {
+        document.getElementById('evacuateModal').style.display = 'none';
+        currentEvacuateRoomIndex = null;
+    }
+    
+    async function requestEvacuateApproval() {
+        const roomIndex = currentEvacuateRoomIndex;
+        const room = roomsData[roomIndex];
+        const reason = document.getElementById('evacuateReason').value.trim();
+        const user = getCurrentUser();
+        
+        if (!reason) { alert('Please provide a reason'); return; }
+        
+        const { error } = await window.supabaseClient.from('approval_requests').insert({
+            property_id: currentPropertyId,
+            action_type: 'evacuate_tenant',
+            action_data: {
+                roomIndex: roomIndex,
+                roomNumber: room.roomNumber,
+                tenantName: room.tenant,
+                reason: reason,
+                writtenOffAmount: room.rentAmount,
+                workerName: user.name,
+                workerId: user.id
+            },
+            worker_id: user.id,
+            worker_name: user.name,
+            status: 'pending',
+            created_at: new Date().toISOString()
+        });
+        
+        if (error) {
+            alert('Failed: ' + error.message);
+        } else {
+            alert('✅ Evacuation request sent to admin!');
+            await addActivityLog('evacuation_requested', `Requested evacuation of ${room.tenant} from ${room.roomNumber}`, currentPropertyId);
+            closeEvacuateModal();
+        }
+    }
+    
+    function openSendNoticeModal() {
+        if (unpaidTenantsList.length === 0) {
+            alert('No unpaid tenants found.');
+            return;
+        }
+        
+        let checklistHtml = '';
+        for (let tenant of unpaidTenantsList) {
+            checklistHtml += `
+                <label style="display:block; margin-bottom:8px;">
+                    <input type="checkbox" value="${tenant.index}" class="tenantCheckbox">
+                    <strong><i class="fas fa-door-open"></i> ${escapeHtml(tenant.roomNumber)}</strong> - ${escapeHtml(tenant.tenantName)} 
+                    (<i class="fas fa-phone"></i> ${tenant.phone || 'No phone'}) - <i class="fas fa-coins"></i> UGX ${tenant.balance.toLocaleString()}
+                    ${tenant.daysOverdue > 0 ? `<span style="color:#dc2626;"><i class="fas fa-exclamation-triangle"></i> ${tenant.daysOverdue} days overdue</span>` : ''}
+                </label>
+            `;
+        }
+        
+        document.getElementById('tenantChecklist').innerHTML = checklistHtml;
+        document.getElementById('noticeMessage').value = 'REMINDER: Your rent payment is overdue. Please pay as soon as possible to avoid penalties.\n\nThank you for your cooperation.\n- BattleTech Management';
+        document.getElementById('noticeModal').style.display = 'flex';
+    }
+    
+    function closeNoticeModal() { document.getElementById('noticeModal').style.display = 'none'; }
+    
+    async function requestNoticeApproval() {
+        const checkboxes = document.querySelectorAll('.tenantCheckbox:checked');
+        const message = document.getElementById('noticeMessage').value.trim();
+        const user = getCurrentUser();
+        
+        if (checkboxes.length === 0) { alert('Select at least one tenant'); return; }
+        if (!message) { alert('Enter a message'); return; }
+        
+        let selectedTenants = [];
+        for (let checkbox of checkboxes) {
+            const tenantIndex = parseInt(checkbox.value);
+            const tenant = unpaidTenantsList.find(t => t.index === tenantIndex);
+            if (tenant) {
+                selectedTenants.push({
+                    name: tenant.tenantName,
+                    phone: tenant.phone,
+                    room: tenant.roomNumber,
+                    balance: tenant.balance,
+                    daysOverdue: tenant.daysOverdue
+                });
+            }
+        }
+        
+        const { error } = await window.supabaseClient.from('approval_requests').insert({
+            property_id: currentPropertyId,
+            action_type: 'broadcast_approval',
+            action_data: {
+                broadcast_type: 'worker_tenant_notice',
+                message: message,
+                recipients: selectedTenants,
+                sender_id: user.id,
+                sender_name: user.name,
+                sender_role: user.role
+            },
+            worker_id: user.id,
+            worker_name: user.name,
+            status: 'pending',
+            created_at: new Date().toISOString()
+        });
+        
+        if (error) {
+            alert('Failed: ' + error.message);
+        } else {
+            alert('✅ Notice request sent to admin!');
+            await addActivityLog('broadcast_requested', `Requested notice for ${selectedTenants.length} tenant(s)`);
+            closeNoticeModal();
+        }
+    }
+    
+    function openSendToAdminModal() {
+        document.getElementById('adminMessage').value = '';
+        document.getElementById('adminMessageModal').style.display = 'flex';
+    }
+    
+    function closeAdminMessageModal() { document.getElementById('adminMessageModal').style.display = 'none'; }
+    
+    async function sendMessageToAdmin() {
+        const message = document.getElementById('adminMessage').value.trim();
+        const user = getCurrentUser();
+        
+        if (!message) { alert('Enter a message'); return; }
+        
+        const { data: workerData } = await window.supabaseClient
+            .from('users')
+            .select('parent_id')
+            .eq('id', user.id)
+            .single();
+        
+        if (workerData && workerData.parent_id) {
+            const { data: adminData } = await window.supabaseClient
+                .from('users')
+                .select('phone, full_name')
+                .eq('id', workerData.parent_id)
+                .single();
+            
+            if (adminData && adminData.phone) {
+                let phone = adminData.phone.replace(/\s/g, '');
+                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                const adminMsg = `🏢 BATTETECH WORKER MESSAGE\n\nFrom: ${user.name}\n\nMessage: ${message}`;
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(adminMsg)}`, '_blank');
+            }
+        }
+        
+        await addActivityLog('sent_message_to_admin', `Sent message to admin`);
+        alert('✅ Message sent to admin!');
+        closeAdminMessageModal();
+    }
+    
+    function showPaymentHistory(roomIndex) {
+        const room = roomsData[roomIndex];
+        if (!room) return;
+        
+        let paymentTable = `
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse: collapse; font-size:0.7rem;">
+                    <thead>
+                        <tr style="background:#0a2b4e; color:white;">
+                            <th style="padding:8px;"><i class="fas fa-calendar-alt"></i> Payment Date</th>
+                            <th style="padding:8px;"><i class="fas fa-coins"></i> Amount</th>
+                            <th style="padding:8px;"><i class="fas fa-calendar-check"></i> Paid Until</th>
+                            <th style="padding:8px;"><i class="fas fa-credit-card"></i> Method</th>
+                            <th style="padding:8px;"><i class="fas fa-hashtag"></i> Reference</th>
+                            <th style="padding:8px;"><i class="fas fa-chart-simple"></i> Status</th>
+                         </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        const payments = room.paymentHistory || [];
+        
+        if (payments.length === 0) {
+            paymentTable += '<tr><td colspan="6" style="text-align:center; padding:2rem;"><i class="fas fa-info-circle"></i> No payment records found.</td></tr>';
+        }
+        
+        for (let payment of payments.sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))) {
+            const paymentDate = payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString() : '-';
+            const paidUntil = payment.paidUntilDate ? new Date(payment.paidUntilDate).toLocaleDateString() : '-';
+            const isValid = payment.paidUntilDate && payment.paidUntilDate >= getTodayDate();
+            const status = isValid ? '<i class="fas fa-check-circle"></i> Active' : '<i class="fas fa-times-circle"></i> Expired';
+            const rowBg = isValid ? '#d1fae5' : '#fee2e2';
+            
+            paymentTable += `
+                <tr style="background:${rowBg};">
+                    <td style="padding:8px;">${paymentDate}</td>
+                    <td style="padding:8px;">UGX ${(payment.amount || 0).toLocaleString()}</td>
+                    <td style="padding:8px;">${paidUntil}</td>
+                    <td style="padding:8px;">${payment.method || '-'}</td>
+                    <td style="padding:8px;">${payment.reference || payment.transaction_id || '-'}</td>
+                    <td style="padding:8px;">${status}</td>
+                </tr>
+            `;
+        }
+        
+        paymentTable += `</tbody></table></div>`;
+        document.getElementById('paymentHistoryContent').innerHTML = paymentTable;
+        document.getElementById('paymentHistoryModal').style.display = 'flex';
+    }
+    
+    function closePaymentHistoryModal() { document.getElementById('paymentHistoryModal').style.display = 'none'; }
+    
+    function openPaymentModal(roomIndex) {
+        const room = roomsData[roomIndex];
+        currentPaymentRoomIndex = roomIndex;
+        document.getElementById('paymentRoom').innerText = room.roomNumber;
+        document.getElementById('paymentTenant').innerText = room.tenant;
+        document.getElementById('paymentAmountDue').innerHTML = `UGX ${room.rentAmount.toLocaleString()}`;
+        document.getElementById('paymentDate').value = getTodayDate();
+        document.getElementById('paymentAmount').value = room.rentAmount;
+        document.getElementById('paymentModal').style.display = 'flex';
+    }
+    
+    function closePaymentModal() { document.getElementById('paymentModal').style.display = 'none'; }
+    
+    async function requestPaymentApproval() {
+        const roomIndex = currentPaymentRoomIndex;
+        const room = roomsData[roomIndex];
+        const paymentDate = document.getElementById('paymentDate').value;
+        const amount = parseInt(document.getElementById('paymentAmount').value);
+        const method = document.getElementById('paymentMethod').value;
+        const reference = document.getElementById('paymentReference').value;
+        const user = getCurrentUser();
+        
+        if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
+        if (!paymentDate) { alert('Select payment date'); return; }
+        
+        const paymentDateObj = new Date(paymentDate);
+        const paymentMonth = `${paymentDateObj.getFullYear()}-${String(paymentDateObj.getMonth() + 1).padStart(2, '0')}`;
+        
+        const { error } = await window.supabaseClient.from('approval_requests').insert({
+            property_id: currentPropertyId,
+            action_type: 'payment_approval',
+            action_data: {
+                roomIndex: roomIndex,
+                roomNumber: room.roomNumber,
+                tenantName: room.tenant,
+                amount: amount,
+                month: paymentMonth,
+                paymentDate: paymentDate,
+                method: method,
+                reference: reference,
+                workerName: user.name,
+                workerId: user.id
+            },
+            worker_id: user.id,
+            worker_name: user.name,
+            status: 'pending',
+            created_at: new Date().toISOString()
+        });
+        
+        if (error) {
+            alert('Failed: ' + error.message);
+        } else {
+            alert('✅ Payment request sent to admin!');
+            closePaymentModal();
+            await addActivityLog('payment_requested', `Requested payment for ${room.tenant} - UGX ${amount.toLocaleString()}`);
+        }
+    }
+    
+    async function loadMyActivityLog() {
+        const user = getCurrentUser();
+        if (!user) return;
+        
+        const { data, error } = await window.supabaseClient
+            .from('activity_logs')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(20);
+        
+        const container = document.getElementById('activityLogList');
+        
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '<div class="activity-item"><i class="fas fa-info-circle"></i> No activities yet.</div>';
+            return;
+        }
+        
+        let html = '';
+        for (let log of data) {
+            const date = new Date(log.created_at);
+            html += `<div class="activity-item">
+                <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small><br>
+                <strong><i class="fas fa-tag"></i> ${escapeHtml(log.action)}</strong><br>
+                <i class="fas fa-info-circle"></i> ${escapeHtml(log.details || '')}
+            </div>`;
+        }
+        container.innerHTML = html;
+    }
+    
+    function logout() {
+        if (confirm('Logout from Worker Dashboard?')) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    window.addEventListener('load', () => {
+        loadWorkerData();
+    });
+</script>
+</body>
+</html>

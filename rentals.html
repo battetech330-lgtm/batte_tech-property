@@ -4,244 +4,436 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>Available Rentals - BATTETECH</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f0f4fa;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
             min-height: 100vh;
+            padding-bottom: 70px;
+            overflow-x: hidden;
         }
-
-        header {
-            background: #0a2b4e;
-            color: white;
-            padding: 1rem;
-            text-align: center;
+        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        header { 
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
+            color: white; 
+            padding: 1rem; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.8rem;
+        .logo-container { display: flex; align-items: center; justify-content: center; gap: 0.8rem; }
+        .logo-icon { 
+            font-size: 2rem; 
+            background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%);
+            color: #0a2b4e; 
+            width: 55px; 
+            height: 55px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-
-        .logo-icon {
-            font-size: 2rem;
-            background: white;
-            color: #0a2b4e;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-        }
-
-        .logo-text h1 {
-            font-size: 1.5rem;
+        .logo-text h1 { 
+            font-size: 1.6rem; 
             letter-spacing: 2px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #bbd4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
-        .logo-text span {
-            font-size: 0.7rem;
-            letter-spacing: 3px;
+        .logo-text span { 
+            font-size: 0.7rem; 
+            letter-spacing: 3px; 
             opacity: 0.8;
+            display: block;
         }
-
-        .tagline {
-            font-size: 0.8rem;
-            opacity: 0.8;
-            margin-top: 0.3rem;
-        }
-
-        .rentals-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .filter-section {
-            background: white;
-            border-radius: 60px;
-            padding: 0.5rem 1rem;
-            margin-bottom: 2rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .filter-section input {
-            flex: 1;
-            min-width: 200px;
-            padding: 12px 20px;
-            border: 1px solid #ddd;
-            border-radius: 50px;
-            font-size: 1rem;
-        }
-
-        .filter-section button {
-            background: #0a2b4e;
+        
+        .hero-section {
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
             color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
+            padding: 4rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-
-        .vacancy-card {
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x bottom;
+            background-size: 1440px 80px;
+            opacity: 0.3;
+        }
+        .hero-section h2 { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-section .hero-subtitle { 
+            font-size: 1.1rem; 
+            opacity: 0.9; 
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-section .hero-description { 
+            font-size: 0.95rem; 
+            max-width: 700px; 
+            margin: 0 auto; 
+            opacity: 0.8; 
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .rentals-container { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+        
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 60px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .filter-bar .results-count {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .filter-bar .results-count strong {
+            color: #0a2b4e;
+            font-size: 1.1rem;
+        }
+        .filter-bar .sort-select {
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        
+        .properties-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); 
+            gap: 2rem; 
+        }
+        
+        .property-card {
             background: white;
             border-radius: 24px;
-            padding: 1.2rem;
-            margin: 1.2rem 0;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .property-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card-image {
+            position: relative;
+            height: 250px;
+            background: #e2e8f0;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card-image:hover img { transform: scale(1.08); }
+        .image-count-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .price-badge {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .card-content { padding: 1.5rem; }
+        .property-title { 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            color: #0a2b4e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+        .property-location { 
+            color: #64748b; 
+            font-size: 0.85rem; 
+            margin: 0.3rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .room-number { 
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #eef2ff; 
+            padding: 4px 12px; 
+            border-radius: 30px; 
+            font-size: 0.7rem; 
+            font-weight: 600; 
+            color: #2c7be5; 
+            margin: 0.7rem 0; 
+        }
+        .rent-price { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            color: #10b981; 
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .features {
+            display: flex;
             gap: 1rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .feature {
+            font-size: 0.7rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .contact-buttons { 
+            display: flex; 
+            gap: 0.8rem; 
+            margin-top: 1.2rem; 
+            flex-wrap: wrap; 
+        }
+        .btn-whatsapp { 
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 18px; 
+            border-radius: 50px; 
+            font-weight: 600; 
+            font-size: 0.8rem; 
+            flex: 1; 
+            text-align: center; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn-whatsapp:hover { 
+            opacity: 0.9; 
+            transform: scale(1.02);
+        }
+        .btn-call { 
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 18px; 
+            border-radius: 50px; 
+            font-weight: 600; 
+            font-size: 0.8rem; 
+            flex: 1; 
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn-call:hover { 
+            background: #1a4a7a; 
+            transform: scale(1.02);
+        }
+        
+        /* Lightbox Modal Styles */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 2001;
             transition: 0.2s;
         }
-
-        .vacancy-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-        }
-
-        .vacancy-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 16px;
-            object-fit: cover;
-            background: #e2e8f0;
-        }
-
-        .vacancy-details {
-            flex: 1;
-        }
-
-        .property-name {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #0a2b4e;
-        }
-
-        .room-number {
-            background: #2c7be5;
-            color: white;
-            display: inline-block;
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            margin: 0.5rem 0;
-        }
-
-        .location {
-            color: #555;
-            margin: 0.3rem 0;
-        }
-
-        .rent-price {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #0a2b4e;
-            margin: 0.5rem 0;
-        }
-
-        .room-description {
-            background: #f8fafc;
-            padding: 0.5rem;
-            border-radius: 12px;
-            margin: 0.5rem 0;
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .contact-buttons {
+        .lightbox-close:hover { color: #dc2626; }
+        .lightbox-image-container {
+            width: 90%;
+            max-width: 1000px;
+            height: 70vh;
             display: flex;
-            gap: 0.8rem;
-            margin-top: 0.8rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-whatsapp {
-            background: #25D366;
-            color: white;
-            text-decoration: none;
-            padding: 8px 18px;
-            border-radius: 40px;
-            font-weight: bold;
-            display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-        }
-
-        .btn-call {
-            background: #0a2b4e;
-            color: white;
-            text-decoration: none;
-            padding: 8px 18px;
-            border-radius: 40px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            background: white;
-            border-radius: 24px;
-            color: #666;
-        }
-
-        .main-footer {
-            background: #071e36;
-            color: white;
-            margin-top: 3rem;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .phones {
-            display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin: 0.5rem 0;
-            flex-wrap: wrap;
+            position: relative;
         }
-
-        .whatsapp-btn a {
-            background: #25D366;
+        .lightbox-main-image { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .lightbox-prev, .lightbox-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
             color: white;
-            padding: 8px 20px;
-            border-radius: 40px;
-            text-decoration: none;
-            display: inline-block;
+            border: none;
+            font-size: 40px;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 50%;
+            transition: 0.2s;
         }
-
-        @media (max-width: 700px) {
-            .vacancy-card {
-                flex-direction: column;
-            }
-            .vacancy-image {
-                width: 100%;
-                height: 180px;
-            }
-            .filter-section {
-                border-radius: 20px;
-                padding: 1rem;
-            }
+        .lightbox-prev { left: 20px; }
+        .lightbox-next { right: 20px; }
+        .lightbox-prev:hover, .lightbox-next:hover { background: rgba(255,255,255,0.4); }
+        .lightbox-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 10px;
+            overflow-x: auto;
+            max-width: 90%;
+            justify-content: center;
+        }
+        .lightbox-thumb {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .lightbox-thumb.active { border-color: #2c7be5; transform: scale(1.05); }
+        .lightbox-thumb:hover { transform: scale(1.05); }
+        .lightbox-caption { 
+            color: white; 
+            margin-top: 15px; 
+            text-align: center; 
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 40px;
+        }
+        
+        .no-results { 
+            text-align: center; 
+            padding: 4rem; 
+            background: white; 
+            border-radius: 28px; 
+            color: #64748b;
+            grid-column: span 2;
+        }
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .loader { 
+            text-align: center; 
+            padding: 4rem; 
+            grid-column: span 2; 
+        }
+        .loader-spinner { 
+            width: 50px; 
+            height: 50px; 
+            border: 3px solid #eef3fc; 
+            border-top-color: #2c7be5; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin: 0 auto 1rem; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .main-footer { 
+            background: linear-gradient(135deg, #0a2b4e 0%, #071e36 100%);
+            color: white; 
+            margin-top: 3rem; 
+            padding: 2rem; 
+            text-align: center; 
+        }
+        .phones { display: flex; justify-content: center; gap: 2rem; margin: 0.8rem 0; flex-wrap: wrap; font-size: 0.85rem; }
+        .whatsapp-btn a { 
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white; 
+            padding: 8px 20px; 
+            border-radius: 50px; 
+            text-decoration: none; 
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .whatsapp-btn a:hover { transform: scale(1.05); }
+        
+        @media (max-width: 768px) {
+            .hero-section h2 { font-size: 1.8rem; }
+            .hero-section { padding: 2.5rem 1rem; }
+            .properties-grid { grid-template-columns: 1fr; }
+            .contact-buttons { flex-direction: column; }
+            .lightbox-thumbnails { display: none; }
+            .lightbox-prev, .lightbox-next { font-size: 30px; padding: 5px 15px; }
+            .filter-bar { flex-direction: column; text-align: center; border-radius: 20px; }
+            .rentals-container { padding: 1rem; }
         }
     </style>
 </head>
@@ -249,34 +441,70 @@
 
 <header>
     <div class="logo-container">
-        <div class="logo-icon">🏢</div>
+        <div class="logo-icon"><i class="fas fa-building"></i></div>
         <div class="logo-text">
             <h1>BATTETECH</h1>
             <span>PROPERTY CONSULTANTS</span>
         </div>
     </div>
-    <div class="tagline">Find Your Next Home</div>
 </header>
 
-<div class="rentals-container">
-    <div class="filter-section">
-        <input type="text" id="locationFilter" placeholder="📍 Filter by location (e.g., Kampala, Wandegeya...)" autocomplete="off">
-        <button onclick="filterVacancies()">🔍 Search</button>
-        <button onclick="clearFilter()" style="background:#6c757d;">Reset</button>
+<div class="hero-section">
+    <h2><i class="fas fa-home"></i> Find Your Perfect Space</h2>
+    <div class="hero-subtitle">Discover quality homes, apartments, and commercial spaces</div>
+    <div class="hero-description">
+        Whether you're looking for a cozy apartment, a family home, or a prime commercial location, 
+        BATTETECH connects you with the best rental properties across Uganda. Professional management, 
+        transparent process, and properties you'll love to call home.
     </div>
-    <div id="vacanciesList"></div>
+</div>
+
+<div class="rentals-container">
+    <div class="filter-bar">
+        <div class="results-count">
+            <i class="fas fa-building"></i> <strong id="propertyCount">0</strong> Properties Available
+        </div>
+        <div class="results-count">
+            <i class="fas fa-door-open"></i> <strong id="unitCount">0</strong> Units For Rent
+        </div>
+        <select id="sortSelect" class="sort-select" onchange="sortVacancies()">
+            <option value="price_asc">Sort by: Price (Low to High)</option>
+            <option value="price_desc">Sort by: Price (High to Low)</option>
+            <option value="name_asc">Sort by: Property Name (A-Z)</option>
+            <option value="name_desc">Sort by: Property Name (Z-A)</option>
+        </select>
+    </div>
+    
+    <div id="vacanciesList" class="properties-grid">
+        <div class="loader">
+            <div class="loader-spinner"></div>
+            <p><i class="fas fa-spinner fa-spin"></i> Loading available rentals...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div id="lightbox" class="lightbox">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <div class="lightbox-image-container">
+        <button class="lightbox-prev" onclick="prevImage()"><i class="fas fa-chevron-left"></i></button>
+        <img id="lightboxMainImage" class="lightbox-main-image" src="" alt="">
+        <button class="lightbox-next" onclick="nextImage()"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div id="lightboxThumbnails" class="lightbox-thumbnails"></div>
+    <div id="lightboxCaption" class="lightbox-caption"></div>
 </div>
 
 <footer class="main-footer">
     <div class="contact-info">
         <h3>YOUR PROPERTY, OUR PRIORITY</h3>
         <div class="phones">
-            <p><strong>📱 MTN: 0794115704</strong></p>
-            <p><strong>📱 AIRTEL: 0756182284</strong></p>
+            <p><i class="fas fa-phone-alt"></i> <strong>MTN: 0794115704</strong></p>
+            <p><i class="fas fa-phone-alt"></i> <strong>AIRTEL: 0756182284</strong></p>
         </div>
-        <p><strong>📧 battetech330@gmail.com</strong></p>
+        <p><i class="fas fa-envelope"></i> <strong>battetech330@gmail.com</strong></p>
         <div class="whatsapp-btn">
-            <a href="https://wa.me/256794115704" target="_blank">💬 Chat on WhatsApp</a>
+            <a href="https://wa.me/256794115704" target="_blank"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
         </div>
     </div>
     <div class="copyright" style="margin-top: 1rem;">
@@ -284,85 +512,289 @@
     </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="supabase-data.js"></script>
+
 <script>
     let allVacantUnits = [];
-
-    function loadVacancies() {
-        allVacantUnits = getAllVacantUnits();
-        displayVacancies(allVacantUnits);
+    let currentLightboxImages = [];
+    let currentLightboxIndex = 0;
+    let currentLightboxRoom = null;
+    
+    // Sorting function
+    function sortVacancies() {
+        const sortBy = document.getElementById('sortSelect').value;
+        let sorted = [...allVacantUnits];
+        
+        switch(sortBy) {
+            case 'price_asc':
+                sorted.sort((a, b) => a.rent - b.rent);
+                break;
+            case 'price_desc':
+                sorted.sort((a, b) => b.rent - a.rent);
+                break;
+            case 'name_asc':
+                sorted.sort((a, b) => a.propertyName.localeCompare(b.propertyName));
+                break;
+            case 'name_desc':
+                sorted.sort((a, b) => b.propertyName.localeCompare(a.propertyName));
+                break;
+            default:
+                sorted.sort((a, b) => a.rent - b.rent);
+        }
+        
+        displayVacancies(sorted);
     }
-
+    
+    // Lightbox functions
+    function openLightbox(images, startIndex, roomName, propertyName, rent) {
+        if (!images || images.length === 0) {
+            images = ['https://placehold.co/800x600?text=No+Images+Uploaded'];
+            startIndex = 0;
+        }
+        
+        currentLightboxImages = images;
+        currentLightboxIndex = startIndex;
+        
+        const mainImage = document.getElementById('lightboxMainImage');
+        if (mainImage) {
+            mainImage.src = images[startIndex];
+            mainImage.onerror = function() {
+                this.src = 'https://placehold.co/800x600?text=Image+Not+Found';
+            };
+        }
+        
+        const caption = document.getElementById('lightboxCaption');
+        if (caption) {
+            caption.innerHTML = `<i class="fas fa-door-open"></i> ${escapeHtml(roomName)} | <i class="fas fa-building"></i> ${escapeHtml(propertyName)} | <i class="fas fa-money-bill-wave"></i> UGX ${rent?.toLocaleString() || 'N/A'} | <i class="fas fa-image"></i> ${startIndex + 1} of ${images.length}`;
+        }
+        
+        const thumbContainer = document.getElementById('lightboxThumbnails');
+        if (thumbContainer) {
+            thumbContainer.innerHTML = '';
+            for (let i = 0; i < images.length; i++) {
+                const thumb = document.createElement('img');
+                thumb.src = images[i];
+                thumb.className = 'lightbox-thumb';
+                if (i === startIndex) thumb.classList.add('active');
+                thumb.onerror = function() { this.src = 'https://placehold.co/70x70?text=No+Image'; };
+                thumb.onclick = (function(idx) { return function() { setLightboxImage(idx); }; })(i);
+                thumbContainer.appendChild(thumb);
+            }
+        }
+        
+        document.getElementById('lightbox').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('active');
+        document.body.style.overflow = '';
+        currentLightboxImages = [];
+        currentLightboxIndex = 0;
+    }
+    
+    function setLightboxImage(index) {
+        if (!currentLightboxImages || index >= currentLightboxImages.length) return;
+        
+        currentLightboxIndex = index;
+        const mainImage = document.getElementById('lightboxMainImage');
+        if (mainImage) {
+            mainImage.src = currentLightboxImages[index];
+        }
+        
+        const caption = document.getElementById('lightboxCaption');
+        if (caption && currentLightboxRoom) {
+            caption.innerHTML = `<i class="fas fa-door-open"></i> ${escapeHtml(currentLightboxRoom.roomNumber)} | <i class="fas fa-building"></i> ${escapeHtml(currentLightboxRoom.propertyName)} | <i class="fas fa-money-bill-wave"></i> UGX ${currentLightboxRoom.rent?.toLocaleString() || 'N/A'} | <i class="fas fa-image"></i> ${index + 1} of ${currentLightboxImages.length}`;
+        }
+        
+        const thumbs = document.querySelectorAll('.lightbox-thumb');
+        thumbs.forEach((thumb, i) => {
+            if (i === index) {
+                thumb.classList.add('active');
+            } else {
+                thumb.classList.remove('active');
+            }
+        });
+    }
+    
+    function prevImage() {
+        if (!currentLightboxImages || currentLightboxImages.length === 0) return;
+        let newIndex = currentLightboxIndex - 1;
+        if (newIndex < 0) newIndex = currentLightboxImages.length - 1;
+        setLightboxImage(newIndex);
+    }
+    
+    function nextImage() {
+        if (!currentLightboxImages || currentLightboxImages.length === 0) return;
+        let newIndex = currentLightboxIndex + 1;
+        if (newIndex >= currentLightboxImages.length) newIndex = 0;
+        setLightboxImage(newIndex);
+    }
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (!document.getElementById('lightbox').classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') prevImage();
+        if (e.key === 'ArrowRight') nextImage();
+    });
+    
+    async function loadVacancies() {
+        console.log('=== LOADING VACANCIES ===');
+        
+        document.getElementById('vacanciesList').innerHTML = `
+            <div class="loader">
+                <div class="loader-spinner"></div>
+                <p><i class="fas fa-spinner fa-spin"></i> Loading available rentals...</p>
+            </div>
+        `;
+        
+        const { data: properties, error } = await window.supabaseClient
+            .from('properties')
+            .select('*');
+        
+        if (error) {
+            console.error('Error:', error);
+            document.getElementById('vacanciesList').innerHTML = '<div class="no-results"><i class="fas fa-exclamation-triangle"></i><br>❌ Error loading properties</div>';
+            return;
+        }
+        
+        console.log('Found', properties?.length, 'properties');
+        
+        allVacantUnits = [];
+        let totalPropertiesWithVacancies = 0;
+        
+        for (let prop of properties) {
+            if (prop.status !== 'active') continue;
+            
+            const propData = prop.data || { units: [] };
+            const units = propData.units || [];
+            let hasVacancy = false;
+            
+            for (let unitIndex = 0; unitIndex < units.length; unitIndex++) {
+                const unit = units[unitIndex];
+                if (unit.vacant === true) {
+                    hasVacancy = true;
+                    let roomImages = [];
+                    if (unit.roomImages && Array.isArray(unit.roomImages) && unit.roomImages.length > 0) {
+                        roomImages = unit.roomImages;
+                    } else if (unit.roomImage && unit.roomImage !== '') {
+                        roomImages = [unit.roomImage];
+                    }
+                    
+                    allVacantUnits.push({
+                        propertyId: prop.id,
+                        propertyName: prop.name,
+                        location: prop.location,
+                        roomNumber: unit.roomNumber,
+                        rent: unit.rentAmount,
+                        roomImage: unit.roomImage || '',
+                        roomImages: roomImages,
+                        dueDate: unit.paymentDueDate || 1,
+                        roomIndex: unitIndex
+                    });
+                }
+            }
+            if (hasVacancy) totalPropertiesWithVacancies++;
+        }
+        
+        // Update counts
+        document.getElementById('propertyCount').innerText = totalPropertiesWithVacancies;
+        document.getElementById('unitCount').innerText = allVacantUnits.length;
+        
+        console.log('Total vacant units found:', allVacantUnits.length);
+        sortVacancies();
+    }
+    
+    function openLightboxForRoom(roomData) {
+        console.log('Opening lightbox for room:', roomData.roomNumber);
+        
+        currentLightboxRoom = {
+            roomNumber: roomData.roomNumber,
+            propertyName: roomData.propertyName,
+            rent: roomData.rent
+        };
+        
+        let images = roomData.roomImages;
+        if (!images || images.length === 0) {
+            images = ['https://placehold.co/800x600?text=No+Images+Uploaded'];
+        }
+        
+        openLightbox(images, 0, roomData.roomNumber, roomData.propertyName, roomData.rent);
+    }
+    
     function displayVacancies(units) {
         const container = document.getElementById('vacanciesList');
         
         if (units.length === 0) {
-            container.innerHTML = '<div class="no-results">🏠 No vacant rooms available at the moment. Check back later.</div>';
+            container.innerHTML = '<div class="no-results"><i class="fas fa-home"></i><br>🏠 No vacant rooms available at the moment.<br>Check back later.</div>';
             return;
         }
-
+        
         let html = '';
-        units.forEach(unit => {
-            const whatsappMsg = `Hello BATTETECH, I'm interested in ${unit.propertyName} - Room ${unit.roomNumber} at UGX ${unit.rent.toLocaleString()}/month`;
-            const encodedMsg = encodeURIComponent(whatsappMsg);
+        for (let unit of units) {
+            const displayImage = unit.roomImage || 'https://placehold.co/600x400?text=No+Image';
+            const imageCount = unit.roomImages.length;
+            
+            // Create a safe JSON string for the room data
+            const roomDataJson = JSON.stringify({
+                propertyId: unit.propertyId,
+                propertyName: unit.propertyName,
+                location: unit.location,
+                roomNumber: unit.roomNumber,
+                rent: unit.rent,
+                roomImages: unit.roomImages,
+                roomImage: unit.roomImage
+            }).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
             
             html += `
-                <div class="vacancy-card">
-                    <img src="${unit.roomImage || 'https://placehold.co/400x300?text=No+Image'}" class="vacancy-image" onerror="this.src='https://placehold.co/400x300?text=No+Image'">
-                    <div class="vacancy-details">
-                        <div class="property-name">🏢 ${escapeHtml(unit.propertyName)}</div>
-                        <div class="room-number">Room ${escapeHtml(unit.roomNumber)}</div>
-                        <div class="location">📍 ${escapeHtml(unit.location)}</div>
-                        <div class="rent-price">💰 UGX ${unit.rent.toLocaleString()} / month</div>
-                        <div class="room-description">
-                            📝 This room is ready for immediate occupation. Contact us for viewing.
+                <div class="property-card">
+                    <div class="card-image" onclick='openLightboxForRoom(${roomDataJson})'>
+                        <img src="${displayImage}" alt="${unit.roomNumber}" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+                        ${imageCount > 1 ? `<div class="image-count-badge"><i class="fas fa-images"></i> ${imageCount} photos</div>` : ''}
+                        <div class="price-badge"><i class="fas fa-money-bill-wave"></i> UGX ${unit.rent.toLocaleString()}/month</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="property-title"><i class="fas fa-building"></i> ${escapeHtml(unit.propertyName)}</div>
+                        <div class="property-location"><i class="fas fa-location-dot"></i> ${escapeHtml(unit.location)}</div>
+                        <div class="room-number"><i class="fas fa-door-open"></i> Room ${escapeHtml(unit.roomNumber)}</div>
+                        <div class="rent-price"><i class="fas fa-coins"></i> UGX ${unit.rent.toLocaleString()} <span style="font-size:0.7rem; font-weight:normal;">/ month</span></div>
+                        <div class="features">
+                            <span class="feature"><i class="fas fa-calendar-alt"></i> Due: ${unit.dueDate}th of month</span>
+                            <span class="feature"><i class="fas fa-shield-alt"></i> Secure</span>
+                            <span class="feature"><i class="fas fa-water"></i> Water Included</span>
                         </div>
                         <div class="contact-buttons">
-                            <a href="https://wa.me/256794115704?text=${encodedMsg}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
-                            <a href="tel:0794115704" class="btn-call">📞 Call MTN</a>
-                            <a href="tel:0756182284" class="btn-call">📞 Call AIRTEL</a>
+                            <a href="https://wa.me/256794115704?text=${encodeURIComponent(`Hello BATTETECH, I'm interested in ${unit.propertyName} - Room ${unit.roomNumber} at UGX ${unit.rent.toLocaleString()}/month`)}" target="_blank" class="btn-whatsapp" onclick="event.stopPropagation();"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                            <a href="tel:0794115704" class="btn-call" onclick="event.stopPropagation();"><i class="fas fa-phone-alt"></i> Call MTN</a>
+                            <a href="tel:0756182284" class="btn-call" onclick="event.stopPropagation();"><i class="fas fa-phone-alt"></i> Call AIRTEL</a>
                         </div>
                     </div>
                 </div>
             `;
-        });
+        }
         container.innerHTML = html;
     }
-
-    function filterVacancies() {
-        const searchTerm = document.getElementById('locationFilter').value.toLowerCase().trim();
-        if (!searchTerm) {
-            displayVacancies(allVacantUnits);
-            return;
-        }
-        const filtered = allVacantUnits.filter(unit => 
-            unit.location.toLowerCase().includes(searchTerm) || 
-            unit.propertyName.toLowerCase().includes(searchTerm)
-        );
-        displayVacancies(filtered);
-    }
-
-    function clearFilter() {
-        document.getElementById('locationFilter').value = '';
-        displayVacancies(allVacantUnits);
-    }
-
+    
     function escapeHtml(text) {
         if (!text) return '';
-        return text.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return String(text).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
     }
-
+    
+    // Make functions globally available
+    window.openLightboxForRoom = openLightboxForRoom;
+    window.openLightbox = openLightbox;
+    window.closeLightbox = closeLightbox;
+    window.prevImage = prevImage;
+    window.nextImage = nextImage;
+    window.sortVacancies = sortVacancies;
+    
     window.addEventListener('load', async () => {
         await window.supabaseDataLoaded;
         loadVacancies();
     });
 </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <script src="supabase-data.js"></script>
 </body>
-</html>
+<html>

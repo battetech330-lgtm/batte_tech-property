@@ -571,16 +571,23 @@
     }
     
     function openChat(propertyId) {
-        const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
-        const container = document.getElementById(`chat-${safeId}`);
-        if (!container) return;
-        
-        if (container.style.display === 'none') {
-            loadAdminChat(propertyId, container);
-            container.style.display = 'block';
-        } else {
-            container.style.display = 'none';
-        }
+        const prop = propertiesDB[propertyId];
+        requestVerification(
+            'Chat with Owner',
+            `Property: ${prop.name}\nOwner: ${prop.ownerName}`,
+            function(paramId) {
+                const safeId = paramId.replace(/[^a-zA-Z0-9]/g, '_');
+                const container = document.getElementById(`chat-${safeId}`);
+                if (!container) return;
+                if (container.style.display === 'none') {
+                    loadAdminChat(paramId, container);
+                    container.style.display = 'block';
+                } else {
+                    container.style.display = 'none';
+                }
+            },
+            propertyId
+        );
     }
     
     function loadAdminChat(propertyId, container) {
@@ -739,6 +746,77 @@
     populatePropertySelect();
     displayRecentUpdates();
 </script>
+
+<!-- Verify Modal -->
+<div id="verifyModal" class="modal">
+    <div class="modal-content">
+        <h2 id="verifyModalTitle">🔐 Verify Action</h2>
+        <div id="verifyModalMessage" style="margin-bottom:0.6rem; color:#333;"></div>
+        <div class="form-row"><input type="text" id="verifyCode" placeholder="Enter verification code"></div>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button id="verifyConfirmBtn" style="background:#10b981;">Confirm</button>
+            <button onclick="closeVerifyModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Generic verification helpers (shared on this page)
+    let pendingVerificationAction = null;
+    let pendingVerificationCode = null;
+    let pendingVerificationParams = null;
+
+    function generateVerificationCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function sendCodeToAdmin(action, details) {
+        const YOUR_WHATSAPP = "256756182282"; // Admin WhatsApp number
+        const code = pendingVerificationCode;
+        let message = `🔐 BATTETECH ACTION VERIFICATION\n\n`;
+        message += `Action: ${action}\n`;
+        message += `Details: ${details}\n`;
+        message += `Verification Code: ${code}\n\n`;
+        message += `⚠️ Someone is trying to perform this action. Enter this code to approve.`;
+        const encodedMsg = encodeURIComponent(message);
+        window.open(`https://wa.me/${YOUR_WHATSAPP}?text=${encodedMsg}`, '_blank');
+    }
+
+    function requestVerification(action, details, callback, callbackParams) {
+        pendingVerificationCode = generateVerificationCode();
+        pendingVerificationAction = action;
+        pendingVerificationParams = callbackParams;
+        // Send code to admin WhatsApp
+        sendCodeToAdmin(action, details);
+        // Show modal
+        document.getElementById('verifyModalTitle').innerHTML = `🔐 ${action}`;
+        document.getElementById('verifyModalMessage').innerHTML = `${details}<br><br>A verification code has been sent to the admin's WhatsApp.`;
+        document.getElementById('verifyCode').value = '';
+        const confirmBtn = document.getElementById('verifyConfirmBtn');
+        const oldBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(oldBtn, confirmBtn);
+        oldBtn.onclick = () => verifyAndExecute(callback);
+        document.getElementById('verifyModal').style.display = 'flex';
+    }
+
+    function verifyAndExecute(callback) {
+        const enteredCode = document.getElementById('verifyCode').value.trim();
+        if (!enteredCode) { alert('Please enter the verification code'); return; }
+        if (enteredCode !== pendingVerificationCode) { alert('❌ Invalid verification code. Please check with the admin.'); return; }
+        closeVerifyModal();
+        if (callback && typeof callback === 'function') {
+            callback(pendingVerificationParams);
+        }
+        pendingVerificationAction = null;
+        pendingVerificationCode = null;
+        pendingVerificationParams = null;
+    }
+
+    function closeVerifyModal() {
+        document.getElementById('verifyModal').style.display = 'none';
+    }
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="supabase-data.js"></script>

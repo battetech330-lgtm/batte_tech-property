@@ -450,7 +450,6 @@
 
     <div class="action-buttons">
         <button class="add-property-btn" onclick="openAddPropertyModal()">➕ Add New Property</button>
-        <button class="delete-all-btn" onclick="deleteAllOtherProperties()">🗑 Delete Others</button>
     </div>
 
     <div class="section-title">📋 My Properties</div>
@@ -509,6 +508,22 @@
     </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-content">
+        <h2>⚠️ Confirm Property Deletion</h2>
+        <p style="margin-bottom: 1rem;">A verification code has been sent to the admin's WhatsApp.</p>
+        <div class="form-row">
+            <input type="text" id="verificationCode" placeholder="Enter 6-digit code" maxlength="6">
+        </div>
+        <p id="deletePropertyName" style="font-size:0.8rem; color:#666; margin-bottom:1rem;"></p>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+            <button onclick="verifyAndDelete()" style="background:#dc2626;">Confirm Delete</button>
+            <button onclick="closeDeleteModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <footer class="main-footer">
     <div class="contact-info">
         <h3>YOUR PROPERTY, OUR PRIORITY</h3>
@@ -517,8 +532,8 @@
             <p><strong>📱 AIRTEL: 0756182284</strong></p>
         </div>
         <p><strong>📧 battetech330@gmail.com</strong></p>
-        <div class="whatsapp-btn">
-            <a href="https://wa.me/256794115704" target="_blank">💬 WhatsApp</a>
+            <div class="whatsapp-btn">
+            <a href="https://wa.me/256756182282" target="_blank">💬 WhatsApp</a>
         </div>
     </div>
 </footer>
@@ -626,24 +641,25 @@
                 '<span class="status-badge status-active">✅ Active</span>';
             
             html += `
-                <div class="property-card ${statusClass}" onclick="goToProperty('${propId}')">
-                    <div class="property-header">
-                        <div class="property-name">🏢 ${escapeHtml(prop.name)}</div>
-                        ${statusBadge}
+                    <div class="property-card ${statusClass}" onclick="goToProperty('${propId}')" style="position:relative;">
+                        <button class="delete-property-btn" onclick="event.stopPropagation(); requestPropertyDelete('${propId}')" style="position: absolute; top: 10px; right: 10px; background: #dc2626; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 0.7rem; cursor: pointer; z-index: 10;">✕</button>
+                        <div class="property-header">
+                            <div class="property-name">🏢 ${escapeHtml(prop.name)}</div>
+                            ${statusBadge}
+                        </div>
+                        <div class="property-location">📍 ${escapeHtml(prop.location)}</div>
+                        ${prop.propertyImage ? `<img src="${prop.propertyImage}" class="property-image-preview" onerror="this.style.display='none'">` : ''}
+                        <div class="property-stats">
+                            <span>📊 ${occupied} occupied</span>
+                            <span>🏠 ${vacant} vacant</span>
+                            <span>💰 ${totalRooms} rooms</span>
+                            <span>💸 Fee: ${prop.managementFee}%</span>
+                        </div>
+                        <div class="owner-info">
+                            👤 Owner: ${escapeHtml(prop.ownerName || 'Not set')} | 📞 ${prop.ownerPhone || '-'}
+                        </div>
                     </div>
-                    <div class="property-location">📍 ${escapeHtml(prop.location)}</div>
-                    ${prop.propertyImage ? `<img src="${prop.propertyImage}" class="property-image-preview" onerror="this.style.display='none'">` : ''}
-                    <div class="property-stats">
-                        <span>📊 ${occupied} occupied</span>
-                        <span>🏠 ${vacant} vacant</span>
-                        <span>💰 ${totalRooms} rooms</span>
-                        <span>💸 Fee: ${prop.managementFee}%</span>
-                    </div>
-                    <div class="owner-info">
-                        👤 Owner: ${escapeHtml(prop.ownerName || 'Not set')} | 📞 ${prop.ownerPhone || '-'}
-                    </div>
-                </div>
-            `;
+                `;
         }
         container.innerHTML = html;
     }
@@ -707,6 +723,67 @@
     function closeAddPropertyModal() {
         document.getElementById('addPropertyModal').style.display = 'none';
         clearAddPropertyForm();
+    }
+
+    // ============ DELETE WITH VERIFICATION ============
+    let pendingDeletePropertyId = null;
+    let pendingDeleteCode = null;
+    let pendingDeletePropertyName = null;
+
+    function generateVerificationCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function sendCodeToAdminWhatsApp(propertyName, code) {
+        const YOUR_WHATSAPP = "256756182282"; // Admin WhatsApp number
+        const message = `🔐 BATTETECH PROPERTY DELETION VERIFICATION\n\nProperty: ${propertyName}\nVerification Code: ${code}\n\n⚠️ Someone is trying to delete this property. Enter this code in the app to confirm deletion.\n\nIf you did not request this, IGNORE this message.`;
+        const encodedMsg = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${YOUR_WHATSAPP}?text=${encodedMsg}`;
+        window.open(whatsappUrl, '_blank');
+    }
+
+    function requestPropertyDelete(propertyId) {
+        const prop = propertiesDB[propertyId];
+        if (!prop) return;
+        const propertyName = prop.name;
+        pendingDeletePropertyId = propertyId;
+        pendingDeletePropertyName = propertyName;
+        pendingDeleteCode = generateVerificationCode();
+        sendCodeToAdminWhatsApp(propertyName, pendingDeleteCode);
+        const modal = document.getElementById('deleteConfirmModal');
+        if (modal) {
+            document.getElementById('deletePropertyName').innerHTML = `Property: <strong>${escapeHtml(propertyName)}</strong><br><small>Code sent to admin's WhatsApp. Ask admin for the code.</small>`;
+            document.getElementById('verificationCode').value = '';
+            modal.style.display = 'flex';
+        } else {
+            alert('Delete modal not found.');
+        }
+    }
+
+    async function verifyAndDelete() {
+        const enteredCode = document.getElementById('verificationCode').value.trim();
+        if (!enteredCode) { alert('Please enter the verification code'); return; }
+        if (enteredCode !== pendingDeleteCode) { alert('❌ Invalid verification code. Please check with the admin.'); return; }
+        if (pendingDeletePropertyId) {
+            const propName = propertiesDB[pendingDeletePropertyId]?.name;
+            await deleteProperty(pendingDeletePropertyId);
+            renderPropertiesGrid();
+            alert(`✅ Property "${propName}" has been permanently deleted.`);
+            const confirmMsg = `✅ Property "${propName}" was successfully deleted by authorized user.`;
+            const encodedConfirm = encodeURIComponent(confirmMsg);
+                window.open(`https://wa.me/256756182282?text=${encodedConfirm}`, '_blank');
+        }
+        closeDeleteModal();
+    }
+
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteConfirmModal');
+        if (modal) modal.style.display = 'none';
+        pendingDeletePropertyId = null;
+        pendingDeleteCode = null;
+        pendingDeletePropertyName = null;
+        const input = document.getElementById('verificationCode');
+        if (input) input.value = '';
     }
     
     function clearAddPropertyForm() {

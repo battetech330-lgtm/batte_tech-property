@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, maximum-scale=1.0">
     <title>Property View - BATTETECH</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; min-height: 100vh; padding-bottom: 70px; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: linear-gradient(135deg, #f0f4fa 0%, #dce3ec 100%);
+            min-height: 100vh;
+        }
         
-        /* SINGLE BACKGROUND IMAGE */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
         .property-background { 
             position: fixed; 
             top: 0; 
@@ -19,7 +25,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: #1a1a2e;
+            background-attachment: fixed;
         }
         .overlay-light { 
             position: fixed; 
@@ -27,394 +33,1002 @@
             left: 0; 
             width: 100%; 
             height: 100%; 
-            background: rgba(0, 0, 0, 0.55); 
+            background: rgba(0, 0, 0, 0.4); 
             z-index: 1; 
         }
         
-        .dashboard-container { position: relative; z-index: 2; max-width: 100%; padding: 0.6rem; }
+        .dashboard-container { 
+            position: relative; 
+            z-index: 2; 
+            max-width: 1400px; 
+            margin: 1.5rem auto; 
+            padding: 0 1.5rem 80px;
+        }
         
-        .back-link { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(108,117,125,0.9); color: white; text-decoration: none; padding: 8px 14px; border-radius: 40px; margin-bottom: 0.8rem; font-size: 0.75rem; backdrop-filter: blur(4px); }
+        .back-link { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(10px);
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 22px; 
+            border-radius: 50px; 
+            margin-bottom: 1.5rem; 
+            font-size: 0.85rem; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .back-link:hover { 
+            background: #0a2b4e; 
+            transform: translateX(-5px);
+        }
         
-        .property-header-card, .section-card, .stats-grid .stat-card, .fee-summary, .balance-info, .notification-banner, .rooms-grid .room-card {
-            background: rgba(255, 255, 255, 0.94);
-            backdrop-filter: blur(8px);
+        header { 
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
+            backdrop-filter: blur(10px); 
+            color: white; 
+            padding: 0.8rem; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .logo-container { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+        .logo-icon { 
+            font-size: 1.6rem; 
+            background: white; 
+            color: #0a2b4e; 
+            width: 45px; 
+            height: 45px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .logo-text h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        .logo-text span { font-size: 0.55rem; letter-spacing: 2px; opacity: 0.8; }
+        
+        .property-header-card {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(15px);
+            border-radius: 28px;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .property-title { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            color: #0a2b4e; 
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .property-meta { 
+            color: #475569; 
+            margin-bottom: 0.3rem; 
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-number { 
+            font-size: 1.4rem; 
+            font-weight: 800; 
+            color: #0a2b4e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+        .stat-label { 
+            font-size: 0.7rem; 
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .stat-card.pending .stat-number { color: #dc2626; }
+        .stat-card.remitted .stat-number { color: #10b981; }
+        .stat-card.fee .stat-number { color: #f59e0b; }
+        .stat-card.collected .stat-number { color: #2c7be5; }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
+        }
+        .btn-statement {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(139,92,246,0.3);
+        }
+        .btn-statement:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(139,92,246,0.4);
+        }
+        
+        .section-card {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(15px);
+            border-radius: 28px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0a2b4e;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        .room-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .room-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            background: #e2e8f0;
+        }
+        .room-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0a2b4e;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .room-rent {
+            font-size: 1rem;
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .tenant-info {
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        .tenant-name {
+            font-weight: 600;
+            color: #0a2b4e;
+            font-size: 0.95rem;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.8rem;
+        }
+        .status-paid { background: #d1fae5; color: #065f46; }
+        .status-unpaid { background: #fee2e2; color: #991b1b; }
+        .vacant-badge { background: #fef3c7; color: #92400e; display: inline-flex; align-items: center; gap: 0.3rem; padding: 5px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
+        
+        .btn-history {
+            background: linear-gradient(135deg, #2c7be5 0%, #1a68d1 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn-history:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(44,123,229,0.3);
+        }
+        
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .activity-item {
+            background: #f8fafc;
             border-radius: 16px;
             padding: 1rem;
             margin-bottom: 0.8rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            border-left: 4px solid #2c7be5;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+        .activity-item:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+        }
+        .activity-date {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .activity-message {
+            color: #334155;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .payment-received { border-left-color: #10b981; }
+        .remittance-sent { border-left-color: #8b5cf6; }
+        .bill-paid { border-left-color: #f59e0b; }
+        
+        .whatsapp-contact {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(37,211,102,0.3);
+        }
+        .whatsapp-contact:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(37,211,102,0.4);
         }
         
-        /* NO IMAGE in property header card - removed */
-        .property-header-card {
+        .logout-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 100%;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(220,38,38,0.3);
+        }
+        
+        .payment-modal, .statement-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .payment-modal-content, .statement-modal-content {
+            background: white;
+            width: 95%;
+            max-width: 750px;
+            border-radius: 28px;
+            padding: 1.8rem;
+            max-height: 85%;
+            overflow-y: auto;
+        }
+        .payment-modal-content h3, .statement-modal-content h3 {
+            color: #0a2b4e;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .statement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .statement-item {
+            background: #f8fafc;
+            border-radius: 16px;
             padding: 1rem;
+            border-left: 4px solid #8b5cf6;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .statement-item:hover {
+            background: #eef2ff;
+            transform: translateX(5px);
+        }
+        .statement-month {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0a2b4e;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .statement-date {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+        .statement-summary {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+        .statement-summary span {
+            background: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .statement-detail {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+            display: none;
+        }
+        .statement-detail.show {
+            display: block;
         }
         
-        header { background: rgba(10, 43, 78, 0.95); backdrop-filter: blur(10px); color: white; padding: 0.7rem; text-align: center; position: sticky; top: 0; z-index: 100; }
-        .logo-container { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .logo-icon { font-size: 1.6rem; background: white; color: #0a2b4e; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
-        .logo-text h1 { font-size: 1.1rem; letter-spacing: 1px; }
-        .logo-text span { font-size: 0.5rem; letter-spacing: 2px; opacity: 0.8; }
+        .main-footer {
+            background: linear-gradient(135deg, #071e36 0%, #0a2b4e 100%);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1.2rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 90;
+        }
+        .phones { display: flex; justify-content: center; gap: 1.5rem; margin: 0.5rem 0; flex-wrap: wrap; font-size: 0.75rem; }
+        .whatsapp-footer a { background: #25D366; color: white; padding: 6px 16px; border-radius: 40px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; transition: 0.3s; }
+        .whatsapp-footer a:hover { transform: scale(1.05); }
         
-        .property-title { font-size: 1.3rem; color: #0a2b4e; margin-bottom: 0.3rem; }
-        .property-meta { color: #666; margin-bottom: 0.3rem; font-size: 0.75rem; }
+        .content-padding { padding-bottom: 100px; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 0.8rem 0; }
-        .stat-card { background: rgba(248, 250, 252, 0.95); padding: 0.7rem; border-radius: 12px; text-align: center; }
-        .stat-number { font-size: 0.9rem; font-weight: bold; color: #0a2b4e; }
-        .stat-label { font-size: 0.55rem; color: #666; }
-        
-        .rooms-grid { display: flex; flex-direction: column; gap: 0.8rem; }
-        .room-card { background: rgba(248, 250, 252, 0.95); border-radius: 14px; padding: 0.8rem; border: 1px solid rgba(226,232,240,0.5); }
-        /* ROOM IMAGE - KEPT, this is the image for each room */
-        .room-image { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 0.5rem; background: #e2e8f0; }
-        .room-number { font-size: 1rem; font-weight: bold; color: #0a2b4e; }
-        .room-rent { font-size: 0.85rem; color: #10b981; font-weight: bold; margin: 0.3rem 0; }
-        .due-date { font-size: 0.7rem; color: #666; margin: 0.2rem 0; }
-        .tenant-info { font-size: 0.75rem; color: #555; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ddd; }
-        .status-paid { color: #10b981; font-weight: bold; }
-        .status-unpaid { color: #dc2626; font-weight: bold; }
-        .vacant-badge { background: #f59e0b; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.6rem; display: inline-block; }
-        .fee-summary { background: rgba(238, 243, 252, 0.95); padding: 0.8rem; border-radius: 12px; margin: 0.8rem 0; font-size: 0.7rem; }
-        .balance-info { background: rgba(230, 247, 230, 0.95); padding: 0.8rem; border-radius: 12px; margin: 0.8rem 0; font-size: 0.7rem; }
-        .notification-banner { background: rgba(255, 243, 205, 0.95); border-left: 4px solid #ffc107; padding: 0.8rem; margin-bottom: 1rem; border-radius: 12px; font-size: 0.7rem; }
-        
-        .payment-table-container { overflow-x: auto; margin-top: 0.5rem; }
-        .payment-table { width: 100%; border-collapse: collapse; font-size: 0.6rem; }
-        .payment-table th, .payment-table td { border: 1px solid #ddd; padding: 4px; text-align: center; }
-        .payment-table th { background: #0a2b4e; color: white; }
-        .status-paid-bg { background: #d1fae5; color: #065f46; }
-        .status-partial-bg { background: #fed7aa; color: #92400e; }
-        .status-unpaid-bg { background: #fee2e2; color: #991b1b; }
-        
-        .view-payments-btn { background: #2c7be5; color: white; border: none; padding: 4px 10px; border-radius: 20px; cursor: pointer; font-size: 0.65rem; margin-top: 0.5rem; }
-        .statement-item { background: rgba(238, 243, 252, 0.95); padding: 8px; margin: 5px 0; border-radius: 10px; border-left: 3px solid #2c7be5; font-size: 0.7rem; cursor: pointer; }
-        
-        .chat-messages { background: rgba(248, 250, 252, 0.95); border-radius: 14px; padding: 0.8rem; max-height: 200px; overflow-y: auto; margin-bottom: 0.8rem; }
-        .chat-message { margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 12px; max-width: 90%; font-size: 0.75rem; }
-        .chat-message.owner { background: #2c7be5; color: white; margin-left: auto; text-align: right; }
-        .chat-message.admin { background: #e5e7eb; }
-        .chat-message.img { max-width: 100px; border-radius: 6px; margin-top: 4px; }
-        .chat-input-area { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
-        .chat-input-area input { flex: 1; padding: 10px; border-radius: 25px; border: 1px solid #ccc; font-size: 0.8rem; background: rgba(255,255,255,0.9); }
-        .file-input-label { background: #6c757d; color: white; padding: 8px 14px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; }
-        button { background: rgba(10, 43, 78, 0.9); color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
-        .logout-btn { background: #dc2626; margin-top: 1rem; width: 100%; }
-        
-        .main-footer { background: rgba(7, 30, 54, 0.95); backdrop-filter: blur(5px); color: white; padding: 0.8rem; text-align: center; position: fixed; bottom: 0; left: 0; right: 0; z-index: 90; }
-        .phones { display: flex; justify-content: center; gap: 0.8rem; margin: 0.2rem 0; flex-wrap: wrap; font-size: 0.65rem; }
-        .whatsapp-btn a { background: #25D366; color: white; padding: 4px 10px; border-radius: 40px; text-decoration: none; display: inline-block; font-size: 0.65rem; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: white; max-width: 95%; width: 500px; border-radius: 16px; padding: 1rem; max-height: 80%; overflow-y: auto; }
-        
-        .content-padding { padding-bottom: 80px; }
-        
-        @media (min-width: 768px) {
-            .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
-            .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-            .main-footer { position: relative; margin-top: 1rem; }
+        @media (max-width: 1000px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+            .rooms-grid { grid-template-columns: 1fr; }
+            .dashboard-container { padding: 0 1rem; }
+        }
+        @media (min-width: 1001px) {
+            .main-footer { position: relative; margin-top: 2rem; }
             .content-padding { padding-bottom: 0; }
         }
     </style>
 </head>
 <body>
-    <!-- SINGLE BACKGROUND IMAGE -->
     <div class="property-background" id="propertyBackground"></div>
     <div class="overlay-light"></div>
 
     <header>
         <div class="logo-container">
-            <div class="logo-icon">🏢</div>
-            <div class="logo-text"><h1>BATTETECH</h1><span>PROPERTY CONSULTANTS</span></div>
+            <div class="logo-icon"><i class="fas fa-building"></i></div>
+            <div class="logo-text">
+                <h1>BATTETECH</h1>
+                <span>PROPERTY VIEW</span>
+            </div>
         </div>
     </header>
 
     <div class="dashboard-container content-padding">
-        <a href="owner-dashboard.html" class="back-link">← Back to My Properties</a>
+        <a href="owner-dashboard.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to My Properties
+        </a>
         <div id="propertyContent"></div>
     </div>
 
     <footer class="main-footer">
-        <div class="phones"><p><strong>📱 MTN: 0794115704</strong></p><p><strong>📱 AIRTEL: 0756182284</strong></p></div>
-        <p><strong>📧 battetech330@gmail.com</strong></p>
-        <div class="whatsapp-btn"><a href="https://wa.me/256794115704" target="_blank">💬 WhatsApp</a></div>
+        <div class="phones">
+            <p><i class="fas fa-phone-alt"></i> <strong>MTN: 0794115704</strong></p>
+            <p><i class="fas fa-phone-alt"></i> <strong>AIRTEL: 0756182284</strong></p>
+        </div>
+        <p><i class="fas fa-envelope"></i> <strong>battetech330@gmail.com</strong></p>
+        <div class="whatsapp-footer">
+            <a href="https://wa.me/256794115704" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-data.js"></script>
+    <script src="activity-log.js"></script>
 
     <script>
         let currentPropertyId = null;
-        let chatRefreshInterval = null;
+        let currentProperty = null;
         
         function updatePropertyBackground(imageUrl) {
             const bgDiv = document.getElementById('propertyBackground');
             if (bgDiv) {
-                if (imageUrl && imageUrl.trim() !== '') {
-                    bgDiv.style.backgroundImage = `url('${imageUrl}')`;
-                    bgDiv.style.backgroundSize = 'cover';
-                    bgDiv.style.backgroundPosition = 'center';
-                } else {
-                    bgDiv.style.backgroundImage = 'linear-gradient(135deg, #0a2b4e 0%, #1a4a7a 100%)';
-                }
+                bgDiv.style.backgroundImage = imageUrl ? `url('${imageUrl}')` : 'linear-gradient(135deg, #0a2b4e 0%, #1a4a7a 100%)';
+                bgDiv.style.backgroundSize = 'cover';
+                bgDiv.style.backgroundPosition = 'center';
             }
         }
 
         function checkOwnerLogin() {
             const logged = localStorage.getItem('battetech_logged_owner');
-            if (!logged) { window.location.href = 'login.html'; return false; }
+            if (!logged) { 
+                window.location.href = 'login.html'; 
+                return false; 
+            }
             return true;
         }
 
         function logout() {
-            clearAutoLogin();
-            localStorage.removeItem('battetech_logged_owner');
-            window.location.href = 'index.html';
-        }
-
-        function viewStatementDetails(statementId) {
-            const financials = getFinancials(propertiesDB[currentPropertyId]);
-            const statement = financials.statements.find(s => s.id == statementId);
-            if (!statement) return;
-            let detailsHtml = `<div style="padding:10px;"><h3>Statement - ${statement.month}</h3><hr><p><strong>Generated:</strong> ${new Date(statement.generatedDate).toLocaleString()}</p><p><strong>Total Collected:</strong> UGX ${statement.summary.totalCollected.toLocaleString()}</p><p><strong>Fee:</strong> UGX ${statement.summary.totalFeeDeducted.toLocaleString()}</p><p><strong>To Owner:</strong> UGX ${statement.summary.totalToOwner.toLocaleString()}</p><h4>✅ Paid:</h4><ul>`;
-            statement.paidTenants.forEach(t => { detailsHtml += `<li>${t.name} (${t.room}): UGX ${t.amount.toLocaleString()}</li>`; });
-            detailsHtml += `</ul><h4>❌ Unpaid:</h4><ul>`;
-            statement.unpaidTenants.forEach(t => { detailsHtml += `<li>${t.name} (${t.room}): UGX ${t.balance.toLocaleString()}${t.penalty > 0 ? ` (Penalty: UGX ${t.penalty.toLocaleString()})` : ''}</li>`; });
-            detailsHtml += `</ul><button onclick="this.parentElement.remove()">Close</button></div>`;
-            const modal = document.createElement('div');
-            modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:3000; display:flex; align-items:center; justify-content:center;';
-            modal.innerHTML = `<div style="background:white; width:90%; max-width:450px; border-radius:16px; padding:1rem; max-height:80%; overflow-y:auto;">${detailsHtml}</div>`;
-            document.body.appendChild(modal);
-            modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
-        }
-
-        function getCurrentMonthOverdue(property) {
-            const currentYear = new Date().getFullYear();
-            const currentMonth = new Date().getMonth() + 1;
-            const monthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
-            let overdue = 0;
-            for (let room of property.units) {
-                if (!room.vacant && room.payments[monthKey] && room.payments[monthKey].status !== 'paid') {
-                    overdue += room.payments[monthKey].balance;
-                }
+            if (confirm('Logout from Property View?')) {
+                localStorage.removeItem('battetech_logged_owner');
+                localStorage.removeItem('battetech_owner_session_time');
+                localStorage.removeItem('battetech_owner_property_id');
+                localStorage.removeItem('battetech_selected_property');
+                window.location.href = 'index.html';
             }
-            return overdue;
         }
 
         async function loadProperty() {
             currentPropertyId = localStorage.getItem('battetech_selected_property');
-            if (!currentPropertyId) { window.location.href = 'owner-dashboard.html'; return; }
+            if (!currentPropertyId) { 
+                window.location.href = 'owner-dashboard.html'; 
+                return; 
+            }
 
-            if (window.supabaseDataLoaded) await window.supabaseDataLoaded;
-            const prop = propertiesDB[currentPropertyId];
-            if (!prop) {
-                document.getElementById('propertyContent').innerHTML = '<div class="section-card"><p>Property not found.</p><a href="owner-dashboard.html">Back</a></div>';
+            await window.supabaseDataLoaded;
+            
+            const { data: property, error } = await window.supabaseClient
+                .from('properties')
+                .select('*')
+                .eq('id', currentPropertyId)
+                .single();
+            
+            if (error || !property) {
+                document.getElementById('propertyContent').innerHTML = '<div class="property-header-card"><p><i class="fas fa-exclamation-triangle"></i> Property not found.</p><a href="owner-dashboard.html">Back</a></div>';
                 return;
             }
             
-            // Set background image
-            updatePropertyBackground(prop.propertyBackgroundImage || '');
+            currentProperty = property;
+            updatePropertyBackground(property.background_image || '');
+            await renderPropertyDetails(property);
+        }
+        
+        async function renderPropertyDetails(property) {
+            const units = property.data?.units || [];
+            const feePercentage = property.management_fee || 5;
             
-            const financials = getFinancials(prop);
-            // Add current month overdue
-            financials.currentMonthOverdue = getCurrentMonthOverdue(prop);
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonthNum = String(today.getMonth() + 1).padStart(2, '0');
+            const monthKey = `${currentYear}-${currentMonthNum}`;
             
-            const feePercentage = prop.managementFee || 5;
-            const penaltyPercentage = prop.penaltyFee || 0;
-            const updates = getUpdatesForProperty(currentPropertyId);
-
-            const currentMonthRentDue = financials.currentMonthRentDue || 0;
-            const currentMonthCollected = financials.currentMonthCollected || 0;
-            const currentMonthPending = financials.currentMonthPending || 0;
-            const currentMonthOverdue = financials.currentMonthOverdue || 0;
-
-            let remittanceHtml = '';
-            if (financials.remittanceHistory && financials.remittanceHistory.length > 0) {
-                financials.remittanceHistory.forEach(r => { remittanceHtml += `<div style="background:#e6f7e6; padding:8px; margin:4px 0; border-radius:10px;"><strong>UGX ${r.amount.toLocaleString()}</strong> - ${r.method}<br><small>${new Date(r.date).toLocaleDateString()}</small></div>`; });
-            } else { remittanceHtml = '<p>No remittances yet.</p>'; }
-
-            let billsHtml = '';
-            if (financials.billsHistory && financials.billsHistory.length > 0) {
-                financials.billsHistory.forEach(bill => { billsHtml += `<div style="background:#f8fafc; padding:8px; margin:4px 0; border-radius:10px;"><strong>${bill.billType}</strong>: UGX ${bill.amount.toLocaleString()}<br><small>${bill.description || ''}</small></div>`; });
-            } else { billsHtml = '<p>No bills recorded yet.</p>'; }
-
-            let statementsHtml = '';
-            if (financials.statements && financials.statements.length > 0) {
-                financials.statements.forEach(stmt => { statementsHtml += `<div class="statement-item" onclick="viewStatementDetails('${stmt.id}')"><strong>${stmt.month}</strong><br><small>Generated: ${new Date(stmt.generatedDate).toLocaleDateString()}</small></div>`; });
-            } else { statementsHtml = '<p>No statements generated yet.</p>'; }
-
+            const financials = getFinancials(property);
+            
+            // Build rooms grid - Card Layout
             let roomsHtml = '<div class="rooms-grid">';
-            for (let i = 0; i < prop.units.length; i++) {
-                const unit = prop.units[i];
-                roomsHtml += `<div class="room-card">
-                    ${unit.roomImage ? `<img src="${unit.roomImage}" class="room-image" onerror="this.src='https://placehold.co/400x300?text=No+Image'">` : '<div class="room-image" style="display:flex;align-items:center;justify-content:center;color:#aaa; background:#e2e8f0;">📷 No Image</div>'}
-                    <div class="room-number">🏠 ${escapeHtml(unit.roomNumber)}</div>
-                    <div class="room-rent">💰 Rent: UGX ${(unit.rentAmount || 0).toLocaleString()}/month</div>
-                    <div class="due-date">📅 Due Date: ${unit.paymentDueDate || 1}th of each month</div>`;
-                if (unit.vacant) {
-                    roomsHtml += `<span class="vacant-badge">🔓 VACANT</span>`;
+            
+            for (let i = 0; i < units.length; i++) {
+                const room = units[i];
+                
+                if (room.vacant) {
+                    roomsHtml += `
+                        <div class="room-card">
+                            ${room.roomImage ? `<img src="${room.roomImage}" class="room-image" onerror="this.src='https://placehold.co/400x300?text=No+Image'">` : '<div class="room-image" style="display:flex;align-items:center;justify-content:center;color:#94a3b8; background:#e2e8f0;"><i class="fas fa-image"></i> No Image</div>'}
+                            <div class="room-number"><i class="fas fa-door-open"></i> ${escapeHtml(room.roomNumber)}</div>
+                            <div class="room-rent"><i class="fas fa-coins"></i> UGX ${(room.rentAmount || 0).toLocaleString()}/month</div>
+                            <div class="vacant-badge"><i class="fas fa-door-closed"></i> VACANT</div>
+                        </div>
+                    `;
                 } else {
-                    let tenantBalance = 0;
-                    let tenantPenalty = 0;
-                    for (let month in unit.payments) {
-                        if (unit.payments[month].balance > 0) tenantBalance += unit.payments[month].balance;
-                        tenantPenalty += unit.payments[month].penaltyAmount || 0;
-                    }
-                    roomsHtml += `<div class="tenant-info">
-                        👤 ${escapeHtml(unit.tenant)}<br>
-                        📞 ${unit.tenantPhone || 'No phone'}<br>
-                        <span class="${unit.paid ? 'status-paid' : 'status-unpaid'}">${unit.paid ? '✅ Current Month PAID' : '❌ Current Month UNPAID'}</span>
-                        ${tenantBalance > 0 ? `<br><span style="color:#dc2626;">📋 Balance Owed: UGX ${tenantBalance.toLocaleString()}</span>` : ''}
-                        ${tenantPenalty > 0 ? `<br><span style="color:#f59e0b;">⚠️ Penalty Applied: UGX ${tenantPenalty.toLocaleString()}</span>` : ''}
-                    </div>`;
-                    roomsHtml += `<button class="view-payments-btn" onclick="viewPayments(${i})">📅 View Payment History</button>`;
+                    const currentMonthPayment = room.payments?.[monthKey];
+                    const isPaidThisMonth = currentMonthPayment ? currentMonthPayment.status === 'paid' : false;
+                    const statusClass = isPaidThisMonth ? 'status-paid' : 'status-unpaid';
+                    const statusText = isPaidThisMonth ? 'PAID' : 'UNPAID';
+                    const statusIcon = isPaidThisMonth ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+                    
+                    roomsHtml += `
+                        <div class="room-card">
+                            ${room.roomImage ? `<img src="${room.roomImage}" class="room-image" onerror="this.src='https://placehold.co/400x300?text=No+Image'">` : '<div class="room-image" style="display:flex;align-items:center;justify-content:center;color:#94a3b8; background:#e2e8f0;"><i class="fas fa-image"></i> No Image</div>'}
+                            <div class="room-number"><i class="fas fa-door-open"></i> ${escapeHtml(room.roomNumber)}</div>
+                            <div class="room-rent"><i class="fas fa-coins"></i> UGX ${(room.rentAmount || 0).toLocaleString()}/month</div>
+                            <div class="tenant-info">
+                                <div><i class="fas fa-user"></i> <span class="tenant-name">${escapeHtml(room.tenant)}</span></div>
+                                <div><i class="fas fa-phone"></i> ${escapeHtml(room.tenantPhone || 'No phone')}</div>
+                                <div><i class="fas fa-calendar-alt"></i> Due Date: ${room.paymentDueDate || 1}th of each month</div>
+                            </div>
+                            <div>
+                                <span class="status-badge ${statusClass}">${statusIcon} ${statusText}</span>
+                            </div>
+                            <button class="btn-history" onclick="viewPayments(${i})">
+                                <i class="fas fa-clock-rotate-left"></i> View Payment History
+                            </button>
+                        </div>
+                    `;
                 }
-                roomsHtml += `</div>`;
             }
+            
+            if (units.length === 0) {
+                roomsHtml += '<div style="grid-column: 1/-1; text-align: center; padding: 2rem;"><i class="fas fa-info-circle"></i> No rooms added to this property yet.</div>';
+            }
+            
             roomsHtml += '</div>';
-
-            let updatesHtml = '';
-            if (updates.length > 0) {
-                updates.slice(0, 10).forEach(up => { updatesHtml += `<div>📢 ${up.message} <small>(${new Date(up.date).toLocaleDateString()})</small></div>`; });
-            } else { updatesHtml = '<p>No updates yet.</p>'; }
-
+            
+            // Load CLEAN activity log for this property
+            const cleanLogs = await getCleanActivityLogsForOwner(property.id);
+            
+            let activityHtml = '';
+            if (cleanLogs && cleanLogs.length > 0) {
+                for (let act of cleanLogs) {
+                    const date = new Date(act.created_at);
+                    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                    
+                    let cleanMessage = '';
+                    let activityClass = '';
+                    let icon = '<i class="fas fa-bell"></i>';
+                    
+                    if (act.action === 'payment_recorded' || act.action === 'payment_approved') {
+                        let amountMatch = act.details.match(/UGX ([\d,]+)/);
+                        let roomMatch = act.details.match(/room ([^\s]+)/);
+                        if (amountMatch) {
+                            cleanMessage = `Payment of ${amountMatch[0]} was received`;
+                            if (roomMatch) cleanMessage += ` for ${roomMatch[0]}`;
+                            activityClass = 'payment-received';
+                            icon = '<i class="fas fa-money-bill-wave"></i>';
+                        } else {
+                            cleanMessage = `A payment was received`;
+                            activityClass = 'payment-received';
+                            icon = '<i class="fas fa-money-bill-wave"></i>';
+                        }
+                    }
+                    else if (act.action === 'remittance_sent') {
+                        let amountMatch = act.details.match(/UGX ([\d,]+)/);
+                        if (amountMatch) {
+                            cleanMessage = `${amountMatch[0]} was sent to you`;
+                        } else {
+                            cleanMessage = `Rent proceeds were sent to you`;
+                        }
+                        activityClass = 'remittance-sent';
+                        icon = '<i class="fas fa-paper-plane"></i>';
+                    }
+                    else if (act.action === 'bill_paid') {
+                        let billMatch = act.details.match(/(Electricity|Water|Garbage)/);
+                        let amountMatch = act.details.match(/UGX ([\d,]+)/);
+                        if (billMatch && amountMatch) {
+                            cleanMessage = `${billMatch[0]} bill of ${amountMatch[0]} was paid on your behalf`;
+                        } else if (billMatch) {
+                            cleanMessage = `${billMatch[0]} bill was paid on your behalf`;
+                        } else {
+                            cleanMessage = `A bill was paid on your behalf`;
+                        }
+                        activityClass = 'bill-paid';
+                        icon = '<i class="fas fa-receipt"></i>';
+                    }
+                    else if (act.action === 'room_added') {
+                        let roomMatch = act.details.match(/room ([^\s]+)/);
+                        cleanMessage = roomMatch ? `New room ${roomMatch[0]} was added` : `A new room was added`;
+                        icon = '<i class="fas fa-door-open"></i>';
+                    }
+                    else if (act.action === 'tenant_evacuated') {
+                        let roomMatch = act.details.match(/room ([^\s]+)/);
+                        cleanMessage = roomMatch ? `Tenant vacated ${roomMatch[0]}` : `A tenant vacated a room`;
+                        icon = '<i class="fas fa-user-minus"></i>';
+                    }
+                    else if (act.action === 'statement_generated') {
+                        let monthMatch = act.details.match(/for ([0-9]{4}-[0-9]{2})/);
+                        if (monthMatch) {
+                            cleanMessage = `Monthly statement for ${monthMatch[0]} was generated`;
+                        } else {
+                            cleanMessage = `A monthly statement was generated`;
+                        }
+                        icon = '<i class="fas fa-file-invoice"></i>';
+                    }
+                    else if (act.action === 'month_reset') {
+                        let monthMatch = act.details.match(/to ([0-9]{4}-[0-9]{2})/);
+                        if (monthMatch) {
+                            cleanMessage = `New month started: ${monthMatch[0]}`;
+                        } else {
+                            cleanMessage = `A new month has started`;
+                        }
+                        icon = '<i class="fas fa-calendar-alt"></i>';
+                    }
+                    else if (act.action === 'fee_changed') {
+                        let feeMatch = act.details.match(/(\d+)% to (\d+)%/);
+                        if (feeMatch) {
+                            cleanMessage = `Management fee changed from ${feeMatch[1]}% to ${feeMatch[2]}%`;
+                        } else {
+                            cleanMessage = `The management fee was updated`;
+                        }
+                        icon = '<i class="fas fa-percent"></i>';
+                    }
+                    else {
+                        cleanMessage = act.details || act.action;
+                        if (cleanMessage.length > 200) cleanMessage = cleanMessage.substring(0, 200) + '...';
+                        icon = '<i class="fas fa-bell"></i>';
+                    }
+                    
+                    if (cleanMessage) {
+                        activityHtml += `
+                            <div class="activity-item ${activityClass}">
+                                <div class="activity-date"><i class="fas fa-calendar-day"></i> ${dateStr}</div>
+                                <div class="activity-message">${icon} ${escapeHtml(cleanMessage)}</div>
+                            </div>
+                        `;
+                    }
+                }
+            }
+            
+            if (activityHtml === '') {
+                activityHtml = '<div class="activity-item"><i class="fas fa-info-circle"></i> No activities recorded yet for this property.</div>';
+            }
+            
             const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            const currentMonthName = monthNames[new Date().getMonth()];
-            const currentYear = new Date().getFullYear();
-
+            const currentMonthName = monthNames[today.getMonth()];
+            
             const html = `
                 <div class="property-header-card">
-                    <div class="property-title">🏢 ${escapeHtml(prop.name)}</div>
-                    <div class="property-meta">📍 ${escapeHtml(prop.location)}</div>
-                    <div class="property-meta"><span style="background:#f59e0b; padding:2px 8px; border-radius:20px;">💰 Management Fee: ${feePercentage}%</span> <span style="background:#dc2626; padding:2px 8px; border-radius:20px;">⚠️ Late Penalty: ${penaltyPercentage}%</span></div>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-number">UGX ${currentMonthRentDue.toLocaleString()}</div><div class="stat-label">Rent Due (${currentMonthName})</div></div>
-                    <div class="stat-card"><div class="stat-number">UGX ${currentMonthCollected.toLocaleString()}</div><div class="stat-label">Collected This Month</div></div>
-                    <div class="stat-card"><div class="stat-number" style="color:#dc2626;">UGX ${currentMonthPending.toLocaleString()}</div><div class="stat-label">Pending This Month</div></div>
-                    <div class="stat-card"><div class="stat-number" style="color:#f59e0b;">UGX ${currentMonthOverdue.toLocaleString()}</div><div class="stat-label">Overdue This Month</div></div>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-number">UGX ${(financials.totalCollected || 0).toLocaleString()}</div><div class="stat-label">Total Collected (All Time)</div></div>
-                    <div class="stat-card"><div class="stat-number">UGX ${(financials.totalFeeDeducted || 0).toLocaleString()}</div><div class="stat-label">Total Fee</div></div>
-                    <div class="stat-card"><div class="stat-number">UGX ${(financials.pendingRemittance || 0).toLocaleString()}</div><div class="stat-label">Pending to You</div></div>
-                    <div class="stat-card"><div class="stat-number">UGX ${(financials.alreadyRemitted || 0).toLocaleString()}</div><div class="stat-label">Already Sent</div></div>
-                </div>
-
-                <div class="fee-summary">
-                    <strong>💰 Financial Summary (${currentMonthName} ${currentYear})</strong><br>
-                    Total Rent Due This Month: UGX ${currentMonthRentDue.toLocaleString()}<br>
-                    Collected This Month: UGX ${currentMonthCollected.toLocaleString()}<br>
-                    <span style="color:#dc2626;">Pending This Month: UGX ${currentMonthPending.toLocaleString()}</span><br>
-                    <span style="color:#f59e0b;">Overdue This Month: UGX ${currentMonthOverdue.toLocaleString()}</span><br>
-                    <hr style="margin:0.3rem 0;">
-                    Management Fee (${feePercentage}%): <span style="color:#dc2626;">- UGX ${(financials.totalFeeDeducted || 0).toLocaleString()}</span><br>
-                    <strong>💰 Pending to Be Sent to You: UGX ${(financials.pendingRemittance || 0).toLocaleString()}</strong><br>
-                    <strong>✅ Already Sent to You: UGX ${(financials.alreadyRemitted || 0).toLocaleString()}</strong>
-                </div>
-
-                <div class="balance-info"><strong>📋 Remittance History</strong>${remittanceHtml}</div>
-                <div class="balance-info"><strong>🧾 Bills Paid (Deducted from Your Rent)</strong>${billsHtml}</div>
-                <div class="balance-info"><strong>📄 Monthly Statements</strong>${statementsHtml}</div>
-                <div class="notification-banner"><strong>🔔 Recent Updates</strong>${updatesHtml}</div>
-
-                <div class="section-card"><div class="section-title">🏠 Rooms & Tenants</div>${roomsHtml}</div>
-
-                <div class="section-card">
-                    <div class="section-title">💬 Message BattleTech Admin</div>
-                    <div id="chatMessages" class="chat-messages"></div>
-                    <div class="chat-input-area">
-                        <input type="text" id="ownerMsgInput" placeholder="Type your message...">
-                        <button onclick="sendOwnerMessage()">Send</button>
-                        <input type="file" id="ownerImageInput" accept="image/*" style="display:none;" onchange="sendOwnerImage()">
-                        <label class="file-input-label" onclick="document.getElementById('ownerImageInput').click()">📷 Attach</label>
+                    <div class="property-title">
+                        <i class="fas fa-building"></i> ${escapeHtml(property.name)}
+                    </div>
+                    <div class="property-meta">
+                        <i class="fas fa-location-dot"></i> ${escapeHtml(property.location)}
+                    </div>
+                    <div class="property-meta">
+                        <span style="background: #f59e0b20; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem;">
+                            <i class="fas fa-percent"></i> Management Fee: ${feePercentage}%
+                        </span>
                     </div>
                 </div>
 
-                <button onclick="logout()" class="logout-btn">🚪 Logout</button>
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-statement" onclick="viewStatements()">
+                        <i class="fas fa-file-invoice"></i> View Statements
+                    </button>
+                </div>
+
+                <!-- Financial Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card collected">
+                        <div class="stat-number"><i class="fas fa-coins"></i> UGX ${financials.currentMonthCollected.toLocaleString()}</div>
+                        <div class="stat-label">Collected This Month (${currentMonthName})</div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="stat-number"><i class="fas fa-hourglass-half"></i> UGX ${financials.currentMonthPending.toLocaleString()}</div>
+                        <div class="stat-label">Pending This Month (${currentMonthName})</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number"><i class="fas fa-wallet"></i> UGX ${financials.totalCollectedSinceLastRemit.toLocaleString()}</div>
+                        <div class="stat-label">Total Collected (Since Last Remit)</div>
+                    </div>
+                    <div class="stat-card fee">
+                        <div class="stat-number"><i class="fas fa-percent"></i> UGX ${financials.totalFeeSinceLastRemit.toLocaleString()}</div>
+                        <div class="stat-label">Management Fee Deducted</div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="stat-number"><i class="fas fa-paper-plane"></i> UGX ${financials.pendingToRemit.toLocaleString()}</div>
+                        <div class="stat-label">Pending to Remit to You</div>
+                    </div>
+                    <div class="stat-card remitted">
+                        <div class="stat-number"><i class="fas fa-circle-check"></i> UGX ${financials.alreadyRemitted.toLocaleString()}</div>
+                        <div class="stat-label">Already Remitted to You</div>
+                    </div>
+                </div>
+
+                <!-- Rooms & Tenants Section -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-door-open"></i> Rooms & Tenants
+                    </div>
+                    ${roomsHtml}
+                </div>
+
+                <!-- Property Activity Log -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-list-check"></i> Property Activity Log
+                    </div>
+                    <div class="activity-list">
+                        ${activityHtml}
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="text-align: center;">
+                    <a href="https://wa.me/256756182282" target="_blank" class="whatsapp-contact">
+                        <i class="fab fa-whatsapp"></i> Chat with Admin on WhatsApp
+                    </a>
+                </div>
+
+                <button onclick="logout()" class="logout-btn">
+                    <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                </button>
             `;
-
+            
             document.getElementById('propertyContent').innerHTML = html;
-            loadChat();
-            if (chatRefreshInterval) clearInterval(chatRefreshInterval);
-            chatRefreshInterval = setInterval(loadChat, 5000);
         }
 
-        function viewPayments(roomIndex) {
-            const prop = propertiesDB[currentPropertyId];
-            const room = prop.units[roomIndex];
-            let paymentTable = `<div class="payment-table-container"><table class="payment-table"><thead><tr><th>Month</th><th>Rent Due</th><th>Amount Paid</th><th>Balance</th><th>Fee Deducted</th><th>Amount to You</th><th>Penalty</th><th>Status</th></tr></thead><tbody>`;
-            const months = Object.keys(room.payments).sort();
-            for (let month of months) {
-                const p = room.payments[month];
-                let statusClass = '';
-                if (p.status === 'paid') statusClass = 'status-paid-bg';
-                else if (p.status === 'partial') statusClass = 'status-partial-bg';
-                else statusClass = 'status-unpaid-bg';
-                paymentTable += `<tr class="${statusClass}"><td>${month}</td><td>UGX ${p.rentDue.toLocaleString()}</td><td>UGX ${p.paid.toLocaleString()}</td><td>UGX ${p.balance.toLocaleString()}</td><td>UGX ${p.feeDeducted.toLocaleString()}</td><td>UGX ${p.amountToOwner.toLocaleString()}</td><td>UGX ${(p.penaltyAmount || 0).toLocaleString()}</td><td>${p.status.toUpperCase()}</td></tr>`;
+        // View Statements Function (View Only - No Print)
+        function viewStatements() {
+            const property = currentProperty;
+            if (!property) return;
+            
+            const statements = property.statements || [];
+            
+            if (statements.length === 0) {
+                alert('No statements have been generated for this property yet.');
+                return;
             }
-            paymentTable += `</tbody></table></div>`;
-            const modalHtml = `<div id="yearlyModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:flex; align-items:center; justify-content:center;"><div style="background:white; width:95%; max-width:500px; border-radius:16px; padding:1rem; max-height:80%; overflow-y:auto;"><h3 style="margin-bottom:1rem;">📅 Payment History - ${room.roomNumber}</h3>${paymentTable}<p style="margin-top:0.5rem; font-size:0.65rem; color:#666;">💡 Fee deducted from each payment | Penalty added for late payments</p><button onclick="document.getElementById('yearlyModal').remove()" style="margin-top:1rem;">Close</button></div></div>`;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
-
-        function loadChat() {
-            const chatContainer = document.getElementById('chatMessages');
-            if (!chatContainer) return;
-            const messages = getMessages(currentPropertyId);
-            if (messages.length === 0) { chatContainer.innerHTML = '<p style="text-align:center;">No messages yet.</p>'; return; }
-            let html = '';
-            messages.slice(-20).forEach(msg => {
-                const isOwner = msg.sender === 'owner';
-                html += `<div class="chat-message ${isOwner ? 'owner' : 'admin'}">
-                            <small>${isOwner ? 'You' : 'BattleTech Admin'} • ${new Date(msg.timestamp).toLocaleString()}</small>
-                            <div>${msg.message}</div>
-                            ${msg.image ? `<img src="${msg.image}">` : ''}
-                         </div>`;
+            
+            let statementsHtml = '<div class="statement-list">';
+            
+            const sortedStatements = [...statements].sort((a, b) => new Date(b.generatedDate) - new Date(a.generatedDate));
+            
+            for (let stmt of sortedStatements) {
+                const date = new Date(stmt.generatedDate);
+                const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                
+                statementsHtml += `
+                    <div class="statement-item" onclick="toggleStatementDetail('${stmt.id}')">
+                        <div class="statement-month"><i class="fas fa-file-invoice"></i> ${stmt.month}</div>
+                        <div class="statement-date"><i class="fas fa-calendar-alt"></i> Generated: ${dateStr}</div>
+                        <div class="statement-summary">
+                            <span><i class="fas fa-coins"></i> Total Collected: UGX ${stmt.summary.totalCollected.toLocaleString()}</span>
+                            <span><i class="fas fa-percent"></i> Fee: UGX ${stmt.summary.totalFeeDeducted.toLocaleString()}</span>
+                            <span><i class="fas fa-paper-plane"></i> To Owner: UGX ${stmt.summary.totalToOwner.toLocaleString()}</span>
+                            <span><i class="fas fa-check-circle"></i> Paid: ${stmt.summary.paidTenantsCount}</span>
+                            <span><i class="fas fa-times-circle"></i> Unpaid: ${stmt.summary.unpaidTenantsCount}</span>
+                        </div>
+                        <div id="stmt-detail-${stmt.id}" class="statement-detail">
+                            <div style="margin-top: 0.5rem;">
+                                <strong><i class="fas fa-check-circle"></i> PAID TENANTS:</strong>
+                                ${stmt.paidTenants.length > 0 ? 
+                                    stmt.paidTenants.map(t => `<div style="margin-left: 1rem; margin-top: 0.3rem;"><i class="fas fa-user"></i> ${escapeHtml(t.name)} (${escapeHtml(t.room)}) - UGX ${t.amount.toLocaleString()}</div>`).join('') : 
+                                    '<div style="margin-left: 1rem; color: #64748b;"><i class="fas fa-info-circle"></i> No paid tenants this month</div>'
+                                }
+                            </div>
+                            <div style="margin-top: 0.8rem;">
+                                <strong><i class="fas fa-times-circle"></i> UNPAID TENANTS:</strong>
+                                ${stmt.unpaidTenants.length > 0 ? 
+                                    stmt.unpaidTenants.map(t => `<div style="margin-left: 1rem; margin-top: 0.3rem;"><i class="fas fa-user"></i> ${escapeHtml(t.name)} (${escapeHtml(t.room)}) - Balance: UGX ${t.balance.toLocaleString()}${t.penalty ? ` (Penalty: UGX ${t.penalty.toLocaleString()})` : ''}</div>`).join('') : 
+                                    '<div style="margin-left: 1rem; color: #64748b;"><i class="fas fa-info-circle"></i> No unpaid tenants this month</div>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            statementsHtml += '</div>';
+            
+            const modalDiv = document.createElement('div');
+            modalDiv.className = 'statement-modal';
+            modalDiv.innerHTML = `
+                <div class="statement-modal-content">
+                    <h3><i class="fas fa-file-invoice"></i> Property Statements</h3>
+                    <div style="margin-bottom: 0.5rem; color: #64748b; font-size: 0.75rem;">
+                        <i class="fas fa-info-circle"></i> Click on any statement to view full details
+                    </div>
+                    ${statementsHtml}
+                    <button onclick="this.closest('.statement-modal').remove()" style="margin-top: 1.5rem; background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%); color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; width: 100%;">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modalDiv);
+            
+            modalDiv.addEventListener('click', function(e) {
+                if (e.target === modalDiv) {
+                    modalDiv.remove();
+                }
             });
-            chatContainer.innerHTML = html;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        window.toggleStatementDetail = function(statementId) {
+            const detailDiv = document.getElementById(`stmt-detail-${statementId}`);
+            if (detailDiv) {
+                detailDiv.classList.toggle('show');
+            }
         }
 
-        function sendOwnerMessage() {
-            const input = document.getElementById('ownerMsgInput');
-            const message = input.value.trim();
-            if (!message) return;
-            sendMessage(currentPropertyId, 'owner', message, null);
-            input.value = '';
-            loadChat();
-        }
-
-        function sendOwnerImage() {
-            const fileInput = document.getElementById('ownerImageInput');
-            const file = fileInput.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                sendMessage(currentPropertyId, 'owner', '(Image attached)', e.target.result);
-                loadChat();
-            };
-            reader.readAsDataURL(file);
-            fileInput.value = '';
+        // Payment History Modal Function
+        function viewPayments(roomIndex) {
+            const property = currentProperty;
+            if (!property) return;
+            
+            const units = property.data?.units || [];
+            const room = units[roomIndex];
+            if (!room) return;
+            
+            let paymentTable = `
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.75rem;">
+                        <thead>
+                            <tr style="background: #0a2b4e; color: white;">
+                                <th style="padding: 10px;"><i class="fas fa-calendar-alt"></i> Month</th>
+                                <th style="padding: 10px;"><i class="fas fa-coins"></i> Rent Due</th>
+                                <th style="padding: 10px;"><i class="fas fa-money-bill-wave"></i> Amount Paid</th>
+                                <th style="padding: 10px;"><i class="fas fa-percent"></i> Fee Deducted</th>
+                                <th style="padding: 10px;"><i class="fas fa-paper-plane"></i> Amount to You</th>
+                                <th style="padding: 10px;"><i class="fas fa-hourglass-half"></i> Balance</th>
+                                <th style="padding: 10px;"><i class="fas fa-circle-info"></i> Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            const payments = room.payments || {};
+            const months = Object.keys(payments).sort().reverse();
+            
+            if (months.length === 0) {
+                paymentTable += `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle"></i> No payment records found for this room.
+                         </td>
+                     </tr>
+                `;
+            }
+            
+            for (let month of months) {
+                const p = payments[month];
+                const [year, monthNum] = month.split('-');
+                const monthName = new Date(parseInt(year), parseInt(monthNum)-1).toLocaleString('default', { month: 'long' });
+                const isPaid = p.status === 'paid';
+                const rowBg = isPaid ? '#d1fae5' : '#fee2e2';
+                
+                paymentTable += `
+                    <tr style="background: ${rowBg};">
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>${monthName} ${year}</strong></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">UGX ${(p.rentDue || 0).toLocaleString()}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">UGX ${(p.paid || 0).toLocaleString()}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">UGX ${(p.feeDeducted || 0).toLocaleString()}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">UGX ${(p.amountToOwner || 0).toLocaleString()}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">UGX ${(p.balance || 0).toLocaleString()}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">${isPaid ? '<i class="fas fa-check-circle"></i> PAID' : '<i class="fas fa-times-circle"></i> UNPAID'}</td>
+                    </tr>
+                `;
+            }
+            
+            paymentTable += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            const modalDiv = document.createElement('div');
+            modalDiv.className = 'payment-modal';
+            modalDiv.innerHTML = `
+                <div class="payment-modal-content">
+                    <h3><i class="fas fa-clock-rotate-left"></i> Payment History - ${escapeHtml(room.roomNumber)}</h3>
+                    <div style="margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #eee;">
+                        <div><i class="fas fa-user"></i> <strong>Tenant:</strong> ${escapeHtml(room.tenant)}</div>
+                        <div><i class="fas fa-coins"></i> <strong>Monthly Rent:</strong> UGX ${(room.rentAmount || 0).toLocaleString()}</div>
+                    </div>
+                    ${paymentTable}
+                    <button onclick="this.closest('.payment-modal').remove()" style="margin-top: 1rem; background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%); color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; width: 100%;">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modalDiv);
+            
+            modalDiv.addEventListener('click', function(e) {
+                if (e.target === modalDiv) {
+                    modalDiv.remove();
+                }
+            });
         }
 
         function escapeHtml(text) {
             if (!text) return '';
-            return text.replace(/[&<>]/g, function(m) {
+            return String(text).replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
                 if (m === '<') return '&lt;';
                 if (m === '>') return '&gt;';
                 return m;
             });
         }
-
+        
+        window.viewPayments = viewPayments;
+        window.viewStatements = viewStatements;
+        
         window.addEventListener('load', async () => {
             await window.supabaseDataLoaded;
-            if (checkOwnerLogin()) { await loadProperty(); }
+            if (checkOwnerLogin()) {
+                await loadProperty();
+            }
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <script src="supabase-data.js"></script>
 </body>
 </html>

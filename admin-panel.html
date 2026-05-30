@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Admin Panel - BATTETECH</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,15 +13,22 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f4fa 0%, #e2e8f0 100%);
+            min-height: 100vh;
         }
 
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         header {
-            background: #0a2b4e;
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
             color: white;
             padding: 1rem;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
         .logo-container {
@@ -32,19 +40,21 @@
 
         .logo-icon {
             font-size: 2rem;
-            background: white;
+            background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%);
             color: #0a2b4e;
             width: 50px;
             height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .logo-text h1 {
             font-size: 1.5rem;
             letter-spacing: 2px;
+            font-weight: 700;
         }
 
         .logo-text span {
@@ -56,68 +66,156 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 2rem auto;
-            padding: 0 1rem;
+            padding: 0 1.5rem;
         }
 
-        .admin-form, .image-upload-panel {
+        /* Admin Header Bar */
+        .admin-header-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .admin-header-bar h2 {
+            color: #0a2b4e;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .session-timer {
+            background: #f59e0b;
+            color: #1a2a3e;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 3px 10px rgba(220,38,38,0.3);
+        }
+
+        /* Cards */
+        .image-upload-panel, .admin-form, .property-card-admin {
             background: white;
             border-radius: 24px;
-            padding: 1.5rem;
+            padding: 1.8rem;
             margin-bottom: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .image-upload-panel:hover, .admin-form:hover, .property-card-admin:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        h3 {
+            color: #0a2b4e;
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-left: 4px solid #2c7be5;
+            padding-left: 0.8rem;
+        }
+
+        hr {
+            margin: 1.5rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #cbd5e1, transparent);
         }
 
         .form-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
             margin-bottom: 1rem;
         }
 
         .form-row-3 {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
             margin-bottom: 1rem;
         }
 
-        .admin-form input, .admin-form select, .admin-form textarea {
+        .admin-form input, .admin-form select, .admin-form textarea, .image-upload-panel input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
-            font-size: 1rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .admin-form input:focus, .admin-form select:focus, .admin-form textarea:focus {
+            outline: none;
+            border-color: #2c7be5;
+            box-shadow: 0 0 0 3px rgba(44,123,229,0.1);
         }
 
         button {
-            background: #0a2b4e;
+            background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 40px;
+            border-radius: 50px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             margin-top: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(10,43,78,0.3);
         }
 
         button.danger {
-            background: #dc2626;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         }
 
         button.warning {
-            background: #f59e0b;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #1a2a3e;
         }
 
         button.success {
-            background: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
 
         .property-card-admin {
-            background: white;
-            padding: 1.2rem;
-            border-radius: 20px;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
             border-left: 5px solid #2c7be5;
         }
 
@@ -129,7 +227,7 @@
         .property-card-admin button {
             margin: 0.3rem;
             padding: 6px 14px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .unit-row {
@@ -137,7 +235,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.8rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e2e8f0;
             flex-wrap: wrap;
             gap: 0.5rem;
         }
@@ -145,7 +243,7 @@
         .unit-image {
             width: 50px;
             height: 50px;
-            border-radius: 8px;
+            border-radius: 10px;
             object-fit: cover;
             background: #e2e8f0;
         }
@@ -163,6 +261,7 @@
             height: 90px;
             border-radius: 12px;
             overflow: hidden;
+            border: 2px solid #e2e8f0;
         }
 
         .image-item img {
@@ -175,9 +274,10 @@
             position: absolute;
             top: 5px;
             right: 5px;
-            background: red;
+            background: #dc2626;
             padding: 2px 6px;
             font-size: 0.7rem;
+            margin: 0;
         }
 
         .url-input {
@@ -189,9 +289,9 @@
 
         .url-input input {
             flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 30px;
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
         }
 
         .chat-section {
@@ -208,8 +308,8 @@
 
         .chat-message {
             margin-bottom: 0.8rem;
-            padding: 0.6rem;
-            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            border-radius: 16px;
             max-width: 80%;
         }
 
@@ -238,29 +338,56 @@
 
         .chat-input-area input {
             flex: 1;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 25px;
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
         }
 
         .file-input-label {
             background: #6c757d;
             color: white;
-            padding: 6px 12px;
-            border-radius: 25px;
+            padding: 8px 16px;
+            border-radius: 50px;
             cursor: pointer;
             font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .notepad textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border-radius: 12px;
-            border: 1px solid #ccc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tenant-details {
+            font-size: 0.8rem;
+            color: #475569;
+            margin-top: 4px;
         }
 
         .main-footer {
-            background: #071e36;
+            background: linear-gradient(135deg, #0a2b4e 0%, #071e36 100%);
             color: white;
             margin-top: 3rem;
             padding: 2rem;
@@ -270,81 +397,42 @@
         .phones {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin: 0.5rem 0;
+            gap: 2rem;
+            margin: 0.8rem 0;
             flex-wrap: wrap;
+            font-size: 0.85rem;
         }
 
         .whatsapp-btn a {
-            background: #25D366;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
             color: white;
             padding: 8px 20px;
-            border-radius: 40px;
+            border-radius: 50px;
             text-decoration: none;
-            display: inline-block;
-        }
-
-        h3 {
-            margin-bottom: 1rem;
-            color: #0a2b4e;
-        }
-
-        hr {
-            margin: 1.5rem 0;
-        }
-
-        .logout-btn {
-            background: #dc2626;
-        }
-
-        .admin-header-bar {
-            display: flex;
-            justify-content: space-between;
+            display: inline-flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
         }
 
-        .session-timer {
-            background: #f59e0b;
-            color: #1a2a3e;
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            font-weight: bold;
+        .whatsapp-btn a:hover {
+            transform: scale(1.05);
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-
-        .status-active {
-            background: #10b981;
-            color: white;
-        }
-
-        .status-pending {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .tenant-details {
-            font-size: 0.8rem;
-            color: #555;
-            margin-top: 4px;
-        }
-
-        @media (max-width: 700px) {
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
             .form-row, .form-row-3 {
                 grid-template-columns: 1fr;
             }
             .chat-message {
                 max-width: 95%;
+            }
+            .admin-header-bar {
+                flex-direction: column;
+                text-align: center;
             }
         }
     </style>
@@ -353,7 +441,7 @@
 
 <header>
     <div class="logo-container">
-        <div class="logo-icon">🏢</div>
+        <div class="logo-icon"><i class="fas fa-building"></i></div>
         <div class="logo-text">
             <h1>BATTETECH</h1>
             <span>ADMIN PANEL</span>
@@ -363,26 +451,26 @@
 
 <div class="dashboard-container">
     <div class="admin-header-bar">
-        <h2>🔧 Property Manager Dashboard</h2>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <span class="session-timer" id="sessionTimer">Session: 5:00</span>
-            <button onclick="adminLogout()" class="logout-btn">🚪 Logout</button>
+        <h2><i class="fas fa-tools"></i> Property Manager Dashboard</h2>
+        <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+            <span class="session-timer" id="sessionTimer"><i class="fas fa-clock"></i> Session: 5:00</span>
+            <button onclick="adminLogout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
     </div>
     
     <!-- IMAGE UPLOAD PANEL -->
     <div class="image-upload-panel">
-        <h3>🖼️ Slideshow Images (Homepage & Login Background)</h3>
+        <h3><i class="fas fa-images"></i> Slideshow Images (Homepage & Login Background)</h3>
         <div class="url-input">
             <input type="text" id="imageUrl" placeholder="Paste image URL">
-            <button onclick="addImageByUrl()">➕ Add Image</button>
+            <button onclick="addImageByUrl()"><i class="fas fa-plus"></i> Add Image</button>
         </div>
         <div class="image-grid" id="imageGrid"></div>
     </div>
     
     <!-- ADD PROPERTY FORM -->
     <div class="admin-form">
-        <h3>➕ Add New Property</h3>
+        <h3><i class="fas fa-plus-circle"></i> Add New Property</h3>
         <div class="form-row">
             <input type="text" id="propName" placeholder="Property Name">
             <input type="text" id="propLocation" placeholder="Location">
@@ -406,30 +494,30 @@
                 <option value="pending">Pending (Hidden from Rentals)</option>
             </select>
         </div>
-        <h4 style="margin: 0.5rem 0;">Monthly Bills (UGX - Optional)</h4>
+        <h4 style="margin: 0.8rem 0;"><i class="fas fa-receipt"></i> Monthly Bills (UGX - Optional)</h4>
         <div class="form-row-3">
             <input type="number" id="propElectricity" placeholder="Electricity">
             <input type="number" id="propWater" placeholder="Water">
             <input type="number" id="propGarbage" placeholder="Garbage">
         </div>
-        <button onclick="addNewProperty()">🏢 ADD PROPERTY</button>
+        <button onclick="addNewProperty()"><i class="fas fa-building"></i> ADD PROPERTY</button>
     </div>
     
     <hr>
     
-    <h3>📋 All Properties Managed</h3>
+    <h3><i class="fas fa-list"></i> All Properties Managed</h3>
     <div id="propertiesList"></div>
     
     <hr>
     
-    <h3>📢 Post Update to Owner</h3>
+    <h3><i class="fas fa-bullhorn"></i> Post Update to Owner</h3>
     <select id="adminPropertySelect" style="width:100%; padding:12px; border-radius:12px; margin-bottom:1rem;"></select>
-    <textarea id="adminMessage" rows="2" placeholder="Update message... (Owner will see this on their dashboard)" style="width:100%; padding:10px; border-radius:12px;"></textarea>
-    <button onclick="postUpdate()">📢 Post Update</button>
+    <textarea id="adminMessage" rows="2" placeholder="Update message... (Owner will see this on their dashboard)" style="width:100%; padding:12px; border-radius:12px; border:1px solid #e2e8f0;"></textarea>
+    <button onclick="postUpdate()"><i class="fas fa-paper-plane"></i> Post Update</button>
     
     <hr>
     
-    <h3>📋 Recent Updates</h3>
+    <h3><i class="fas fa-clock"></i> Recent Updates</h3>
     <div id="recentUpdatesList"></div>
 </div>
 
@@ -437,12 +525,12 @@
     <div class="contact-info">
         <h3>YOUR PROPERTY, OUR PRIORITY</h3>
         <div class="phones">
-            <p><strong>📱 MTN: 0794115704</strong></p>
-            <p><strong>📱 AIRTEL: 0756182284</strong></p>
+            <p><i class="fas fa-phone-alt"></i> <strong>MTN: 0794115704</strong></p>
+            <p><i class="fas fa-phone-alt"></i> <strong>AIRTEL: 0756182284</strong></p>
         </div>
-        <p><strong>📧 battetech330@gmail.com</strong></p>
+        <p><i class="fas fa-envelope"></i> <strong>battetech330@gmail.com</strong></p>
         <div class="whatsapp-btn">
-            <a href="https://wa.me/256794115704" target="_blank">💬 Chat on WhatsApp</a>
+            <a href="https://wa.me/256794115704" target="_blank"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
         </div>
     </div>
     <div class="copyright" style="margin-top: 1.5rem;">
@@ -494,7 +582,7 @@
             const secs = seconds % 60;
             const timerDisplay = document.getElementById('sessionTimer');
             if (timerDisplay) {
-                timerDisplay.textContent = `Session: ${minutes}:${secs.toString().padStart(2, '0')}`;
+                timerDisplay.innerHTML = `<i class="fas fa-clock"></i> Session: ${minutes}:${secs.toString().padStart(2, '0')}`;
                 if (remaining <= 30000) {
                     timerDisplay.style.background = '#dc2626';
                     timerDisplay.style.color = 'white';
@@ -540,7 +628,7 @@
         if (grid) {
             grid.innerHTML = '';
             images.forEach((url, idx) => {
-                grid.innerHTML += `<div class="image-item"><img src="${url}" onerror="this.src='https://placehold.co/600x400?text=Image'"><button onclick="deleteImage(${idx})">✕</button></div>`;
+                grid.innerHTML += `<div class="image-item"><img src="${url}" onerror="this.src='https://placehold.co/600x400?text=Image'"><button onclick="deleteImage(${idx})"><i class="fas fa-times"></i></button></div>`;
             });
         }
     }
@@ -615,73 +703,12 @@
         refreshSession();
     }
     
-    // EDIT PROPERTY FUNCTION - NEW
-    function editProperty(propertyId) {
-        const prop = propertiesDB[propertyId];
-        if (!prop) return;
-        
-        const updatedData = {};
-        
-        const newName = prompt('✏️ Edit Property Name:', prop.name);
-        if (newName && newName !== prop.name) updatedData.name = newName;
-        
-        const newLocation = prompt('✏️ Edit Location:', prop.location);
-        if (newLocation && newLocation !== prop.location) updatedData.location = newLocation;
-        
-        const newDefaultRent = prompt('✏️ Edit Default Rent (UGX):', prop.defaultRent);
-        if (newDefaultRent && parseInt(newDefaultRent) !== prop.defaultRent && parseInt(newDefaultRent) > 0) {
-            updatedData.defaultRent = parseInt(newDefaultRent);
-        }
-        
-        const newOwnerPassword = prompt('✏️ Edit Owner Password:', prop.ownerPassword);
-        if (newOwnerPassword && newOwnerPassword !== prop.ownerPassword) updatedData.ownerPassword = newOwnerPassword;
-        
-        const newOwnerName = prompt('✏️ Edit Owner Name:', prop.ownerName);
-        if (newOwnerName && newOwnerName !== prop.ownerName) updatedData.ownerName = newOwnerName;
-        
-        const newOwnerPhone = prompt('✏️ Edit Owner Phone:', prop.ownerPhone);
-        if (newOwnerPhone && newOwnerPhone !== prop.ownerPhone) updatedData.ownerPhone = newOwnerPhone;
-        
-        const newPropertyImage = prompt('✏️ Edit Property Image URL (leave blank to keep current):', prop.propertyImage || '');
-        if (newPropertyImage !== null && newPropertyImage !== prop.propertyImage) updatedData.propertyImage = newPropertyImage;
-        
-        const newStatus = confirm(`Current Status: ${prop.status.toUpperCase()}\nClick OK to change to ${prop.status === 'active' ? 'PENDING' : 'ACTIVE'}, Cancel to keep same.`);
-        if (newStatus !== null) {
-            updatedData.status = prop.status === 'active' ? 'pending' : 'active';
-        }
-        
-        const newElectricity = prompt('✏️ Edit Electricity Bill (UGX):', prop.bills.electricity);
-        if (newElectricity !== null && parseInt(newElectricity) !== prop.bills.electricity) {
-            updatedData.electricity = parseInt(newElectricity) || 0;
-        }
-        
-        const newWater = prompt('✏️ Edit Water Bill (UGX):', prop.bills.water);
-        if (newWater !== null && parseInt(newWater) !== prop.bills.water) {
-            updatedData.water = parseInt(newWater) || 0;
-        }
-        
-        const newGarbage = prompt('✏️ Edit Garbage Bill (UGX):', prop.bills.garbage);
-        if (newGarbage !== null && parseInt(newGarbage) !== prop.bills.garbage) {
-            updatedData.garbage = parseInt(newGarbage) || 0;
-        }
-        
-        if (Object.keys(updatedData).length > 0) {
-            editProperty(propertyId, updatedData);
-            renderPropertiesList();
-            populatePropertySelect();
-            alert('✅ Property updated successfully!');
-        } else {
-            alert('No changes made.');
-        }
-        refreshSession();
-    }
-    
     function renderPropertiesList() {
         const container = document.getElementById('propertiesList');
         if (!container) return;
         
         if (Object.keys(propertiesDB).length === 0) {
-            container.innerHTML = '<div style="background:white; padding:2rem; border-radius:20px; text-align:center;">🏢 No properties yet. Add your first property above.</div>';
+            container.innerHTML = '<div style="background:white; padding:2rem; border-radius:20px; text-align:center;"><i class="fas fa-building"></i> No properties yet. Add your first property above.</div>';
             return;
         }
         
@@ -692,26 +719,26 @@
             const occupied = getOccupiedCount(prop);
             const safeId = propId.replace(/[^a-zA-Z0-9]/g, '_');
             const statusClass = prop.status === 'pending' ? 'pending' : '';
-            const statusBadge = prop.status === 'pending' ? '<span class="status-badge status-pending">⏳ Pending</span>' : '<span class="status-badge status-active">✅ Active</span>';
+            const statusBadge = prop.status === 'pending' ? '<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>' : '<span class="status-badge status-active"><i class="fas fa-check-circle"></i> Active</span>';
             
             html += `<div class="property-card-admin ${statusClass}" id="card-${safeId}">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                            <h4>🏢 ${prop.name} ${statusBadge}</h4>
+                            <h4><i class="fas fa-building"></i> ${prop.name} ${statusBadge}</h4>
                             <div>
-                                <button onclick="togglePropertyStatus('${propId}')" class="warning">${prop.status === 'pending' ? 'Mark Active' : 'Mark Pending'}</button>
-                                <button onclick="editProperty('${propId}')" class="success" style="background:#10b981;">✏️ Edit Property</button>
+                                <button onclick="togglePropertyStatus('${propId}')" class="warning"><i class="fas fa-sync-alt"></i> ${prop.status === 'pending' ? 'Mark Active' : 'Mark Pending'}</button>
+                                <button onclick="editProperty('${propId}')" class="success" style="background:#10b981;"><i class="fas fa-edit"></i> Edit Property</button>
                             </div>
                         </div>
-                        <p>📍 ${prop.location} | ${occupied}/${prop.totalRooms} occupied | ${vacant} vacant</p>
-                        <p>💰 Default Rent: UGX ${prop.defaultRent.toLocaleString()}/month | 🔑 Password: <strong>${prop.ownerPassword}</strong></p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${prop.location} | ${occupied}/${prop.totalRooms} occupied | ${vacant} vacant</p>
+                        <p><i class="fas fa-money-bill-wave"></i> Default Rent: UGX ${prop.defaultRent.toLocaleString()}/month | <i class="fas fa-key"></i> Password: <strong>${prop.ownerPassword}</strong></p>
                         ${prop.propertyImage ? `<img src="${prop.propertyImage}" style="width:100px; height:70px; object-fit:cover; border-radius:8px; margin:5px 0;">` : ''}
                         <div>
-                            <button onclick="updatePropertyImage('${propId}')">🖼️ Change Property Image</button>
-                            <button onclick="toggleUnits('${propId}')">📋 Manage Units</button>
-                            <button onclick="openChat('${propId}')">💬 Chat with Owner</button>
-                            <button onclick="openNotepad('${propId}')">📝 Notepad</button>
-                            <button onclick="sendBillReceiptPrompt('${propId}')">🧾 Send Bill Receipt</button>
-                            <button class="danger" onclick="deletePropertyConfirm('${propId}')">🗑 Delete</button>
+                            <button onclick="updatePropertyImage('${propId}')"><i class="fas fa-image"></i> Change Property Image</button>
+                            <button onclick="toggleUnits('${propId}')"><i class="fas fa-door-open"></i> Manage Units</button>
+                            <button onclick="openChat('${propId}')"><i class="fas fa-comment"></i> Chat with Owner</button>
+                            <button onclick="openNotepad('${propId}')"><i class="fas fa-sticky-note"></i> Notepad</button>
+                            <button onclick="sendBillReceiptPrompt('${propId}')"><i class="fas fa-receipt"></i> Send Bill Receipt</button>
+                            <button class="danger" onclick="deletePropertyConfirm('${propId}')"><i class="fas fa-trash"></i> Delete</button>
                         </div>
                         <div id="units-${safeId}" style="margin-top:1rem; display:none;"></div>
                         <div id="chat-${safeId}" style="margin-top:1rem; display:none;"></div>
@@ -761,23 +788,23 @@
         if (!container) return;
         
         if (container.style.display === 'none') {
-            let unitsHtml = `<h5>Rooms / Units - Each room can have different rent</h5><div style="max-height:400px; overflow-y:auto;">`;
+            let unitsHtml = `<h5><i class="fas fa-door-open"></i> Rooms / Units - Each room can have different rent</h5><div style="max-height:400px; overflow-y:auto;">`;
             prop.units.forEach((unit, idx) => {
                 const unitRent = unit.rentAmount || prop.defaultRent;
                 unitsHtml += `<div class="unit-row">
                                 <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
-                                    ${unit.roomImage ? `<img src="${unit.roomImage}" class="unit-image" onerror="this.style.display='none'">` : '<div class="unit-image" style="display:flex;align-items:center;justify-content:center;">📷</div>'}
+                                    ${unit.roomImage ? `<img src="${unit.roomImage}" class="unit-image" onerror="this.style.display='none'">` : '<div class="unit-image" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-image"></i></div>'}
                                     <div>
-                                        <strong>${unit.room}</strong>
-                                        <div>💰 Rent: UGX ${unitRent.toLocaleString()}</div>
-                                        ${!unit.vacant ? `<div class="tenant-details">👤 ${unit.tenant}<br>📞 ${unit.tenantPhone || 'No phone'}<br>${unit.paid ? '✅ Paid' : '❌ Unpaid'}</div>` : '<span class="status-badge status-pending" style="background:#f59e0b;">VACANT</span>'}
+                                        <strong><i class="fas fa-door-open"></i> ${unit.room}</strong>
+                                        <div><i class="fas fa-money-bill-wave"></i> Rent: UGX ${unitRent.toLocaleString()}</div>
+                                        ${!unit.vacant ? `<div class="tenant-details"><i class="fas fa-user"></i> ${unit.tenant}<br><i class="fas fa-phone"></i> ${unit.tenantPhone || 'No phone'}<br>${unit.paid ? '<i class="fas fa-check-circle"></i> Paid' : '<i class="fas fa-times-circle"></i> Unpaid'}</div>` : '<span class="status-badge status-pending"><i class="fas fa-door-closed"></i> VACANT</span>'}
                                     </div>
                                 </div>
                                 <div>
-                                    <button onclick="updateRoomRent('${propertyId}', ${idx})">💰 Set Rent</button>
-                                    <button onclick="updateRoomImage('${propertyId}', ${idx})">📷 Room Pic</button>
-                                    ${unit.vacant ? `<button onclick="markOccupied('${propertyId}', ${idx})">👤 Mark Occupied</button>` : `<button onclick="editTenant('${propertyId}', ${idx})">✏️ Edit Tenant</button><button onclick="markVacant('${propertyId}', ${idx})">🔓 Mark Vacant</button>`}
-                                    ${unit.vacant ? `<button class="warning" onclick="prepareMerge('${propertyId}', ${idx})">🔗 Merge</button>` : ''}
+                                    <button onclick="updateRoomRent('${propertyId}', ${idx})"><i class="fas fa-dollar-sign"></i> Set Rent</button>
+                                    <button onclick="updateRoomImage('${propertyId}', ${idx})"><i class="fas fa-camera"></i> Room Pic</button>
+                                    ${unit.vacant ? `<button onclick="markOccupied('${propertyId}', ${idx})"><i class="fas fa-user-plus"></i> Mark Occupied</button>` : `<button onclick="editTenant('${propertyId}', ${idx})"><i class="fas fa-user-edit"></i> Edit Tenant</button><button onclick="markVacant('${propertyId}', ${idx})"><i class="fas fa-door-open"></i> Mark Vacant</button>`}
+                                    ${unit.vacant ? `<button class="warning" onclick="prepareMerge('${propertyId}', ${idx})"><i class="fas fa-compress-alt"></i> Merge</button>` : ''}
                                 </div>
                              </div>`;
             });
@@ -879,11 +906,11 @@
         const safeId = propertyId.replace(/[^a-zA-Z0-9]/g, '_');
         const mergeArea = document.getElementById(`merge-area-${safeId}`);
         if (selectedMergeUnits.length === 1) {
-            mergeArea.innerHTML = `<p>✅ Selected ${propertiesDB[propertyId].units[unitIndex].room}. Select another vacant room to merge.</p>`;
+            mergeArea.innerHTML = `<p><i class="fas fa-info-circle"></i> Selected ${propertiesDB[propertyId].units[unitIndex].room}. Select another vacant room to merge.</p>`;
         } else if (selectedMergeUnits.length === 2) {
             const unit1 = propertiesDB[propertyId].units[selectedMergeUnits[0]];
             const unit2 = propertiesDB[propertyId].units[selectedMergeUnits[1]];
-            mergeArea.innerHTML = `<p>🔄 Merge ${unit1.room} + ${unit2.room}? 
+            mergeArea.innerHTML = `<p><i class="fas fa-compress-alt"></i> Merge ${unit1.room} + ${unit2.room}? 
                 <button onclick="confirmMerge('${propertyId}', ${selectedMergeUnits[0]}, ${selectedMergeUnits[1]})">Confirm</button> 
                 <button onclick="cancelMerge('${propertyId}')">Cancel</button></p>`;
         }
@@ -931,10 +958,10 @@
             <div class="chat-messages" id="admin-chat-${safeId}" style="max-height:300px; overflow-y:auto;"></div>
             <div class="chat-input-area">
                 <input type="text" id="adminMsgInput-${safeId}" placeholder="Type message...">
-                <button onclick="sendAdminMessage('${propertyId}')">Send</button>
+                <button onclick="sendAdminMessage('${propertyId}')"><i class="fas fa-paper-plane"></i> Send</button>
                 <input type="file" id="adminImageInput-${safeId}" accept="image/*" style="display:none;" onchange="sendAdminImage('${propertyId}')">
-                <label class="file-input-label" onclick="document.getElementById('adminImageInput-${safeId}').click()">📷 Image</label>
-                <label class="file-input-label" onclick="sendBillReceiptPrompt('${propertyId}')">🧾 Bill Receipt</label>
+                <label class="file-input-label" onclick="document.getElementById('adminImageInput-${safeId}').click()"><i class="fas fa-image"></i> Image</label>
+                <label class="file-input-label" onclick="sendBillReceiptPrompt('${propertyId}')"><i class="fas fa-receipt"></i> Bill Receipt</label>
             </div>
         </div>`;
         refreshAdminChat(propertyId);
@@ -948,7 +975,7 @@
         if (!chatContainer) return;
         
         if (messages.length === 0) {
-            chatContainer.innerHTML = '<p style="text-align:center; color:gray;">No messages yet.</p>';
+            chatContainer.innerHTML = '<p style="text-align:center; color:gray;"><i class="fas fa-comment"></i> No messages yet.</p>';
             return;
         }
         
@@ -956,7 +983,7 @@
         messages.forEach(msg => {
             const isAdmin = msg.sender === 'admin';
             html += `<div class="chat-message ${isAdmin ? 'owner' : 'admin'}" style="${isAdmin ? 'background:#0a2b4e; color:white; margin-left:auto;' : 'background:#e5e7eb;'}">
-                        <small>${msg.sender === 'admin' ? 'You (Admin)' : 'Owner'} • ${new Date(msg.timestamp).toLocaleString()}</small>
+                        <small><i class="fas fa-user"></i> ${msg.sender === 'admin' ? 'You (Admin)' : 'Owner'} • ${new Date(msg.timestamp).toLocaleString()}</small>
                         <div>${msg.message}</div>
                         ${msg.image ? `<img src="${msg.image}">` : ''}
                      </div>`;
@@ -998,7 +1025,7 @@
         const currentNote = getAdminNote(propertyId);
         container.innerHTML = `<div class="notepad">
             <textarea id="note-text-${safeId}" rows="3" placeholder="Private notes...">${currentNote}</textarea>
-            <button onclick="saveNote('${propertyId}')">Save Note</button>
+            <button onclick="saveNote('${propertyId}')"><i class="fas fa-save"></i> Save Note</button>
         </div>`;
         container.style.display = container.style.display === 'none' ? 'block' : 'none';
         refreshSession();
@@ -1041,14 +1068,14 @@
         const container = document.getElementById('recentUpdatesList');
         if (!container) return;
         if (globalUpdates.length === 0) {
-            container.innerHTML = '<div style="background:white; padding:1rem; border-radius:16px;">No updates yet.</div>';
+            container.innerHTML = '<div style="background:white; padding:1rem; border-radius:16px;"><i class="fas fa-info-circle"></i> No updates yet.</div>';
             return;
         }
         let html = '';
         globalUpdates.slice(0, 10).forEach(up => {
             const propName = propertiesDB[up.propertyId]?.name || 'Unknown';
             html += `<div style="background:white; padding:0.8rem; margin:0.5rem 0; border-radius:12px;">
-                        <strong>🏢 ${propName}</strong> <small>(${up.date})</small><br>📢 ${up.message}
+                        <strong><i class="fas fa-building"></i> ${propName}</strong> <small>(${up.date})</small><br><i class="fas fa-bullhorn"></i> ${up.message}
                      </div>`;
         });
         container.innerHTML = html;
@@ -1074,8 +1101,8 @@
         }
     }
 </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <script src="supabase-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="supabase-data.js"></script>
 </body>
 </html>

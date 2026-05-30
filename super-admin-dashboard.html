@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Super Admin - BATTETECH</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; min-height: 100vh; padding-bottom: 70px; }
+        
+        .dashboard-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f0f4fa;
+        }
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+        
+        header { background: rgba(10, 43, 78, 0.95); backdrop-filter: blur(10px); color: white; padding: 0.8rem 1rem; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .logo-container { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+        .logo-icon { font-size: 1.6rem; background: white; color: #0a2b4e; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+        .logo-text h1 { font-size: 1.2rem; letter-spacing: 1px; }
+        .logo-text span { font-size: 0.55rem; letter-spacing: 2px; opacity: 0.8; }
+        
+        .dashboard-container { max-width: 1400px; margin: 1rem auto; padding: 0 1rem; }
+        .admin-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 1rem; border-radius: 16px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .welcome-text { font-size: 1.4rem; color: #0a2b4e; }
+        .welcome-text strong { color: #2c7be5; font-size: 1.5rem; }
+        .session-timer { background: #f59e0b; color: #1a2a3e; padding: 6px 12px; border-radius: 40px; font-size: 0.8rem; font-weight: bold; }
+        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; border-radius: 40px; cursor: pointer; }
+        
+        .notification-bell { position: relative; display: inline-block; margin-right: 15px; }
+        .notification-btn { background: #2c7be5; position: relative; padding: 8px 16px; border-radius: 40px; cursor: pointer; border: none; color: white; font-weight: bold; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: none; align-items: center; justify-content: center; }
+        .notification-dropdown { display: none; position: absolute; right: 0; top: 45px; width: 350px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-height: 450px; overflow-y: auto; }
+        .notification-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .notification-item.unread { background: #fff3cd; }
+        .notification-item:hover { background: #f0f4fa; }
+        .notification-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 4px; }
+        .notification-message { font-size: 0.75rem; color: #555; margin-bottom: 4px; }
+        .notification-time { font-size: 0.65rem; color: #999; }
+        .mark-all-read { width: 100%; background: #f59e0b; border: none; padding: 10px; border-radius: 0 0 12px 12px; cursor: pointer; font-weight: bold; }
+        
+        .section-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .section-title { font-size: 1.2rem; color: #0a2b4e; margin-bottom: 1rem; border-left: 4px solid #2c7be5; padding-left: 0.8rem; font-weight: bold; }
+        
+        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .form-row input, .form-row select, .form-row textarea { padding: 12px; border-radius: 10px; border: 1px solid #ddd; flex: 1; min-width: 200px; font-size: 0.9rem; }
+        .photo-preview { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-top: 5px; }
+        .bg-preview { width: 100px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid #ddd; }
+        .upload-btn { background: #f59e0b; color: white; border: none; padding: 10px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
+        
+        button { background: #0a2b4e; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: bold; }
+        button.danger { background: #dc2626; }
+        button.warning { background: #f59e0b; color: #1a2a3e; }
+        button.success { background: #10b981; }
+        button.small { padding: 4px 12px; font-size: 0.7rem; }
+        
+        .admin-card, .property-card, .worker-card, .activity-item, .approval-card, .owner-card { background: rgba(248, 250, 252, 0.95); border-radius: 12px; padding: 1rem; margin-bottom: 0.8rem; border-left: 4px solid #2c7be5; cursor: pointer; transition: 0.2s; }
+        .admin-card:hover, .property-card:hover { transform: translateX(5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .admin-name { font-weight: bold; color: #0a2b4e; font-size: 1rem; }
+        .password-badge { background: #eef3fc; padding: 4px 10px; border-radius: 20px; font-family: monospace; font-size: 0.75rem; display: inline-block; }
+        
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1rem; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 20px; padding: 1.5rem; max-height: 80%; overflow-y: auto; }
+        
+        .main-footer { background: rgba(7, 30, 54, 0.95); backdrop-filter: blur(5px); color: white; margin-top: 2rem; padding: 1rem; text-align: center; }
+        .phones { display: flex; justify-content: center; gap: 1rem; margin: 0.3rem 0; flex-wrap: wrap; font-size: 0.7rem; }
+        .whatsapp-btn a { background: #25D366; color: white; padding: 6px 14px; border-radius: 40px; text-decoration: none; font-size: 0.7rem; display: inline-block; }
+        
+        .transfer-btn { background: #8b5cf6; margin-left: 0.5rem; }
+        
+        @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="dashboard-bg" id="dashboardBg"></div>
+    <div class="bg-overlay"></div>
+    
+    <div class="content-wrapper">
+        <header>
+            <div class="logo-container">
+                <div class="logo-icon">👑</div>
+                <div class="logo-text">
+                    <h1>BATTETECH</h1>
+                    <span>SUPER ADMIN</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="admin-header">
+                <div class="welcome-text">
+                    👋 Welcome, <strong id="adminName"></strong>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <div class="notification-bell">
+                        <button class="notification-btn" id="notificationBell">
+                            🔔 Notifications
+                            <span id="notificationBadge" class="notification-badge">0</span>
+                        </button>
+                        <div id="notificationDropdown" class="notification-dropdown">
+                            <div id="notificationList"></div>
+                            <button class="mark-all-read" onclick="markAllNotificationsAsRead()">Mark All Read</button>
+                        </div>
+                    </div>
+                    <button class="warning" onclick="openBroadcastModal()">📢 Broadcast Message</button>
+                    <span class="session-timer" id="sessionTimer">Session: 5:00</span>
+                    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+                </div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">🖼️ DASHBOARD BACKGROUND IMAGE</div>
+                <div class="form-row">
+                    <button type="button" class="upload-btn" onclick="uploadBackgroundImage()">📷 Upload Background Image</button>
+                    <input type="file" id="bgImageInput" accept="image/*" style="display:none;" onchange="previewBackgroundImage(event)">
+                    <div id="bgPreview"></div>
+                    <button onclick="removeBackgroundImage()" class="danger small">🗑️ Remove Background</button>
+                </div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">📜 PENDING HISTORY ACCESS REQUESTS</div>
+                <div id="pendingHistoryRequests"></div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">⏳ PENDING BROADCAST APPROVALS</div>
+                <div id="pendingBroadcastApprovals"></div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">➕ Create New Property Admin</div>
+                <div class="form-row">
+                    <input type="text" id="newAdminName" placeholder="Full Name">
+                    <input type="tel" id="newAdminPhone" placeholder="Phone Number">
+                </div>
+                <div class="form-row">
+                    <input type="password" id="newAdminPassword" placeholder="Create Secure Password">
+                    <button type="button" class="upload-btn" onclick="uploadAdminPhoto()">📷 Upload Photo</button>
+                    <input type="file" id="adminPhotoInput" accept="image/*" style="display:none;" onchange="previewAdminPhoto(event)">
+                    <div id="adminPhotoPreview"></div>
+                </div>
+                <button onclick="createPropertyAdmin()">✅ Create Property Admin</button>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">🏢 Assign Property Admin to Property</div>
+                <div class="form-row">
+                    <select id="assignAdminSelect">
+                        <option value="">-- Select Property Admin --</option>
+                    </select>
+                    <select id="assignPropertySelect">
+                        <option value="">-- Select Property --</option>
+                    </select>
+                </div>
+                <button onclick="assignAdminToProperty()">✅ Assign Admin to Property</button>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">📋 ALL PROPERTIES</div>
+                <div id="myPropertiesList" class="grid-2"></div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">🏢 PROPERTY ADMINS & PASSWORDS</div>
+                <div id="adminsList" class="grid-2"></div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">👷 ALL WORKERS & PASSWORDS</div>
+                <div id="allWorkersList" class="grid-2"></div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">👤 PROPERTY OWNERS & PASSWORDS</div>
+                <div id="ownersList" class="grid-2"></div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-title">📋 ALL ACTIVITY LOG</div>
+                <div id="activityLogList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Broadcast Modal -->
+    <div id="broadcastModal" class="modal">
+        <div class="modal-content">
+            <h3>📢 Super Admin Broadcast</h3>
+            <div class="form-row">
+                <select id="broadcastType" onchange="toggleBroadcastRecipients()">
+                    <option value="">-- Select Recipient Type --</option>
+                    <option value="property_admins">🏢 Property Admins</option>
+                    <option value="workers">👷 Workers</option>
+                    <option value="all_tenants">🏠 All Tenants</option>
+                    <option value="unpaid_tenants">⚠️ Unpaid Tenants Only</option>
+                    <option value="paid_tenants">✅ Paid Tenants Only</option>
+                    <option value="property_owners">👤 Property Owners</option>
+                    <option value="all_users">🌍 Entire System (All Users)</option>
+                </select>
+            </div>
+            <div id="recipientSelectContainer" style="display:none;">
+                <div id="recipientFilters" class="form-row"></div>
+                <div id="recipientList" style="max-height:200px; overflow-y:auto; border:1px solid #ddd; border-radius:10px; padding:10px; margin:10px 0;"></div>
+            </div>
+            <div class="form-row">
+                <textarea id="broadcastMessage" rows="4" placeholder="Type your message here..."></textarea>
+            </div>
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+                <button onclick="sendBroadcast()" style="background:#25D366;">📱 Send Broadcast</button>
+                <button onclick="closeBroadcastModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Property Modal -->
+    <div id="editPropertyModal" class="modal">
+        <div class="modal-content">
+            <h3>✏️ Edit Property</h3>
+            <div class="form-row"><input type="text" id="editPropertyName" placeholder="Property Name"></div>
+            <div class="form-row"><input type="text" id="editPropertyLocation" placeholder="Location"></div>
+            <div class="form-row"><input type="text" id="editOwnerName" placeholder="Owner Name"></div>
+            <div class="form-row"><input type="text" id="editOwnerPhone" placeholder="Owner Phone"></div>
+            <div class="form-row"><input type="password" id="editOwnerPassword" placeholder="Owner Password (reset)"></div>
+            <div class="form-row"><select id="editAdminSelect"><option value="">-- Assign to Admin --</option></select></div>
+            <input type="hidden" id="editPropertyId">
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+                <button onclick="savePropertyEdit()" class="success">💾 Save Changes</button>
+                <button onclick="closeEditPropertyModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Worker Modal -->
+    <div id="transferWorkerModal" class="modal">
+        <div class="modal-content">
+            <h3>🔄 Transfer Worker</h3>
+            <p>Transferring: <strong id="transferWorkerName"></strong></p>
+            <div class="form-row">
+                <label>Select New Admin:</label>
+                <select id="newAdminSelect" style="width:100%; padding:10px;"></select>
+            </div>
+            <div class="form-row">
+                <label>Select New Property:</label>
+                <select id="newPropertySelect" style="width:100%; padding:10px;"></select>
+            </div>
+            <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:8px;">
+                <small>⚠️ This will immediately transfer the worker. No approval needed. The worker and both admins will be notified.</small>
+            </div>
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+                <button onclick="confirmTransferWorker()" style="background:#8b5cf6;">✅ Confirm Transfer</button>
+                <button onclick="closeTransferModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Admin Modal -->
+    <div id="transferAdminModal" class="modal">
+        <div class="modal-content">
+            <h3>🔄 Transfer / Assign Admin</h3>
+            <p>Admin: <strong id="transferAdminName"></strong></p>
+            <div class="form-row">
+                <label>Select Property to Assign:</label>
+                <select id="adminPropertySelect" style="width:100%; padding:10px;"></select>
+            </div>
+            <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:8px;">
+                <small>⚠️ This will immediately assign this admin to the selected property. No approval needed. The admin will be notified.</small>
+            </div>
+            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+                <button onclick="confirmTransferAdmin()" style="background:#8b5cf6;">✅ Confirm Assignment</button>
+                <button onclick="closeAdminTransferModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="phones"><p><strong>📱 MTN: 0794115704</strong></p><p><strong>📱 AIRTEL: 0756182284</strong></p></div>
+        <p><strong>📧 battetech330@gmail.com</strong></p>
+        <div class="whatsapp-btn"><a href="https://wa.me/256756182282" target="_blank">💬 WhatsApp</a></div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="supabase-data.js"></script>
+    <script src="activity-log.js"></script>
+    <script src="notifications.js"></script>
+    <script src="chat-system.js"></script>
+
+    <script>
+        let selectedAdminPhotoBase64 = '';
+        let selectedBgImageBase64 = '';
+        let timerInterval;
+        let allPropertyAdmins = [];
+        let allWorkers = [];
+        let allProperties = [];
+        let allTenantsList = [];
+        let unpaidTenantsList = [];
+        let paidTenantsList = [];
+        let superAdminId = null;
+        let currentTransferWorkerId = null;
+        let currentTransferWorkerName = null;
+        let currentTransferAdminId = null;
+        let currentTransferAdminName = null;
+        
+        // ============ SESSION MANAGEMENT ============
+        
+        function checkAdminSession() {
+            const role = localStorage.getItem('battetech_user_role');
+            const sessionTime = parseInt(localStorage.getItem('battetech_session_time') || '0');
+            if (role !== 'super_admin') { window.location.href = 'login.html'; return false; }
+            if (Date.now() - sessionTime > 300000) { 
+                localStorage.clear(); 
+                window.location.replace('login.html'); 
+                return false; 
+            }
+            refreshSession(); 
+            return true;
+        }
+        
+        function refreshSession() { localStorage.setItem('battetech_session_time', Date.now()); startTimer(); }
+        function resetInactivityTimer() { refreshSession(); }
+        
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const sessionTime = parseInt(localStorage.getItem('battetech_session_time') || '0');
+                const remaining = Math.max(0, 300000 - (Date.now() - sessionTime));
+                const minutes = Math.floor(remaining / 60000);
+                const secs = Math.floor((remaining % 60000) / 1000);
+                const timerDisplay = document.getElementById('sessionTimer');
+                if (timerDisplay) {
+                    timerDisplay.textContent = `Session: ${minutes}:${secs.toString().padStart(2, '0')}`;
+                    if (remaining <= 60000) {
+                        timerDisplay.style.background = '#dc2626';
+                        timerDisplay.style.color = 'white';
+                    }
+                }
+                if (remaining <= 0) { 
+                    clearInterval(timerInterval); 
+                    localStorage.clear(); 
+                    window.location.replace('login.html'); 
+                }
+            }, 1000);
+        }
+        
+        // ============ BACKGROUND IMAGE ============
+        
+        function uploadBackgroundImage() { document.getElementById('bgImageInput').click(); }
+        
+        function previewBackgroundImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedBgImageBase64 = e.target.result;
+                    document.getElementById('bgPreview').innerHTML = `<img src="${e.target.result}" class="bg-preview">`;
+                    document.getElementById('dashboardBg').style.backgroundImage = `url('${e.target.result}')`;
+                    localStorage.setItem('battetech_superadmin_bg', selectedBgImageBase64);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function removeBackgroundImage() {
+            selectedBgImageBase64 = '';
+            document.getElementById('bgPreview').innerHTML = '';
+            document.getElementById('dashboardBg').style.backgroundImage = '';
+            localStorage.removeItem('battetech_superadmin_bg');
+            alert('Background image removed.');
+        }
+        
+        function loadSavedBackground() {
+            const savedBg = localStorage.getItem('battetech_superadmin_bg');
+            if (savedBg) {
+                document.getElementById('dashboardBg').style.backgroundImage = `url('${savedBg}')`;
+                document.getElementById('bgPreview').innerHTML = `<img src="${savedBg}" class="bg-preview">`;
+                selectedBgImageBase64 = savedBg;
+            }
+        }
+        
+        // ============ PHOTO UPLOAD ============
+        
+        function uploadAdminPhoto() { document.getElementById('adminPhotoInput').click(); }
+        
+        function previewAdminPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedAdminPhotoBase64 = e.target.result;
+                    document.getElementById('adminPhotoPreview').innerHTML = `<img src="${e.target.result}" class="photo-preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // ============ LOAD DATA ============
+        
+        async function loadSuperAdminData() {
+            if (!checkAdminSession()) return;
+            const userName = localStorage.getItem('battetech_user_name') || 'Super Admin';
+            document.getElementById('adminName').innerText = userName;
+            const events = ['click', 'keypress', 'scroll', 'mousemove', 'touchstart'];
+            events.forEach(event => document.addEventListener(event, resetInactivityTimer));
+            startTimer();
+            loadSavedBackground();
+            await getSuperAdminId();
+            await loadAllDataForBroadcast();
+            await loadMyProperties();
+            await loadAdmins();
+            await loadAllWorkers();
+            await loadOwners();
+            await loadPendingHistoryRequests();
+            await loadPendingBroadcastApprovals();
+            await loadAllActivities();
+            await populateSelects();
+            await initNotificationSystem();
+            initChatPanel();
+        }
+        
+        async function getSuperAdminId() {
+            const { data, error } = await window.supabaseClient
+                .from('users')
+                .select('id')
+                .eq('role', 'super_admin')
+                .single();
+            if (!error && data) {
+                superAdminId = data.id;
+            }
+            return superAdminId;
+        }
+        
+        async function loadAllDataForBroadcast() {
+            const { data: admins } = await window.supabaseClient.from('users').select('id, full_name, phone').eq('role', 'property_admin');
+            const { data: workers } = await window.supabaseClient.from('users').select('id, full_name, phone, parent_id, property_id').eq('role', 'worker');
+            const { data: properties } = await window.supabaseClient.from('properties').select('id, name, owner_name, owner_phone, owner_password, data, admin_id');
+            
+            allPropertyAdmins = admins || [];
+            allWorkers = workers || [];
+            allProperties = properties || [];
+            
+            const currentYear = new Date().getFullYear();
+            const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+            const monthKey = `${currentYear}-${currentMonth}`;
+            
+            for (let prop of properties || []) {
+                const units = prop.data?.units || [];
+                for (let room of units) {
+                    if (!room.vacant && room.tenantPhone) {
+                        const payment = room.payments?.[monthKey] || { paid: 0, rentDue: room.rentAmount };
+                        const isPaid = payment.paid >= payment.rentDue;
+                        const tenantInfo = {
+                            name: room.tenant,
+                            phone: room.tenantPhone,
+                            room: room.roomNumber,
+                            property: prop.name,
+                            propertyId: prop.id,
+                            balance: isPaid ? 0 : (payment.balance || room.rentAmount)
+                        };
+                        allTenantsList.push(tenantInfo);
+                        if (!isPaid) {
+                            unpaidTenantsList.push(tenantInfo);
+                        } else {
+                            paidTenantsList.push(tenantInfo);
+                        }
+                    }
+                }
+            }
+        }
+        
+        async function populateSelects() {
+            const adminSelect = document.getElementById('assignAdminSelect');
+            adminSelect.innerHTML = '<option value="">-- Select Property Admin --</option>';
+            allPropertyAdmins.forEach(admin => {
+                adminSelect.innerHTML += `<option value="${admin.id}">${escapeHtml(admin.full_name)}</option>`;
+            });
+            
+            const propertySelect = document.getElementById('assignPropertySelect');
+            propertySelect.innerHTML = '<option value="">-- Select Property --</option>';
+            allProperties.forEach(prop => {
+                propertySelect.innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
+            });
+            
+            const editAdminSelect = document.getElementById('editAdminSelect');
+            editAdminSelect.innerHTML = '<option value="">-- Unassigned --</option>';
+            allPropertyAdmins.forEach(admin => {
+                editAdminSelect.innerHTML += `<option value="${admin.id}">${escapeHtml(admin.full_name)}</option>`;
+            });
+        }
+        
+        // ============ PENDING HISTORY ACCESS REQUESTS ============
+        
+        async function loadPendingHistoryRequests() {
+            const requests = await getPendingHistoryAccessRequests();
+            const container = document.getElementById('pendingHistoryRequests');
+            
+            if (!requests || requests.length === 0) {
+                container.innerHTML = '<div class="approval-card">No pending history access requests.</div>';
+                return;
+            }
+            
+            let html = '';
+            for (let req of requests) {
+                const { data: property } = await window.supabaseClient
+                    .from('properties')
+                    .select('name')
+                    .eq('id', req.property_id)
+                    .single();
+                
+                html += `<div class="approval-card" style="border-left-color:#8b5cf6;">
+                    <div><strong>📜 HISTORY ACCESS REQUEST</strong></div>
+                    <div>👤 Requester: ${escapeHtml(req.requester_name)}</div>
+                    <div>🏢 Property: ${escapeHtml(property?.name || 'Unknown')}</div>
+                    <div>📅 Requested: ${new Date(req.requested_at).toLocaleString()}</div>
+                    <div style="margin-top:8px; display:flex; gap:8px;">
+                        <button onclick="approveHistoryAccessRequest('${req.id}')" class="success small">✅ Approve Access</button>
+                        <button onclick="rejectHistoryAccessRequest('${req.id}')" class="danger small">❌ Reject</button>
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+        
+        async function approveHistoryAccessRequest(requestId) {
+            const success = await approveHistoryAccess(requestId, superAdminId);
+            if (success) {
+                alert('✅ History access approved for 24 hours');
+                await loadPendingHistoryRequests();
+            } else {
+                alert('Failed to approve request');
+            }
+        }
+        
+        async function rejectHistoryAccessRequest(requestId) {
+            const reason = prompt('Reason for rejection:');
+            if (!reason) return;
+            const success = await rejectHistoryAccess(requestId, superAdminId, reason);
+            if (success) {
+                alert('❌ History access rejected');
+                await loadPendingHistoryRequests();
+            } else {
+                alert('Failed to reject request');
+            }
+        }
+        
+        // ============ MY PROPERTIES ============
+        
+        async function loadMyProperties() {
+            const { data: properties, error } = await window.supabaseClient.from('properties').select('*').order('created_at', { ascending: false });
+            if (error) return;
+            if (!properties || properties.length === 0) {
+                document.getElementById('myPropertiesList').innerHTML = '<div class="property-card">No properties yet.</div>';
+                return;
+            }
+            let html = '';
+            for (let prop of properties) {
+                const propData = prop.data || { units: [] };
+                const occupied = propData.units ? propData.units.filter(u => !u.vacant).length : 0;
+                const vacant = propData.units ? propData.units.filter(u => u.vacant).length : 0;
+                let adminName = 'Unassigned';
+                if (prop.admin_id) {
+                    const { data: admin } = await window.supabaseClient.from('users').select('full_name').eq('id', prop.admin_id).single();
+                    if (admin) adminName = admin.full_name;
+                }
+                const financials = getFinancials(prop);
+                
+                html += `<div class="property-card">
+                    <div class="property-name">🏢 ${escapeHtml(prop.name)}</div>
+                    <div>📍 ${escapeHtml(prop.location)}</div>
+                    <div>👤 Owner: ${escapeHtml(prop.owner_name || 'Not set')} | 🔑 <span class="password-badge">${escapeHtml(prop.owner_password || 'N/A')}</span></div>
+                    <div>👤 Assigned to: <strong>${escapeHtml(adminName)}</strong></div>
+                    <div>📊 ${occupied} occupied | ${vacant} vacant | 💰 Fee: ${prop.management_fee || 5}%</div>
+                    <div>💰 Collected This Month: UGX ${financials.currentMonthCollected.toLocaleString()} | Pending: UGX ${financials.currentMonthPending.toLocaleString()}</div>
+                    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <button onclick="goToPropertyDetail('${prop.id}')" style="font-size:0.7rem; background:#10b981;">📋 Manage Property</button>
+                        <button onclick="openEditPropertyModal('${prop.id}', '${escapeHtml(prop.name)}', '${escapeHtml(prop.location)}', '${escapeHtml(prop.owner_name || '')}', '${escapeHtml(prop.owner_phone || '')}', '${escapeHtml(prop.owner_password || '')}', '${prop.admin_id || ''}')" class="warning" style="font-size:0.7rem;">✏️ Edit Property</button>
+                        <button onclick="deleteProperty('${prop.id}', '${escapeHtml(prop.name)}')" class="danger" style="font-size:0.7rem;">🗑 Delete</button>
+                    </div>
+                </div>`;
+            }
+            document.getElementById('myPropertiesList').innerHTML = html;
+        }
+        
+        function goToPropertyDetail(propertyId) {
+            localStorage.setItem('battetech_current_property', propertyId);
+            window.location.href = 'admin-property-detail.html';
+        }
+        
+        // ============ ASSIGN ADMIN TO PROPERTY ============
+        
+        async function assignAdminToProperty() {
+            const adminId = document.getElementById('assignAdminSelect').value;
+            const propertyId = document.getElementById('assignPropertySelect').value;
+            
+            if (!adminId || !propertyId) {
+                alert('Please select both an admin and a property');
+                return;
+            }
+            
+            const { error } = await window.supabaseClient
+                .from('properties')
+                .update({ admin_id: adminId })
+                .eq('id', propertyId);
+            
+            if (error) {
+                alert('Failed to assign: ' + error.message);
+            } else {
+                alert('✅ Admin assigned to property successfully');
+                await loadMyProperties();
+                await logAdminAssigned(adminId, propertyId);
+            }
+        }
+        
+        // ============ EDIT PROPERTY ============
+        
+        function openEditPropertyModal(propertyId, name, location, ownerName, ownerPhone, ownerPassword, adminId) {
+            document.getElementById('editPropertyId').value = propertyId;
+            document.getElementById('editPropertyName').value = name;
+            document.getElementById('editPropertyLocation').value = location;
+            document.getElementById('editOwnerName').value = ownerName;
+            document.getElementById('editOwnerPhone').value = ownerPhone;
+            document.getElementById('editOwnerPassword').value = '';
+            document.getElementById('editAdminSelect').value = adminId || '';
+            document.getElementById('editPropertyModal').style.display = 'flex';
+        }
+        
+        async function savePropertyEdit() {
+            const propertyId = document.getElementById('editPropertyId').value;
+            const updateData = {
+                name: document.getElementById('editPropertyName').value,
+                location: document.getElementById('editPropertyLocation').value,
+                owner_name: document.getElementById('editOwnerName').value,
+                owner_phone: document.getElementById('editOwnerPhone').value,
+                admin_id: document.getElementById('editAdminSelect').value || null
+            };
+            const newPassword = document.getElementById('editOwnerPassword').value;
+            if (newPassword) updateData.owner_password = newPassword;
+            
+            const { error } = await window.supabaseClient.from('properties').update(updateData).eq('id', propertyId);
+            if (error) alert('Failed: ' + error.message);
+            else {
+                alert('✅ Property updated');
+                closeEditPropertyModal();
+                await loadMyProperties();
+                await loadOwners();
+                await loadAllDataForBroadcast();
+                await addActivityLog('property_updated', `Updated property: ${updateData.name}`, propertyId);
+            }
+        }
+        
+        function closeEditPropertyModal() { document.getElementById('editPropertyModal').style.display = 'none'; }
+        
+        // ============ ADMINS LIST ============
+        
+        async function loadAdmins() {
+            const { data: admins, error } = await window.supabaseClient.from('users').select('*').eq('role', 'property_admin').order('created_at', { ascending: false });
+            if (error) return;
+            if (!admins || admins.length === 0) {
+                document.getElementById('adminsList').innerHTML = '<div class="admin-card">No property admins yet.</div>';
+                return;
+            }
+            let html = '';
+            for (let admin of admins) {
+                const { data: properties } = await window.supabaseClient.from('properties').select('*').eq('admin_id', admin.id);
+                const { data: workers } = await window.supabaseClient.from('users').select('*').eq('parent_id', admin.id).eq('role', 'worker');
+                html += `<div class="admin-card" onclick="toggleAdminDetails('${admin.id}')">
+                    <div><span class="admin-name">👤 ${escapeHtml(admin.full_name)}</span></div>
+                    <div>📞 ${admin.phone || '-'}</div>
+                    <div>🔑 Password: <span class="password-badge">${escapeHtml(admin.password_hash || 'N/A')}</span></div>
+                    <div class="${admin.status === 'frozen' ? 'status-frozen' : 'status-active'}">${admin.status === 'frozen' ? '❄️ FROZEN' : '✅ ACTIVE'}</div>
+                    <div style="margin-top:8px;">
+                        <button onclick="event.stopPropagation(); openEditAdminModal('${admin.id}', '${escapeHtml(admin.full_name)}', '${admin.phone || ''}', '${escapeHtml(admin.password_hash || '')}')" class="warning small">✏️ Edit</button>
+                        <button onclick="event.stopPropagation(); freezeAdmin('${admin.id}', '${admin.status}')" class="warning small">${admin.status === 'frozen' ? '❄️ Unfreeze' : '🔒 Freeze'}</button>
+                        <button onclick="event.stopPropagation(); openTransferAdminModal('${admin.id}', '${escapeHtml(admin.full_name)}')" class="transfer-btn small">🔄 Transfer</button>
+                    </div>
+                    <div id="admin-details-${admin.id}" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #ddd;">
+                        <strong>🏢 Properties (${properties?.length || 0}):</strong> ${properties?.map(p => `<div>• ${escapeHtml(p.name)}</div>`).join('') || 'None'}
+                        <strong>👷 Workers (${workers?.length || 0}):</strong> ${workers?.map(w => `<div>• ${escapeHtml(w.full_name)} (${w.status === 'frozen' ? 'Frozen' : 'Active'}) 🔑 ${escapeHtml(w.password_hash || 'N/A')}</div>`).join('') || 'None'}
+                    </div>
+                </div>`;
+            }
+            document.getElementById('adminsList').innerHTML = html;
+        }
+        
+        function toggleAdminDetails(adminId) {
+            const details = document.getElementById(`admin-details-${adminId}`);
+            if (details) details.style.display = details.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function openEditAdminModal(adminId, name, phone, password) {
+            document.getElementById('editAdminId').value = adminId;
+            document.getElementById('editAdminName').value = name;
+            document.getElementById('editAdminPhone').value = phone;
+            document.getElementById('editAdminPassword').value = '';
+            document.getElementById('editAdminModal').style.display = 'flex';
+        }
+        
+        async function saveAdminEdit() {
+            const adminId = document.getElementById('editAdminId').value;
+            const updateData = {
+                full_name: document.getElementById('editAdminName').value,
+                phone: document.getElementById('editAdminPhone').value
+            };
+            const newPassword = document.getElementById('editAdminPassword').value;
+            if (newPassword) updateData.password_hash = newPassword;
+            
+            const { error } = await window.supabaseClient.from('users').update(updateData).eq('id', adminId);
+            if (error) alert('Failed: ' + error.message);
+            else {
+                alert('✅ Admin updated');
+                closeEditAdminModal();
+                await loadAdmins();
+                await addActivityLog('admin_updated', `Updated admin: ${updateData.full_name}`);
+            }
+        }
+        
+        function closeEditAdminModal() { document.getElementById('editAdminModal').style.display = 'none'; }
+        
+        async function freezeAdmin(adminId, currentStatus) {
+            const newStatus = currentStatus === 'frozen' ? 'active' : 'frozen';
+            if (confirm(`${newStatus === 'frozen' ? 'FREEZE' : 'UNFREEZE'} this admin?`)) {
+                await window.supabaseClient.from('users').update({ status: newStatus }).eq('id', adminId);
+                alert(`✅ Admin ${newStatus === 'frozen' ? 'frozen' : 'unfrozen'}`);
+                await loadAdmins();
+                await addActivityLog('admin_status_changed', `${newStatus === 'frozen' ? 'Froze' : 'Unfroze'} admin`);
+            }
+        }
+        
+        async function createPropertyAdmin() {
+            const name = document.getElementById('newAdminName').value.trim();
+            const phone = document.getElementById('newAdminPhone').value.trim();
+            const password = document.getElementById('newAdminPassword').value;
+            const photo = selectedAdminPhotoBase64;
+            if (!name || !password) { alert('Please fill Name and Password'); return; }
+            const email = name.toLowerCase().replace(/\s/g, '.') + '@admin.battetech.local';
+            const { error } = await window.supabaseClient.from('users').insert({ email, password_hash: password, full_name: name, phone, photo_url: photo, role: 'property_admin', status: 'active' });
+            if (error) alert('Failed: ' + error.message);
+            else {
+                alert(`✅ Property Admin "${name}" created!\nPassword: ${password}`);
+                document.getElementById('newAdminName').value = ''; document.getElementById('newAdminPhone').value = ''; document.getElementById('newAdminPassword').value = ''; document.getElementById('adminPhotoPreview').innerHTML = ''; selectedAdminPhotoBase64 = '';
+                await loadAdmins();
+                await loadAllDataForBroadcast();
+                await populateSelects();
+                await addActivityLog('admin_created', `Created property admin: ${name} with password: ${password}`);
+            }
+        }
+        
+        // ============ TRANSFER WORKER ============
+        
+        function openTransferWorkerModal(workerId, workerName, currentAdminId, currentPropertyId) {
+            currentTransferWorkerId = workerId;
+            currentTransferWorkerName = workerName;
+            document.getElementById('transferWorkerName').innerText = workerName;
+            
+            let adminOptions = '<option value="">-- Select New Admin --</option>';
+            allPropertyAdmins.forEach(admin => {
+                if (admin.id !== currentAdminId) {
+                    adminOptions += `<option value="${admin.id}">${escapeHtml(admin.full_name)}</option>`;
+                }
+            });
+            
+            let propertyOptions = '<option value="">-- Select New Property --</option>';
+            allProperties.forEach(prop => {
+                propertyOptions += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
+            });
+            
+            document.getElementById('newAdminSelect').innerHTML = adminOptions;
+            document.getElementById('newPropertySelect').innerHTML = propertyOptions;
+            document.getElementById('transferWorkerModal').style.display = 'flex';
+        }
+        
+        function closeTransferModal() {
+            document.getElementById('transferWorkerModal').style.display = 'none';
+            currentTransferWorkerId = null;
+            currentTransferWorkerName = null;
+        }
+        
+        async function confirmTransferWorker() {
+            const newAdminId = document.getElementById('newAdminSelect').value;
+            const newPropertyId = document.getElementById('newPropertySelect').value;
+            
+            if (!newAdminId || !newPropertyId) {
+                alert('Please select both a new admin and a new property');
+                return;
+            }
+            
+            const { data: worker } = await window.supabaseClient
+                .from('users')
+                .select('parent_id, property_id, phone')
+                .eq('id', currentTransferWorkerId)
+                .single();
+            
+            if (!worker) {
+                alert('Worker not found');
+                closeTransferModal();
+                return;
+            }
+            
+            const { data: oldAdmin } = await window.supabaseClient
+                .from('users')
+                .select('full_name, phone')
+                .eq('id', worker.parent_id)
+                .single();
+            
+            const { data: newAdmin } = await window.supabaseClient
+                .from('users')
+                .select('full_name, phone')
+                .eq('id', newAdminId)
+                .single();
+            
+            const { data: newProperty } = await window.supabaseClient
+                .from('properties')
+                .select('name')
+                .eq('id', newPropertyId)
+                .single();
+            
+            const { error } = await window.supabaseClient
+                .from('users')
+                .update({
+                    parent_id: newAdminId,
+                    property_id: newPropertyId,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', currentTransferWorkerId);
+            
+            if (error) {
+                alert('Transfer failed: ' + error.message);
+                closeTransferModal();
+                return;
+            }
+            
+            const message = `🏢 BATTETECH - WORKER TRANSFER NOTIFICATION\n\nWorker: ${currentTransferWorkerName}\n\nTransferred from: ${oldAdmin?.full_name || 'Unknown'}\nTransferred to: ${newAdmin?.full_name}\nNew Property: ${newProperty?.name}\n\nThis is an automated notification.`;
+            
+            if (worker.phone) {
+                let phone = worker.phone.replace(/\s/g, '');
+                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            }
+            
+            if (oldAdmin?.phone) {
+                let phone = oldAdmin.phone.replace(/\s/g, '');
+                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                setTimeout(() => {
+                    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+                }, 1500);
+            }
+            
+            if (newAdmin?.phone) {
+                let phone = newAdmin.phone.replace(/\s/g, '');
+                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                setTimeout(() => {
+                    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+                }, 3000);
+            }
+            
+            await addActivityLog('worker_transferred', `Transferred worker ${currentTransferWorkerName} from ${oldAdmin?.full_name || 'Unknown'} to ${newAdmin?.full_name} (Property: ${newProperty?.name})`);
+            
+            alert(`✅ Worker ${currentTransferWorkerName} transferred successfully!\nNotifications sent.`);
+            closeTransferModal();
+            setTimeout(() => location.reload(), 3000);
+        }
+        
+        // ============ TRANSFER ADMIN ============
+        
+        function openTransferAdminModal(adminId, adminName) {
+            currentTransferAdminId = adminId;
+            currentTransferAdminName = adminName;
+            document.getElementById('transferAdminName').innerText = adminName;
+            
+            let propertyOptions = '<option value="">-- Select Property --</option>';
+            allProperties.forEach(prop => {
+                propertyOptions += `<option value="${prop.id}">${escapeHtml(prop.name)} (Current: ${prop.admin_id === adminId ? 'Assigned' : 'Available'})</option>`;
+            });
+            propertyOptions += `<option value="remove">-- Remove from All Properties --</option>`;
+            
+            document.getElementById('adminPropertySelect').innerHTML = propertyOptions;
+            document.getElementById('transferAdminModal').style.display = 'flex';
+        }
+        
+        function closeAdminTransferModal() {
+            document.getElementById('transferAdminModal').style.display = 'none';
+            currentTransferAdminId = null;
+            currentTransferAdminName = null;
+        }
+        
+        async function confirmTransferAdmin() {
+            const propertyValue = document.getElementById('adminPropertySelect').value;
+            
+            if (!propertyValue) {
+                alert('Please select a property');
+                return;
+            }
+            
+            let message = '';
+            
+            if (propertyValue === 'remove') {
+                message = `Admin ${currentTransferAdminName} has been removed from all properties.`;
+            } else {
+                const { error: propError } = await window.supabaseClient
+                    .from('properties')
+                    .update({ admin_id: currentTransferAdminId })
+                    .eq('id', propertyValue);
+                
+                if (propError) {
+                    alert('Failed to assign property: ' + propError.message);
+                    closeAdminTransferModal();
+                    return;
+                }
+                
+                const { data: property } = await window.supabaseClient
+                    .from('properties')
+                    .select('name')
+                    .eq('id', propertyValue)
+                    .single();
+                
+                message = `Admin ${currentTransferAdminName} has been assigned to property: ${property?.name}`;
+            }
+            
+            const { data: admin } = await window.supabaseClient
+                .from('users')
+                .select('phone')
+                .eq('id', currentTransferAdminId)
+                .single();
+            
+            if (admin?.phone) {
+                let phone = admin.phone.replace(/\s/g, '');
+                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent('🏢 BATTETECH - ' + message)}`, '_blank');
+            }
+            
+            await addActivityLog('admin_transferred', message);
+            
+            alert(`✅ ${message}`);
+            closeAdminTransferModal();
+            setTimeout(() => location.reload(), 3000);
+        }
+        
+        // ============ ALL WORKERS ============
+        
+        async function loadAllWorkers() {
+            const { data: workers, error } = await window.supabaseClient.from('users').select('*').eq('role', 'worker').order('created_at', { ascending: false });
+            if (error) return;
+            if (!workers || workers.length === 0) {
+                document.getElementById('allWorkersList').innerHTML = '<div class="worker-card">No workers yet.</div>';
+                return;
+            }
+            let html = '';
+            for (let worker of workers) {
+                let adminName = 'Unknown';
+                if (worker.parent_id) {
+                    const { data: admin } = await window.supabaseClient.from('users').select('full_name').eq('id', worker.parent_id).single();
+                    if (admin) adminName = admin.full_name;
+                }
+                let propertyName = 'Not assigned';
+                if (worker.property_id) {
+                    const { data: prop } = await window.supabaseClient.from('properties').select('name').eq('id', worker.property_id).single();
+                    if (prop) propertyName = prop.name;
+                }
+                html += `<div class="worker-card">
+                    <div><strong>👤 ${escapeHtml(worker.full_name)}</strong> ${worker.photo_url ? `<img src="${worker.photo_url}" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-left:8px;">` : ''}</div>
+                    <div>📞 ${worker.phone || '-'}</div>
+                    <div>🔑 Password: <span class="password-badge">${escapeHtml(worker.password_hash || 'N/A')}</span></div>
+                    <div>🏢 Property: ${escapeHtml(propertyName)}</div>
+                    <div>👑 Admin: ${escapeHtml(adminName)}</div>
+                    <div class="${worker.status === 'frozen' ? 'status-frozen' : 'status-active'}">${worker.status === 'frozen' ? '❄️ FROZEN' : '✅ ACTIVE'}</div>
+                    <div style="margin-top:8px;">
+                        <button onclick="openTransferWorkerModal('${worker.id}', '${escapeHtml(worker.full_name)}', '${worker.parent_id || ''}', '${worker.property_id || ''}')" class="transfer-btn small">🔄 Transfer</button>
+                        <button onclick="openEditWorkerModal('${worker.id}', '${escapeHtml(worker.full_name)}', '${worker.phone || ''}', '${worker.property_id || ''}', '${escapeHtml(worker.password_hash || '')}')" class="warning small">✏️ Edit</button>
+                    </div>
+                </div>`;
+            }
+            document.getElementById('allWorkersList').innerHTML = html;
+        }
+        
+        function openEditWorkerModal(workerId, name, phone, propertyId, password) {
+            document.getElementById('editWorkerId').value = workerId;
+            document.getElementById('editWorkerName').value = name;
+            document.getElementById('editWorkerPhone').value = phone;
+            document.getElementById('editWorkerPassword').value = '';
+            document.getElementById('editWorkerPropertySelect').value = propertyId || '';
+            document.getElementById('editWorkerModal').style.display = 'flex';
+        }
+        
+        async function saveWorkerEdit() {
+            const workerId = document.getElementById('editWorkerId').value;
+            const updateData = {
+                full_name: document.getElementById('editWorkerName').value,
+                phone: document.getElementById('editWorkerPhone').value,
+                property_id: document.getElementById('editWorkerPropertySelect').value || null
+            };
+            const newPassword = document.getElementById('editWorkerPassword').value;
+            if (newPassword) updateData.password_hash = newPassword;
+            
+            const { error } = await window.supabaseClient.from('users').update(updateData).eq('id', workerId);
+            if (error) alert('Failed: ' + error.message);
+            else {
+                alert('✅ Worker updated');
+                closeEditWorkerModal();
+                await loadAllWorkers();
+                await addActivityLog('worker_updated', `Updated worker: ${updateData.full_name}`);
+            }
+        }
+        
+        function closeEditWorkerModal() { document.getElementById('editWorkerModal').style.display = 'none'; }
+        
+        // ============ PROPERTY OWNERS ============
+        
+        async function loadOwners() {
+            const { data: properties, error } = await window.supabaseClient.from('properties').select('id, name, owner_name, owner_phone, owner_password');
+            if (error) return;
+            if (!properties || properties.length === 0) {
+                document.getElementById('ownersList').innerHTML = '<div class="owner-card">No property owners yet.</div>';
+                return;
+            }
+            let html = '';
+            for (let prop of properties) {
+                if (prop.owner_name) {
+                    html += `<div class="owner-card">
+                        <div><strong>🏢 ${escapeHtml(prop.name)}</strong></div>
+                        <div>👤 Owner: ${escapeHtml(prop.owner_name)}</div>
+                        <div>📞 Phone: ${escapeHtml(prop.owner_phone || '-')}</div>
+                        <div>🔑 Password: <span class="password-badge">${escapeHtml(prop.owner_password || 'N/A')}</span></div>
+                    </div>`;
+                }
+            }
+            if (html === '') html = '<div class="owner-card">No property owners yet.</div>';
+            document.getElementById('ownersList').innerHTML = html;
+        }
+        
+        async function deleteProperty(propertyId, propertyName) {
+            if (confirm(`⚠️ Delete "${propertyName}" permanently?`)) {
+                await window.supabaseClient.from('properties').delete().eq('id', propertyId);
+                alert('✅ Property deleted');
+                await loadMyProperties();
+                await loadAdmins();
+                await loadOwners();
+                await loadAllDataForBroadcast();
+                await addActivityLog('property_deleted', `Deleted property: ${propertyName}`, propertyId);
+            }
+        }
+        
+        // ============ PENDING BROADCAST APPROVALS ============
+        
+        async function loadPendingBroadcastApprovals() {
+            const { data, error } = await window.supabaseClient
+                .from('approval_requests')
+                .select('*')
+                .eq('action_type', 'broadcast_approval')
+                .eq('status', 'pending')
+                .order('created_at', { ascending: false });
+            
+            const container = document.getElementById('pendingBroadcastApprovals');
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<div class="approval-card">No pending broadcast approvals.</div>';
+                return;
+            }
+            
+            let html = '';
+            for (let req of data) {
+                const broadcastType = req.action_data?.broadcast_type === 'property_owners' ? 'PROPERTY OWNERS' : req.action_data?.broadcast_type;
+                const recipientCount = req.action_data?.recipients?.length || 0;
+                html += `<div class="approval-card" style="border-left-color:#8b5cf6;">
+                    <div><strong>📢 BROADCAST APPROVAL REQUEST</strong></div>
+                    <div>👤 Requested by: ${escapeHtml(req.action_data?.sender_name)} (${req.action_data?.sender_role})</div>
+                    <div>📋 Type: ${escapeHtml(broadcastType)}</div>
+                    <div>👥 Recipients: ${recipientCount} person(s)</div>
+                    <div>📝 Message: ${escapeHtml(req.action_data?.message?.substring(0, 200))}${req.action_data?.message?.length > 200 ? '...' : ''}</div>
+                    <div style="margin-top:8px; display:flex; gap:8px;">
+                        <button onclick="approveBroadcast('${req.id}')" class="success small">✅ Approve & Send</button>
+                        <button onclick="rejectBroadcast('${req.id}')" class="danger small">❌ Reject</button>
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+        
+        async function approveBroadcast(requestId) {
+            if (!confirm(`Approve and send this broadcast?`)) return;
+            
+            const { data: request } = await window.supabaseClient
+                .from('approval_requests')
+                .select('*')
+                .eq('id', requestId)
+                .single();
+            
+            if (!request) return;
+            
+            const recipients = request.action_data?.recipients || [];
+            const message = request.action_data?.message;
+            const broadcastType = request.action_data?.broadcast_type;
+            
+            let sentCount = 0;
+            for (let i = 0; i < recipients.length; i++) {
+                const r = recipients[i];
+                let phone = r.phone;
+                if (phone) {
+                    let cleanPhone = phone.replace(/\s/g, '');
+                    if (cleanPhone.startsWith('0')) cleanPhone = '256' + cleanPhone.substring(1);
+                    const personalMsg = `🏢 BATTETECH APPROVED BROADCAST\n\nDear ${r.name},\n\n${message}\n\n- BattleTech Management`;
+                    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(personalMsg)}`, '_blank');
+                    sentCount++;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            
+            await window.supabaseClient
+                .from('approval_requests')
+                .update({ status: 'approved', approved_by: superAdminId, approved_at: new Date() })
+                .eq('id', requestId);
+            
+            if (request.action_data?.sender_id) {
+                await addNotification(
+                    request.action_data.sender_id,
+                    request.action_data.sender_role,
+                    '✅ Broadcast Approved',
+                    `Your broadcast request to ${broadcastType} has been approved and sent to ${sentCount} recipients`,
+                    'broadcast',
+                    requestId
+                );
+            }
+            
+            await addActivityLog('broadcast_approved', `Approved and sent ${broadcastType} broadcast to ${sentCount} recipients`);
+            
+            alert(`✅ Broadcast approved and sent to ${sentCount} recipient(s)!`);
+            await loadPendingBroadcastApprovals();
+            await loadAllActivities();
+        }
+        
+        async function rejectBroadcast(requestId) {
+            const reason = prompt('Reason for rejection:');
+            if (!reason) return;
+            
+            const { data: request } = await window.supabaseClient
+                .from('approval_requests')
+                .select('*')
+                .eq('id', requestId)
+                .single();
+            
+            await window.supabaseClient
+                .from('approval_requests')
+                .update({ status: 'rejected', rejection_reason: reason, approved_by: superAdminId, approved_at: new Date() })
+                .eq('id', requestId);
+            
+            if (request && request.action_data?.sender_id) {
+                await addNotification(
+                    request.action_data.sender_id,
+                    request.action_data.sender_role,
+                    '❌ Broadcast Rejected',
+                    `Your broadcast request to ${request.action_data?.broadcast_type} was rejected. Reason: ${reason}`,
+                    'broadcast',
+                    requestId
+                );
+            }
+            
+            await addActivityLog('broadcast_rejected', `Rejected broadcast request. Reason: ${reason}`);
+            alert('❌ Broadcast rejected');
+            await loadPendingBroadcastApprovals();
+        }
+        
+        // ============ BROADCAST SYSTEM ============
+        
+        function openBroadcastModal() {
+            document.getElementById('broadcastType').value = '';
+            document.getElementById('recipientSelectContainer').style.display = 'none';
+            document.getElementById('broadcastMessage').value = '';
+            document.getElementById('broadcastModal').style.display = 'flex';
+        }
+        
+        function closeBroadcastModal() { document.getElementById('broadcastModal').style.display = 'none'; }
+        
+        async function toggleBroadcastRecipients() {
+            const type = document.getElementById('broadcastType').value;
+            const container = document.getElementById('recipientSelectContainer');
+            const recipientList = document.getElementById('recipientList');
+            const filtersDiv = document.getElementById('recipientFilters');
+            
+            if (!type) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            recipientList.innerHTML = '';
+            filtersDiv.innerHTML = '';
+            
+            if (type === 'property_admins') {
+                recipientList.innerHTML = '<div><strong>Select Property Admins:</strong></div>';
+                allPropertyAdmins.forEach(admin => {
+                    recipientList.innerHTML += `
+                        <label style="display:block; margin:8px 0;">
+                            <input type="checkbox" value="${admin.id}" class="broadcastRecipient">
+                            👑 ${escapeHtml(admin.full_name)} - 📞 ${admin.phone || 'No phone'}
+                        </label>
+                    `;
+                });
+                recipientList.innerHTML += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllAdmins"> Select All Admins</label>';
+            }
+            else if (type === 'workers') {
+                filtersDiv.innerHTML = `
+                    <select id="adminFilter" style="width:100%; padding:8px; border-radius:8px;">
+                        <option value="all">All Admins</option>
+                        ${allPropertyAdmins.map(a => `<option value="${a.id}">${escapeHtml(a.full_name)}</option>`).join('')}
+                    </select>
+                `;
+                recipientList.innerHTML = '<div><strong>Select Workers:</strong></div>';
+                allWorkers.forEach(worker => {
+                    const admin = allPropertyAdmins.find(a => a.id === worker.parent_id);
+                    recipientList.innerHTML += `
+                        <label style="display:block; margin:8px 0;" data-admin="${worker.parent_id}" class="worker-item">
+                            <input type="checkbox" value="${worker.id}" class="broadcastRecipient">
+                            👷 ${escapeHtml(worker.full_name)} (${admin?.full_name || 'Unknown'}) - 📞 ${worker.phone || 'No phone'}
+                        </label>
+                    `;
+                });
+                recipientList.innerHTML += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllWorkers"> Select All Workers</label>';
+                
+                document.getElementById('adminFilter').addEventListener('change', function() {
+                    const selectedAdmin = this.value;
+                    document.querySelectorAll('.worker-item').forEach(item => {
+                        if (selectedAdmin === 'all' || item.dataset.admin === selectedAdmin) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            else if (type === 'all_tenants') {
+                recipientList.innerHTML = `<div><strong>All Tenants (${allTenantsList.length} total)</strong></div>`;
+                allTenantsList.forEach(tenant => {
+                    recipientList.innerHTML += `
+                        <label style="display:block; margin:8px 0;">
+                            <input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}" data-property="${escapeHtml(tenant.property)}">
+                            🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - ${escapeHtml(tenant.property)} - 📞 ${tenant.phone}
+                        </label>
+                    `;
+                });
+                recipientList.innerHTML += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllTenants"> Select All Tenants</label>';
+            }
+            else if (type === 'unpaid_tenants') {
+                recipientList.innerHTML = `<div><strong>Unpaid Tenants (${unpaidTenantsList.length} total)</strong></div>`;
+                unpaidTenantsList.forEach(tenant => {
+                    recipientList.innerHTML += `
+                        <label style="display:block; margin:8px 0;">
+                            <input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}" data-balance="${tenant.balance}">
+                            🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - Balance: UGX ${tenant.balance.toLocaleString()} - 📞 ${tenant.phone}
+                        </label>
+                    `;
+                });
+                recipientList.innerHTML += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllUnpaid"> Select All Unpaid</label>';
+            }
+            else if (type === 'paid_tenants') {
+                recipientList.innerHTML = `<div><strong>Paid Tenants (${paidTenantsList.length} total)</strong></div>`;
+                paidTenantsList.forEach(tenant => {
+                    recipientList.innerHTML += `
+                        <label style="display:block; margin:8px 0;">
+                            <input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}">
+                            🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - 📞 ${tenant.phone}
+                        </label>
+                    `;
+                });
+                recipientList.innerHTML += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllPaid"> Select All Paid</label>';
+            }
+            else if (type === 'property_owners') {
+                recipientList.innerHTML = `<div><strong>Property Owners (${allProperties.filter(p => p.owner_phone).length} total)</strong></div>`;
+                allProperties.forEach(prop => {
+                    if (prop.owner_phone) {
+                        recipientList.innerHTML += `
+                            <label style="display:block; margin:8px 0;">
+                                <input type="checkbox" value="${prop.owner_phone}" class="broadcastRecipient" data-name="${escapeHtml(prop.owner_name)}" data-property="${escapeHtml(prop.name)}">
+                                👤 ${escapeHtml(prop.owner_name)} (${escapeHtml(prop.name)}) - 📞 ${prop.owner_phone}
+                            </label>
+                        `;
+                    }
+                });
+                recipientList.innerHTML += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllOwners"> Select All Owners</label>';
+            }
+            else if (type === 'all_users') {
+                const allUsers = [...allPropertyAdmins, ...allWorkers];
+                recipientList.innerHTML = `<div><strong>All System Users (${allUsers.length} total)</strong></div>`;
+                allUsers.forEach(user => {
+                    recipientList.innerHTML += `
+                        <label style="display:block; margin:8px 0;">
+                            <input type="checkbox" value="${user.phone}" class="broadcastRecipient" data-name="${escapeHtml(user.full_name)}" data-role="${user.role}">
+                            ${user.role === 'property_admin' ? '👑' : '👷'} ${escapeHtml(user.full_name)} (${user.role}) - 📞 ${user.phone || 'No phone'}
+                        </label>
+                    `;
+                });
+                recipientList.innerHTML += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllUsers"> Select All Users</label>';
+            }
+            
+            setTimeout(() => {
+                const selectAllAdmins = document.getElementById('selectAllAdmins');
+                if (selectAllAdmins) selectAllAdmins.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+                const selectAllWorkers = document.getElementById('selectAllWorkers');
+                if (selectAllWorkers) selectAllWorkers.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+                const selectAllTenants = document.getElementById('selectAllTenants');
+                if (selectAllTenants) selectAllTenants.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+                const selectAllUnpaid = document.getElementById('selectAllUnpaid');
+                if (selectAllUnpaid) selectAllUnpaid.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+                const selectAllPaid = document.getElementById('selectAllPaid');
+                if (selectAllPaid) selectAllPaid.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+                const selectAllOwners = document.getElementById('selectAllOwners');
+                if (selectAllOwners) selectAllOwners.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+                const selectAllUsers = document.getElementById('selectAllUsers');
+                if (selectAllUsers) selectAllUsers.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+            }, 100);
+        }
+        
+        async function sendBroadcast() {
+            const broadcastType = document.getElementById('broadcastType').value;
+            const message = document.getElementById('broadcastMessage').value.trim();
+            const checkboxes = document.querySelectorAll('.broadcastRecipient:checked');
+            const sender = getCurrentUser();
+            
+            if (!broadcastType) { alert('Please select recipient type'); return; }
+            if (!message) { alert('Please enter a message'); return; }
+            
+            let recipients = [];
+            let recipientNames = [];
+            
+            for (let cb of checkboxes) {
+                const name = cb.dataset?.name || cb.closest('label')?.innerText?.split('-')[0]?.trim() || 'User';
+                const phone = cb.value;
+                if (phone && phone !== 'No phone') {
+                    recipients.push({ name: name, phone: phone });
+                    recipientNames.push(name);
+                }
+            }
+            
+            if (recipients.length === 0) {
+                alert('No valid recipients selected');
+                return;
+            }
+            
+            if (!confirm(`Send broadcast to ${recipients.length} recipient(s)?\nMessage: ${message.substring(0, 100)}`)) return;
+            
+            let sentCount = 0;
+            for (let i = 0; i < recipients.length; i++) {
+                const r = recipients[i];
+                let phone = r.phone.replace(/\s/g, '');
+                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                const personalMsg = `🏢 BATTETECH SUPER ADMIN BROADCAST\n\nDear ${r.name},\n\n${message}\n\n- ${sender.name}\nBattleTech Management`;
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(personalMsg)}`, '_blank');
+                sentCount++;
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            await window.supabaseClient.from('broadcast_logs').insert({
+                sender_id: sender.id,
+                sender_name: sender.name,
+                sender_role: sender.role,
+                recipient_type: broadcastType,
+                recipient_count: recipients.length,
+                message: message,
+                sent_at: new Date().toISOString()
+            });
+            
+            await addActivityLog('broadcast_sent', `Sent ${broadcastType} broadcast to ${sentCount} recipients`);
+            
+            alert(`✅ Broadcast sent to ${sentCount} recipient(s)!`);
+            closeBroadcastModal();
+            await loadAllActivities();
+        }
+        
+        // ============ ACTIVITY LOG ============
+        
+        async function loadAllActivities() {
+            const { data, error } = await window.supabaseClient.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(50);
+            const container = document.getElementById('activityLogList');
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<div class="activity-item">No activities yet.</div>';
+                return;
+            }
+            let html = '';
+            for (let log of data) {
+                const date = new Date(log.created_at);
+                const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                html += `<div class="activity-item">
+                    <small>${dateStr}</small><br>
+                    <strong>👤 ${escapeHtml(log.user_name || 'Unknown')}</strong> - ${escapeHtml(log.action)}<br>
+                    ${escapeHtml(log.details || '')}
+                    ${log.transaction_id ? `<br><small>Transaction ID: ${escapeHtml(log.transaction_id)}</small>` : ''}
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+        
+        function logout() { 
+            if (confirm('Logout from Super Admin Dashboard?')) { 
+                localStorage.clear(); 
+                window.location.href = 'login.html'; 
+            } 
+        }
+        
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            return String(text).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); 
+        }
+        
+        window.addEventListener('load', () => { loadSuperAdminData(); });
+    </script>
+</body>
+</html>
