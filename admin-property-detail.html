@@ -846,7 +846,15 @@
             updatedData.units = units;
             const { error } = await window.supabaseClient.from('properties').update({ data: updatedData }).eq('id', currentPropertyId);
             if (error) alert('Failed: ' + error.message);
-            else { alert(`✅ Room added with ${roomImages.length} image(s)`); closeAddRoomModal(); selectedRoomImagesArray = []; document.getElementById('roomImagesPreview').innerHTML = ''; await loadProperty(); }
+            else {
+                await notifyRoomAdded(currentPropertyId, currentProperty.name, roomNumber, rentAmount);
+                await notifyOwnerRoomAdded(currentPropertyId, roomNumber, rentAmount);
+                alert(`✅ Room added with ${roomImages.length} image(s)`);
+                closeAddRoomModal();
+                selectedRoomImagesArray = [];
+                document.getElementById('roomImagesPreview').innerHTML = '';
+                await loadProperty();
+            }
         }
         
         function closeAddRoomModal() { document.getElementById('addRoomModal').style.display = 'none'; }
@@ -900,6 +908,9 @@
             if (currentEditRoomIndex === null) return;
             const units = currentProperty.data.units;
             const room = units[currentEditRoomIndex];
+            const oldRent = room.rentAmount;
+            const wasVacant = room.vacant;
+            const previousTenant = room.tenant || '';
             room.roomNumber = document.getElementById('editRoomNumber').value;
             room.rentAmount = parseInt(document.getElementById('editRentAmount').value);
             room.paymentDueDate = parseInt(document.getElementById('editPaymentDueDate').value) || 1;
@@ -915,7 +926,25 @@
             updatedData.units = units;
             const { error } = await window.supabaseClient.from('properties').update({ data: updatedData }).eq('id', currentPropertyId);
             if (error) alert('Failed: ' + error.message);
-            else { alert(`✅ Room updated`); closeEditRoomModal(); await loadProperty(); }
+            else {
+                const newRent = room.rentAmount;
+                if (oldRent !== newRent) {
+                    await notifyRoomRentChanged(currentPropertyId, currentProperty.name, room.roomNumber, oldRent, newRent);
+                    await notifyOwnerRentChanged(currentPropertyId, room.roomNumber, oldRent, newRent);
+                }
+                if (wasVacant !== room.vacant) {
+                    if (room.vacant) {
+                        await notifyRoomVacated(currentPropertyId, currentProperty.name, room.roomNumber, previousTenant);
+                        await notifyOwnerRoomVacated(currentPropertyId, room.roomNumber);
+                    } else {
+                        await notifyRoomOccupied(currentPropertyId, currentProperty.name, room.roomNumber, room.tenant, room.rentAmount);
+                        await notifyOwnerRoomOccupied(currentPropertyId, room.roomNumber, room.tenant, room.rentAmount);
+                    }
+                }
+                alert(`✅ Room updated`);
+                closeEditRoomModal();
+                await loadProperty();
+            }
         }
         
         function closeEditRoomModal() { document.getElementById('editRoomModal').style.display = 'none'; }
@@ -1006,7 +1035,7 @@
             currentProperty.totalFeeSinceLastRemit = 0;
             const { error } = await window.supabaseClient.from('properties').update({ already_remitted: currentProperty.alreadyRemitted, total_collected_since_last_remit: 0, total_fee_since_last_remit: 0, remittance_history: currentProperty.remittanceHistory, data: currentProperty.data }).eq('id', currentPropertyId);
             if (error) alert('❌ Failed: ' + error.message);
-            else { alert(`✅ UGX ${amount.toLocaleString()} remitted successfully!`); closeRemitModal(); await loadProperty(); }
+            else { alert(`✅ UGX ${amount.toLocaleString()} remitted successfully!`); await notifyOwnerRemittanceSent(currentPropertyId, amount, method); closeRemitModal(); await loadProperty(); }
         }
         
         function openBillModal() {
@@ -1052,6 +1081,7 @@
             const receiptImage = document.getElementById('billReceipt').value;
             if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
             await addBillPayment(currentPropertyId, billType, amount, receiptImage, description);
+            await notifyOwnerBillPaid(currentPropertyId, billType, amount);
             alert(`✅ ${billType} bill UGX ${amount.toLocaleString()} recorded`);
             closeBillModal();
             await loadProperty();
@@ -1070,7 +1100,10 @@
             if (!monthYear) { alert('Select month/year'); return; }
             const [year, month] = monthYear.split('-');
             const statement = await generateMonthlyStatement(currentPropertyId, parseInt(month), parseInt(year));
-            if (statement) alert(`✅ Statement for ${monthYear} generated and saved.`);
+            if (statement) {
+                alert(`✅ Statement for ${monthYear} generated and saved.`);
+                await notifyOwnerStatementGenerated(currentPropertyId, monthYear);
+            }
             const whatsapp = document.getElementById('ownerWhatsApp').value;
             if (whatsapp) {
                 let phone = whatsapp.replace(/\s/g, '');
@@ -1098,6 +1131,7 @@
             const [newYear, newMonth] = newMonthValue.split('-');
             if (confirm(`⚠️ Reset to ${newMonthValue}? This will reset all counters to zero and carry forward unpaid balances.`)) {
                 await resetMonth(currentPropertyId, parseInt(newYear), parseInt(newMonth));
+                await notifyOwnerMonthReset(currentPropertyId, newMonthValue);
                 alert(`✅ Month reset to ${newMonthValue}. Statement generated.`);
                 closeResetMonthModal();
                 closeStatementModal();
@@ -1124,7 +1158,10 @@
             if (!reason) { alert('Please provide a reason'); return; }
             if (confirm(`⚠️ Confirm evacuation of ${room.tenant} from ${room.roomNumber}?`)) {
                 const result = await evacuateTenant(currentPropertyId, roomIndex, reason);
-                if (result.success) alert(`✅ Tenant evacuated. Written off: UGX ${result.writtenOffAmount.toLocaleString()}`);
+                if (result.success) {
+                    await notifyOwnerEvacuation(currentPropertyId, room.roomNumber, room.tenant);
+                    alert(`✅ Tenant evacuated. Written off: UGX ${result.writtenOffAmount.toLocaleString()}`);
+                }
                 else alert('Failed to evacuate tenant');
                 closeEvacuateModal();
                 await loadProperty();
@@ -1134,12 +1171,18 @@
         async function deleteRoomConfirm(roomIndex) {
             if (!confirm('⚠️ Permanently delete this room?')) return;
             const units = currentProperty.data.units;
+            const roomNumber = units[roomIndex].roomNumber;
             units.splice(roomIndex, 1);
             const updatedData = currentProperty.data;
             updatedData.units = units;
             const { error } = await window.supabaseClient.from('properties').update({ data: updatedData }).eq('id', currentPropertyId);
             if (error) alert('Failed: ' + error.message);
-            else { alert('✅ Room deleted'); await loadProperty(); }
+            else {
+                await notifyRoomDeleted(currentPropertyId, currentProperty.name, roomNumber);
+                await notifyOwnerRoomDeleted(currentPropertyId, roomNumber);
+                alert('✅ Room deleted');
+                await loadProperty();
+            }
         }
         
         function viewPayments(roomIndex) {
@@ -1341,6 +1384,193 @@
         
         function closeEditFeeModal() { document.getElementById('editFeeModal').style.display = 'none'; }
         
+        // ============ ROOM CHANGE NOTIFICATIONS ============
+
+        async function notifyRoomAdded(propertyId, propertyName, roomNumber, rentAmount, actingUserId = null, actingUserName = null) {
+            const user = getCurrentUser();
+            
+            const { data: property } = await window.supabaseClient
+                .from('properties')
+                .select('admin_id')
+                .eq('id', propertyId)
+                .single();
+            
+            const { data: workers } = await window.supabaseClient
+                .from('users')
+                .select('id, full_name')
+                .eq('role', 'worker')
+                .eq('property_id', propertyId);
+            
+            const title = '🏠 New Room Added';
+            const message = `New room ${roomNumber} (UGX ${rentAmount.toLocaleString()}/month) has been added to ${propertyName}`;
+            
+            if (property?.admin_id && property.admin_id !== user?.id) {
+                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
+            }
+            
+            if (workers && workers.length > 0) {
+                for (let worker of workers) {
+                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
+                }
+            }
+            
+            await notifySuperAdminOfAction(
+                'room_added',
+                { roomNumber, rentAmount, propertyName },
+                propertyId,
+                actingUserId || user?.id,
+                actingUserName || user?.name
+            );
+        }
+
+        async function notifyRoomOccupied(propertyId, propertyName, roomNumber, tenantName, rentAmount, actingUserId = null, actingUserName = null) {
+            const user = getCurrentUser();
+            
+            const { data: property } = await window.supabaseClient
+                .from('properties')
+                .select('admin_id, owner_name, owner_phone')
+                .eq('id', propertyId)
+                .single();
+            
+            const { data: workers } = await window.supabaseClient
+                .from('users')
+                .select('id, full_name')
+                .eq('role', 'worker')
+                .eq('property_id', propertyId);
+            
+            const title = '👤 Room Now Occupied';
+            const message = `${roomNumber} has been occupied by ${tenantName} (Rent: UGX ${rentAmount.toLocaleString()}/month) at ${propertyName}`;
+            
+            if (property?.admin_id && property.admin_id !== user?.id) {
+                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
+            }
+            
+            if (workers && workers.length > 0) {
+                for (let worker of workers) {
+                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
+                }
+            }
+            
+            await notifySuperAdminOfAction(
+                'room_occupied',
+                { roomNumber, tenantName, propertyName },
+                propertyId,
+                actingUserId || user?.id,
+                actingUserName || user?.name
+            );
+        }
+
+        async function notifyRoomVacated(propertyId, propertyName, roomNumber, tenantName, actingUserId = null, actingUserName = null) {
+            const user = getCurrentUser();
+            
+            const { data: property } = await window.supabaseClient
+                .from('properties')
+                .select('admin_id')
+                .eq('id', propertyId)
+                .single();
+            
+            const { data: workers } = await window.supabaseClient
+                .from('users')
+                .select('id, full_name')
+                .eq('role', 'worker')
+                .eq('property_id', propertyId);
+            
+            const title = '🚪 Room Now Vacant';
+            const message = `${roomNumber} (previously occupied by ${tenantName}) is now vacant at ${propertyName}`;
+            
+            if (property?.admin_id && property.admin_id !== user?.id) {
+                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
+            }
+            
+            if (workers && workers.length > 0) {
+                for (let worker of workers) {
+                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
+                }
+            }
+            
+            await notifySuperAdminOfAction(
+                'room_vacated',
+                { roomNumber, propertyName },
+                propertyId,
+                actingUserId || user?.id,
+                actingUserName || user?.name
+            );
+        }
+
+        async function notifyRoomDeleted(propertyId, propertyName, roomNumber, actingUserId = null, actingUserName = null) {
+            const user = getCurrentUser();
+            
+            const { data: property } = await window.supabaseClient
+                .from('properties')
+                .select('admin_id')
+                .eq('id', propertyId)
+                .single();
+            
+            const { data: workers } = await window.supabaseClient
+                .from('users')
+                .select('id, full_name')
+                .eq('role', 'worker')
+                .eq('property_id', propertyId);
+            
+            const title = '🗑️ Room Deleted';
+            const message = `${roomNumber} has been removed from ${propertyName}`;
+            
+            if (property?.admin_id && property.admin_id !== user?.id) {
+                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
+            }
+            
+            if (workers && workers.length > 0) {
+                for (let worker of workers) {
+                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
+                }
+            }
+            
+            await notifySuperAdminOfAction(
+                'room_deleted',
+                { roomNumber, propertyName },
+                propertyId,
+                actingUserId || user?.id,
+                actingUserName || user?.name
+            );
+        }
+
+        async function notifyRoomRentChanged(propertyId, propertyName, roomNumber, oldRent, newRent, actingUserId = null, actingUserName = null) {
+            const user = getCurrentUser();
+            
+            const { data: property } = await window.supabaseClient
+                .from('properties')
+                .select('admin_id')
+                .eq('id', propertyId)
+                .single();
+            
+            const { data: workers } = await window.supabaseClient
+                .from('users')
+                .select('id, full_name')
+                .eq('role', 'worker')
+                .eq('property_id', propertyId);
+            
+            const title = '💰 Room Rent Changed';
+            const message = `${roomNumber} rent changed from UGX ${oldRent.toLocaleString()} to UGX ${newRent.toLocaleString()} at ${propertyName}`;
+            
+            if (property?.admin_id && property.admin_id !== user?.id) {
+                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
+            }
+            
+            if (workers && workers.length > 0) {
+                for (let worker of workers) {
+                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
+                }
+            }
+            
+            await notifySuperAdminOfAction(
+                'rent_changed',
+                { roomNumber, oldRent, newRent, propertyName },
+                propertyId,
+                actingUserId || user?.id,
+                actingUserName || user?.name
+            );
+        }
+
         function escapeHtml(text) {
             if (!text) return '';
             return String(text).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');

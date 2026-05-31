@@ -443,6 +443,9 @@
     <div class="admin-header-bar">
         <h2>🔧 Welcome, Admin</h2>
         <div class="session-info">
+            <button id="enableNotificationsBtn" onclick="requestPushNotificationPermission()" style="background: #2c7be5; margin-right: 0.5rem; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-weight: bold;">
+                <i class="fas fa-bell"></i> Enable Notifications
+            </button>
             <span class="session-timer" id="sessionTimer">Session: 5:00</span>
             <button onclick="adminLogout()" class="logout-btn">🚪 Logout</button>
         </div>
@@ -857,10 +860,13 @@
         
         startTimer();
         renderPropertiesGrid();
+        await initNotificationSystem();
     };
 </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
+    <script src="auth.js"></script>
     <script src="supabase-data.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

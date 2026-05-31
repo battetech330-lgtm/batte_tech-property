@@ -228,18 +228,14 @@
             align-items: center;
             gap: 0.3rem;
         }
-        .features {
-            display: flex;
-            gap: 1rem;
-            margin: 1rem 0;
-            flex-wrap: wrap;
-        }
-        .feature {
-            font-size: 0.7rem;
+        .room-description {
+            font-size: 0.75rem;
             color: #64748b;
+            margin: 1rem 0;
+            line-height: 1.5;
             display: flex;
-            align-items: center;
-            gap: 0.3rem;
+            align-items: flex-start;
+            gap: 0.4rem;
         }
         
         .contact-buttons { 
@@ -462,10 +458,7 @@
 <div class="rentals-container">
     <div class="filter-bar">
         <div class="results-count">
-            <i class="fas fa-building"></i> <strong id="propertyCount">0</strong> Properties Available
-        </div>
-        <div class="results-count">
-            <i class="fas fa-door-open"></i> <strong id="unitCount">0</strong> Units For Rent
+            <i class="fas fa-building"></i> <strong id="unitCount">0</strong> Units Available for Rent
         </div>
         <select id="sortSelect" class="sort-select" onchange="sortVacancies()">
             <option value="price_asc">Sort by: Price (Low to High)</option>
@@ -664,19 +657,16 @@
         console.log('Found', properties?.length, 'properties');
         
         allVacantUnits = [];
-        let totalPropertiesWithVacancies = 0;
         
         for (let prop of properties) {
             if (prop.status !== 'active') continue;
             
             const propData = prop.data || { units: [] };
             const units = propData.units || [];
-            let hasVacancy = false;
             
             for (let unitIndex = 0; unitIndex < units.length; unitIndex++) {
                 const unit = units[unitIndex];
                 if (unit.vacant === true) {
-                    hasVacancy = true;
                     let roomImages = [];
                     if (unit.roomImages && Array.isArray(unit.roomImages) && unit.roomImages.length > 0) {
                         roomImages = unit.roomImages;
@@ -697,11 +687,9 @@
                     });
                 }
             }
-            if (hasVacancy) totalPropertiesWithVacancies++;
         }
         
         // Update counts
-        document.getElementById('propertyCount').innerText = totalPropertiesWithVacancies;
         document.getElementById('unitCount').innerText = allVacantUnits.length;
         
         console.log('Total vacant units found:', allVacantUnits.length);
@@ -761,10 +749,8 @@
                         <div class="property-location"><i class="fas fa-location-dot"></i> ${escapeHtml(unit.location)}</div>
                         <div class="room-number"><i class="fas fa-door-open"></i> Room ${escapeHtml(unit.roomNumber)}</div>
                         <div class="rent-price"><i class="fas fa-coins"></i> UGX ${unit.rent.toLocaleString()} <span style="font-size:0.7rem; font-weight:normal;">/ month</span></div>
-                        <div class="features">
-                            <span class="feature"><i class="fas fa-calendar-alt"></i> Due: ${unit.dueDate}th of month</span>
-                            <span class="feature"><i class="fas fa-shield-alt"></i> Secure</span>
-                            <span class="feature"><i class="fas fa-water"></i> Water Included</span>
+                        <div class="room-description">
+                            <i class="fas fa-info-circle"></i> ${escapeHtml(unit.propertyName)} offers a comfortable living space with secure access and professional property management.
                         </div>
                         <div class="contact-buttons">
                             <a href="https://wa.me/256794115704?text=${encodeURIComponent(`Hello BATTETECH, I'm interested in ${unit.propertyName} - Room ${unit.roomNumber} at UGX ${unit.rent.toLocaleString()}/month`)}" target="_blank" class="btn-whatsapp" onclick="event.stopPropagation();"><i class="fab fa-whatsapp"></i> WhatsApp</a>

@@ -85,13 +85,15 @@
         <div class="welcome-greeting">WELCOME, <span id="adminNameDisplay">ADMIN</span></div>
         <div>
             <div class="notification-bell">
+                <button id="enableNotificationsBtn" onclick="requestPushNotificationPermission()" style="background: #2c7be5; margin-right: 0.5rem;">
+                    <i class="fas fa-bell"></i> Enable Notifications
+                </button>
                 <button class="notification-btn" id="notificationBell">
                     🔔 Notifications
                     <span id="notificationBadge" class="notification-badge">0</span>
                 </button>
                 <div id="notificationDropdown" class="notification-dropdown">
                     <div id="notificationList"></div>
-                    <button class="mark-all-read" onclick="markAllNotificationsAsRead()">Mark All Read</button>
                 </div>
             </div>
             <button class="history-btn" onclick="requestHistoryAccess()">📜 Request History Access</button>
@@ -353,6 +355,24 @@
         await loadActivityLog();
         await initNotificationSystem();
         initChatPanel();
+
+        const notificationBell = document.getElementById('notificationBell');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        if (notificationBell && notificationDropdown) {
+            notificationBell.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const isOpen = notificationDropdown.style.display === 'block';
+                notificationDropdown.style.display = isOpen ? 'none' : 'block';
+                if (!isOpen) {
+                    await displayNotificationsInDropdown('notificationList');
+                }
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.notification-bell')) {
+                    notificationDropdown.style.display = 'none';
+                }
+            });
+        }
         
         const { data: superAdmin } = await window.supabaseClient.from('users').select('id, full_name, phone').eq('role', 'super_admin').single();
         superAdminData = superAdmin;
@@ -908,6 +928,15 @@
         } else {
             alert(`✅ Worker "${name}" created!\nPassword: ${password}`);
             
+            const adminUser = getCurrentUser();
+            await notifySuperAdminOfAction(
+                'worker_created',
+                { workerName: name },
+                propertyId,
+                adminUser?.id,
+                adminUser?.name
+            );
+            
             document.getElementById('workerName').value = '';
             document.getElementById('workerPhone').value = '';
             document.getElementById('workerPassword').value = '';
@@ -1194,8 +1223,11 @@
                     })
                     .eq('id', requestId);
                 
+                const adminUser = getCurrentUser();
+                
+                // Notify the worker
                 if (request.worker_id) {
-                    await addNotification(
+                    await sendPushNotification(
                         request.worker_id,
                         'worker',
                         '✅ Payment Approved',
@@ -1205,6 +1237,23 @@
                         request.property_id
                     );
                 }
+                
+                // Notify Super Admin
+                if (superAdminData && superAdminData.id) {
+                    await sendPushNotification(
+                        superAdminData.id,
+                        'super_admin',
+                        '💰 Payment Approved',
+                        `${adminUser?.name || 'Admin'} approved payment of UGX ${actualAmount?.toLocaleString()} for property`,
+                        'payment',
+                        requestId,
+                        request.property_id
+                    );
+                }
+                
+                // Notify Property Owner
+                const roomNumber = request.action_data?.roomNumber || 'Unknown room';
+                await notifyOwnerPaymentReceived(request.property_id, roomNumber, actualAmount, transactionId);
                 
                 await addActivityLog('payment_approved', `Approved payment of UGX ${actualAmount?.toLocaleString()} - Transaction: ${transactionId}`, request.property_id, transactionId);
                 
@@ -1471,6 +1520,133 @@
             localStorage.clear(); 
             window.location.href = 'login.html'; 
         } 
+    }
+
+    // ============ FIXED NOTIFICATION FUNCTIONS ============
+
+    // Override the displayNotificationsInDropdown function
+    async function displayNotificationsInDropdown(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        try {
+            const user = getCurrentUser();
+            if (!user) {
+                container.innerHTML = '<div style="padding: 15px; text-align: center;">Please login to see notifications</div>';
+                return;
+            }
+            
+            const { data, error } = await window.supabaseClient
+                .from('system_notifications')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(20);
+            
+            if (error) throw error;
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div style="padding: 15px; text-align: center; color: #666;"><i class="fas fa-bell-slash"></i> No notifications</div>';
+                return;
+            }
+            
+            let html = '';
+            for (let notif of data) {
+                const date = new Date(notif.created_at);
+                const isUnread = !notif.is_read;
+                const icon = getNotificationIcon(notif.type);
+                
+                html += `
+                    <div class="notification-item ${isUnread ? 'unread' : ''}" data-id="${notif.id}" onclick="markNotificationAsRead('${notif.id}')" style="padding: 12px; border-bottom: 1px solid #eee; background: ${isUnread ? '#fff3cd' : 'white'}; cursor: pointer;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.2rem;">${icon}</span>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; font-size: 0.85rem;">${escapeHtml(notif.title)}</div>
+                                <div style="font-size: 0.75rem; color: #555;">${escapeHtml(notif.message)}</div>
+                                <div style="font-size: 0.65rem; color: #999; margin-top: 5px;">${date.toLocaleString()}</div>
+                            </div>
+                            ${!isUnread ? '<span style="font-size: 0.7rem; color: #10b981;"><i class="fas fa-check-circle"></i></span>' : '<span style="font-size: 0.7rem; color: #f59e0b;"><i class="fas fa-circle"></i></span>'}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `<button class="mark-all-read" onclick="markAllNotificationsAsRead()" style="width: 100%; background: #f59e0b; border: none; padding: 10px; border-radius: 0 0 12px 12px; cursor: pointer; font-weight: bold;"><i class="fas fa-check-double"></i> Mark All Read</button>`;
+            
+            container.innerHTML = html;
+            
+        } catch (err) {
+            console.error("Error loading notifications:", err);
+            container.innerHTML = '<div style="padding: 15px; text-align: center; color: red;">Error loading notifications</div>';
+        }
+    }
+
+    function getNotificationIcon(type) {
+        switch(type) {
+            case 'payment': return '💰';
+            case 'broadcast': return '📢';
+            case 'approval': return '✅';
+            case 'system': return '🔔';
+            default: return '📬';
+        }
+    }
+
+    // Make sure markNotificationAsRead is defined
+    async function markNotificationAsRead(notificationId) {
+        try {
+            await window.supabaseClient
+                .from('system_notifications')
+                .update({ is_read: true })
+                .eq('id', notificationId);
+            
+            await displayNotificationsInDropdown('notificationList');
+            await updateNotificationBadge();
+        } catch (err) {
+            console.error("Error marking notification as read:", err);
+        }
+    }
+
+    async function markAllNotificationsAsRead() {
+        try {
+            const user = getCurrentUser();
+            if (!user) return;
+            
+            await window.supabaseClient
+                .from('system_notifications')
+                .update({ is_read: true })
+                .eq('user_id', user.id)
+                .eq('is_read', false);
+            
+            await displayNotificationsInDropdown('notificationList');
+            await updateNotificationBadge();
+            alert('✅ All notifications marked as read');
+        } catch (err) {
+            console.error("Error marking all as read:", err);
+        }
+    }
+
+    async function updateNotificationBadge() {
+        try {
+            const user = getCurrentUser();
+            if (!user) return;
+            
+            const { data, error } = await window.supabaseClient
+                .from('system_notifications')
+                .select('id', { count: 'exact' })
+                .eq('user_id', user.id)
+                .eq('is_read', false);
+            
+            if (error) throw error;
+            
+            const count = data?.length || 0;
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+        } catch (err) {
+            console.error("Error updating badge:", err);
+        }
     }
     
     window.addEventListener('load', () => { loadPropertyAdminData(); });
