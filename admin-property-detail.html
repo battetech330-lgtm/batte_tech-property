@@ -386,13 +386,17 @@
         <div id="propertyContent">Loading...</div>
     </div>
 
-    <!-- Add Room Modal -->
+    <!-- Add Room Modal (WITH TENANT NAME & PHONE) -->
     <div id="addRoomModal" class="modal">
         <div class="modal-content">
             <h2><i class="fas fa-plus-circle"></i> Add New Room</h2>
             <div class="form-row"><input type="text" id="roomNumber" placeholder="Room Number (e.g., A101)"></div>
             <div class="form-row"><input type="number" id="roomRent" placeholder="Monthly Rent (UGX)"></div>
             <div class="form-row"><input type="number" id="paymentDueDate" placeholder="Due Date (day of month)" value="1"></div>
+            <div class="form-row">
+                <input type="text" id="roomTenantName" placeholder="Tenant Name (if occupied)">
+                <input type="tel" id="roomTenantPhone" placeholder="Tenant Phone (for WhatsApp)">
+            </div>
             <div class="form-row">
                 <label><i class="fas fa-images"></i> Room Images (Upload multiple):</label>
                 <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
@@ -409,7 +413,7 @@
         </div>
     </div>
 
-    <!-- Edit Room Modal -->
+    <!-- Edit Room Modal (WITH TENANT PHONE) -->
     <div id="editRoomModal" class="modal">
         <div class="modal-content">
             <h2><i class="fas fa-edit"></i> Edit Room</h2>
@@ -417,9 +421,22 @@
             <div class="form-row"><input type="number" id="editRentAmount" placeholder="Rent (UGX)"></div>
             <div class="form-row"><input type="number" id="editPaymentDueDate" placeholder="Due Date (day)"></div>
             <div class="form-row"><label><i class="fas fa-calendar-alt"></i> Move In Date:</label><input type="date" id="editMoveInDate"></div>
-            <div class="form-row"><select id="editVacantStatus"><option value="vacant"><i class="fas fa-door-open"></i> VACANT</option><option value="occupied"><i class="fas fa-user"></i> OCCUPIED</option></select></div>
-            <div class="form-row"><input type="text" id="editTenantName" placeholder="Tenant Name"><input type="text" id="editTenantPhone" placeholder="Tenant Phone"></div>
-            <div class="form-row"><select id="editPaymentStatus"><option value="unpaid"><i class="fas fa-times-circle"></i> UNPAID</option><option value="paid"><i class="fas fa-check-circle"></i> PAID</option></select></div>
+            <div class="form-row">
+                <select id="editVacantStatus">
+                    <option value="vacant"><i class="fas fa-door-open"></i> VACANT</option>
+                    <option value="occupied"><i class="fas fa-user"></i> OCCUPIED</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <input type="text" id="editTenantName" placeholder="Tenant Name">
+                <input type="tel" id="editTenantPhone" placeholder="Tenant Phone (for WhatsApp)">
+            </div>
+            <div class="form-row">
+                <select id="editPaymentStatus">
+                    <option value="unpaid"><i class="fas fa-times-circle"></i> UNPAID</option>
+                    <option value="paid"><i class="fas fa-check-circle"></i> PAID</option>
+                </select>
+            </div>
             <div class="form-row">
                 <label><i class="fas fa-images"></i> Room Images:</label>
                 <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
@@ -524,40 +541,6 @@
             <div style="display:flex; gap:0.8rem; margin-top:1rem;">
                 <button onclick="confirmResetMonth()" style="background:#ec489a;"><i class="fas fa-check"></i> Confirm Reset</button>
                 <button onclick="closeResetMonthModal()"><i class="fas fa-times"></i> Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Property Modal -->
-    <div id="editPropertyModal" class="modal">
-        <div class="modal-content">
-            <h2><i class="fas fa-edit"></i> Edit Property Details</h2>
-            <div class="form-row"><input type="text" id="editPropName" placeholder="Property Name"></div>
-            <div class="form-row"><input type="text" id="editPropLocation" placeholder="Location"></div>
-            <div class="form-row"><input type="text" id="editOwnerName" placeholder="Owner Name"></div>
-            <div class="form-row"><input type="text" id="editOwnerPhone" placeholder="Owner Phone"></div>
-            <div class="form-row"><input type="password" id="editOwnerPassword" placeholder="New Owner Password (leave blank to keep same)"></div>
-            <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:8px;">
-                <small><i class="fas fa-shield-alt"></i> This request will be sent to Super Admin for approval.</small>
-            </div>
-            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
-                <button onclick="requestPropertyEditApproval()" class="warning"><i class="fas fa-paper-plane"></i> Request Approval</button>
-                <button onclick="closeEditPropertyModal()"><i class="fas fa-times"></i> Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Fee Modal -->
-    <div id="editFeeModal" class="modal">
-        <div class="modal-content">
-            <h2><i class="fas fa-percent"></i> Change Management Fee</h2>
-            <div class="form-row"><input type="number" id="editFeeAmount" placeholder="New Management Fee (%)" step="0.5"></div>
-            <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:8px;">
-                <small><i class="fas fa-shield-alt"></i> This request will be sent to Super Admin for approval.</small>
-            </div>
-            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
-                <button onclick="requestFeeChangeApproval()" class="warning"><i class="fas fa-paper-plane"></i> Request Approval</button>
-                <button onclick="closeEditFeeModal()"><i class="fas fa-times"></i> Cancel</button>
             </div>
         </div>
     </div>
@@ -676,78 +659,7 @@
             if (bgDiv) bgDiv.style.backgroundImage = imageUrl ? `url('${imageUrl}')` : 'linear-gradient(135deg, #0a2b4e 0%, #1a4a7a 100%)';
         }
         
-        async function requestPropertyEditApproval() {
-            const user = getCurrentUser();
-            const newName = document.getElementById('editPropName').value;
-            const newLocation = document.getElementById('editPropLocation').value;
-            const newOwnerName = document.getElementById('editOwnerName').value;
-            const newOwnerPhone = document.getElementById('editOwnerPhone').value;
-            const newOwnerPassword = document.getElementById('editOwnerPassword').value;
-            
-            if (!newName || !newLocation) { alert('Property Name and Location are required'); return; }
-            
-            const { error } = await window.supabaseClient.from('approval_requests').insert({
-                property_id: currentPropertyId,
-                action_type: 'edit_property',
-                action_data: {
-                    property_id: currentPropertyId,
-                    current_name: currentProperty.name,
-                    current_location: currentProperty.location,
-                    current_owner_name: currentProperty.owner_name || '',
-                    current_owner_phone: currentProperty.owner_phone || '',
-                    new_name: newName,
-                    new_location: newLocation,
-                    new_owner_name: newOwnerName,
-                    new_owner_phone: newOwnerPhone,
-                    new_owner_password: newOwnerPassword || null,
-                    requester_id: user.id,
-                    requester_name: user.name,
-                    requester_role: user.role
-                },
-                status: 'pending',
-                created_at: new Date().toISOString()
-            });
-            
-            if (error) alert('Failed: ' + error.message);
-            else {
-                alert('✅ Edit request sent to Super Admin for approval.');
-                if (superAdminData) {
-                    await addNotification(superAdminData.id, 'super_admin', '✏️ Property Edit Approval Needed', `${user.name} requested to edit property ${currentProperty.name}`, 'edit_property', null, currentPropertyId);
-                }
-                closeEditPropertyModal();
-            }
-        }
-        
-        async function requestFeeChangeApproval() {
-            const user = getCurrentUser();
-            const newFee = parseFloat(document.getElementById('editFeeAmount').value);
-            if (!newFee || newFee < 0) { alert('Please enter a valid fee percentage'); return; }
-            
-            const { error } = await window.supabaseClient.from('approval_requests').insert({
-                property_id: currentPropertyId,
-                action_type: 'edit_fee',
-                action_data: {
-                    property_id: currentPropertyId,
-                    current_fee: currentProperty.management_fee || 5,
-                    new_fee: newFee,
-                    requester_id: user.id,
-                    requester_name: user.name,
-                    requester_role: user.role
-                },
-                status: 'pending',
-                created_at: new Date().toISOString()
-            });
-            
-            if (error) alert('Failed: ' + error.message);
-            else {
-                alert('✅ Fee change request sent to Super Admin for approval.');
-                if (superAdminData) {
-                    await addNotification(superAdminData.id, 'super_admin', '💰 Fee Change Approval Needed', `${user.name} requested fee change from ${currentProperty.management_fee || 5}% to ${newFee}%`, 'edit_fee', null, currentPropertyId);
-                }
-                closeEditFeeModal();
-            }
-        }
-        
+        // ============ PROPERTY BACKGROUND IMAGE ============
         function openPropertyImageModal() {
             const modal = document.getElementById('propertyImageModal');
             if (modal) {
@@ -796,6 +708,7 @@
             else { currentProperty.data = updatedData; updatePropertyBackground(''); alert('✅ Background image removed.'); closePropertyImageModal(); await loadProperty(); }
         }
         
+        // ============ MULTIPLE IMAGE HANDLING ============
         function uploadMultipleRoomImages() { document.getElementById('roomImagesInput').click(); }
         
         function previewMultipleRoomImages(event) {
@@ -828,12 +741,20 @@
             }
         }
         
+        // ============ ADD NEW ROOM WITH TENANT NAME & PHONE ============
         async function addNewRoomWithImages() {
             const roomNumber = document.getElementById('roomNumber').value.trim();
             const rentAmount = parseInt(document.getElementById('roomRent').value);
             const paymentDueDate = parseInt(document.getElementById('paymentDueDate').value) || 1;
+            const tenantName = document.getElementById('roomTenantName').value.trim();
+            const tenantPhone = document.getElementById('roomTenantPhone').value.trim();
             const roomImages = selectedRoomImagesArray;
-            if (!roomNumber || !rentAmount) { alert('Please fill Room Number and Rent'); return; }
+            
+            if (!roomNumber || !rentAmount) {
+                alert('Please fill Room Number and Rent');
+                return;
+            }
+            
             const units = currentProperty.data?.units || [];
             const currentYear = new Date().getFullYear();
             const payments = {};
@@ -841,24 +762,64 @@
                 const monthKey = `${currentYear}-${String(m).padStart(2, '0')}`;
                 payments[monthKey] = { rentDue: rentAmount, paid: 0, balance: rentAmount, status: "unpaid", paidDate: null, feeDeducted: 0, amountToOwner: 0, penaltyAmount: 0, locked: false };
             }
-            units.push({ id: Date.now(), roomNumber, rentAmount, roomImages, roomImage: roomImages[0] || '', vacant: true, tenant: "", tenantPhone: "", paymentDueDate, paid: false, payments, paymentHistory: [] });
+            
+            const vacant = !tenantName;
+            
+            units.push({
+                id: Date.now(),
+                roomNumber,
+                rentAmount,
+                roomImages: roomImages,
+                roomImage: roomImages[0] || '',
+                vacant: vacant,
+                tenant: tenantName || "",
+                tenantPhone: tenantPhone || "",
+                paymentDueDate,
+                paid: false,
+                payments,
+                paymentHistory: []
+            });
+            
             const updatedData = currentProperty.data || {};
             updatedData.units = units;
-            const { error } = await window.supabaseClient.from('properties').update({ data: updatedData }).eq('id', currentPropertyId);
-            if (error) alert('Failed: ' + error.message);
-            else {
-                await notifyRoomAdded(currentPropertyId, currentProperty.name, roomNumber, rentAmount);
-                await notifyOwnerRoomAdded(currentPropertyId, roomNumber, rentAmount);
-                alert(`✅ Room added with ${roomImages.length} image(s)`);
+            
+            const { error } = await window.supabaseClient
+                .from('properties')
+                .update({ data: updatedData })
+                .eq('id', currentPropertyId);
+            
+            if (error) {
+                alert('Failed to add room: ' + error.message);
+            } else {
+                alert(`✅ Room ${roomNumber} added with ${roomImages.length} image(s)`);
+                if (!vacant && tenantPhone) {
+                    alert(`📱 WhatsApp notifications will be sent to ${tenantPhone}`);
+                }
                 closeAddRoomModal();
                 selectedRoomImagesArray = [];
                 document.getElementById('roomImagesPreview').innerHTML = '';
+                document.getElementById('roomNumber').value = '';
+                document.getElementById('roomRent').value = '';
+                document.getElementById('roomTenantName').value = '';
+                document.getElementById('roomTenantPhone').value = '';
                 await loadProperty();
             }
         }
         
         function closeAddRoomModal() { document.getElementById('addRoomModal').style.display = 'none'; }
         
+        function openAddRoomModal() { 
+            selectedRoomImagesArray = []; 
+            document.getElementById('roomImagesPreview').innerHTML = ''; 
+            document.getElementById('roomNumber').value = ''; 
+            document.getElementById('roomRent').value = ''; 
+            document.getElementById('paymentDueDate').value = '1';
+            document.getElementById('roomTenantName').value = '';
+            document.getElementById('roomTenantPhone').value = '';
+            document.getElementById('addRoomModal').style.display = 'flex'; 
+        }
+        
+        // ============ EDIT ROOM ============
         function openEditRoomModalWithImages(roomIndex) {
             currentEditRoomIndex = roomIndex;
             const room = currentProperty.data.units[roomIndex];
@@ -908,9 +869,10 @@
             if (currentEditRoomIndex === null) return;
             const units = currentProperty.data.units;
             const room = units[currentEditRoomIndex];
+            
             const oldRent = room.rentAmount;
             const wasVacant = room.vacant;
-            const previousTenant = room.tenant || '';
+            
             room.roomNumber = document.getElementById('editRoomNumber').value;
             room.rentAmount = parseInt(document.getElementById('editRentAmount').value);
             room.paymentDueDate = parseInt(document.getElementById('editPaymentDueDate').value) || 1;
@@ -921,27 +883,28 @@
             room.paid = document.getElementById('editPaymentStatus').value === 'paid';
             room.roomImages = currentEditRoomImagesArray;
             room.roomImage = currentEditRoomImagesArray[0] || '';
-            if (room.vacant) { room.tenant = ""; room.tenantPhone = ""; room.paid = false; }
+            
+            if (room.vacant) { 
+                room.tenant = ""; 
+                room.tenantPhone = ""; 
+                room.paid = false; 
+            }
+            
             const updatedData = currentProperty.data;
             updatedData.units = units;
-            const { error } = await window.supabaseClient.from('properties').update({ data: updatedData }).eq('id', currentPropertyId);
-            if (error) alert('Failed: ' + error.message);
-            else {
-                const newRent = room.rentAmount;
-                if (oldRent !== newRent) {
-                    await notifyRoomRentChanged(currentPropertyId, currentProperty.name, room.roomNumber, oldRent, newRent);
-                    await notifyOwnerRentChanged(currentPropertyId, room.roomNumber, oldRent, newRent);
+            
+            const { error } = await window.supabaseClient
+                .from('properties')
+                .update({ data: updatedData })
+                .eq('id', currentPropertyId);
+            
+            if (error) {
+                alert('Failed to update room: ' + error.message);
+            } else {
+                alert(`✅ Room ${room.roomNumber} updated successfully`);
+                if (!room.vacant && room.tenantPhone) {
+                    alert(`📱 WhatsApp number: ${room.tenantPhone}`);
                 }
-                if (wasVacant !== room.vacant) {
-                    if (room.vacant) {
-                        await notifyRoomVacated(currentPropertyId, currentProperty.name, room.roomNumber, previousTenant);
-                        await notifyOwnerRoomVacated(currentPropertyId, room.roomNumber);
-                    } else {
-                        await notifyRoomOccupied(currentPropertyId, currentProperty.name, room.roomNumber, room.tenant, room.rentAmount);
-                        await notifyOwnerRoomOccupied(currentPropertyId, room.roomNumber, room.tenant, room.rentAmount);
-                    }
-                }
-                alert(`✅ Room updated`);
                 closeEditRoomModal();
                 await loadProperty();
             }
@@ -949,8 +912,7 @@
         
         function closeEditRoomModal() { document.getElementById('editRoomModal').style.display = 'none'; }
         
-        function openAddRoomModal() { selectedRoomImagesArray = []; document.getElementById('roomImagesPreview').innerHTML = ''; document.getElementById('roomNumber').value = ''; document.getElementById('roomRent').value = ''; document.getElementById('paymentDueDate').value = '1'; document.getElementById('addRoomModal').style.display = 'flex'; }
-        
+        // ============ DIRECT PAYMENT ============
         function openDirectPaymentModal(roomIndex) {
             const room = currentProperty.data.units[roomIndex];
             if (room.vacant) { alert('Cannot record payment for vacant room'); return; }
@@ -1005,6 +967,7 @@
             else { alert(`✅ Payment recorded!\nAmount: UGX ${amount.toLocaleString()}\nFee: UGX ${feeAmount.toLocaleString()}\nTo Owner: UGX ${amountToOwner.toLocaleString()}\nTransaction ID: ${transactionId}`); closePaymentModal(); await loadProperty(); }
         }
         
+        // ============ REMIT TO OWNER ============
         function openRemitModal() {
             if (!currentProperty) { alert('Property not loaded'); return; }
             const financials = getFinancials(currentProperty);
@@ -1035,9 +998,10 @@
             currentProperty.totalFeeSinceLastRemit = 0;
             const { error } = await window.supabaseClient.from('properties').update({ already_remitted: currentProperty.alreadyRemitted, total_collected_since_last_remit: 0, total_fee_since_last_remit: 0, remittance_history: currentProperty.remittanceHistory, data: currentProperty.data }).eq('id', currentPropertyId);
             if (error) alert('❌ Failed: ' + error.message);
-            else { alert(`✅ UGX ${amount.toLocaleString()} remitted successfully!`); await notifyOwnerRemittanceSent(currentPropertyId, amount, method); closeRemitModal(); await loadProperty(); }
+            else { alert(`✅ UGX ${amount.toLocaleString()} remitted successfully!`); closeRemitModal(); await loadProperty(); }
         }
         
+        // ============ BILL PAYMENT ============
         function openBillModal() {
             document.getElementById('billType').value = 'Electricity';
             document.getElementById('customBillTypeRow').style.display = 'none';
@@ -1081,12 +1045,12 @@
             const receiptImage = document.getElementById('billReceipt').value;
             if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
             await addBillPayment(currentPropertyId, billType, amount, receiptImage, description);
-            await notifyOwnerBillPaid(currentPropertyId, billType, amount);
             alert(`✅ ${billType} bill UGX ${amount.toLocaleString()} recorded`);
             closeBillModal();
             await loadProperty();
         }
         
+        // ============ STATEMENT & RESET MONTH ============
         function openStatementModal() {
             document.getElementById('statementMonth').value = new Date().toISOString().slice(0,7);
             document.getElementById('ownerWhatsApp').value = currentProperty.owner_phone || '';
@@ -1100,10 +1064,7 @@
             if (!monthYear) { alert('Select month/year'); return; }
             const [year, month] = monthYear.split('-');
             const statement = await generateMonthlyStatement(currentPropertyId, parseInt(month), parseInt(year));
-            if (statement) {
-                alert(`✅ Statement for ${monthYear} generated and saved.`);
-                await notifyOwnerStatementGenerated(currentPropertyId, monthYear);
-            }
+            if (statement) alert(`✅ Statement for ${monthYear} generated and saved.`);
             const whatsapp = document.getElementById('ownerWhatsApp').value;
             if (whatsapp) {
                 let phone = whatsapp.replace(/\s/g, '');
@@ -1131,7 +1092,6 @@
             const [newYear, newMonth] = newMonthValue.split('-');
             if (confirm(`⚠️ Reset to ${newMonthValue}? This will reset all counters to zero and carry forward unpaid balances.`)) {
                 await resetMonth(currentPropertyId, parseInt(newYear), parseInt(newMonth));
-                await notifyOwnerMonthReset(currentPropertyId, newMonthValue);
                 alert(`✅ Month reset to ${newMonthValue}. Statement generated.`);
                 closeResetMonthModal();
                 closeStatementModal();
@@ -1139,6 +1099,7 @@
             }
         }
         
+        // ============ EVACUATE TENANT ============
         function openEvacuateModal(roomIndex) {
             const room = currentProperty.data.units[roomIndex];
             if (room.vacant) { alert('This room is already vacant'); return; }
@@ -1158,36 +1119,31 @@
             if (!reason) { alert('Please provide a reason'); return; }
             if (confirm(`⚠️ Confirm evacuation of ${room.tenant} from ${room.roomNumber}?`)) {
                 const result = await evacuateTenant(currentPropertyId, roomIndex, reason);
-                if (result.success) {
-                    await notifyOwnerEvacuation(currentPropertyId, room.roomNumber, room.tenant);
-                    alert(`✅ Tenant evacuated. Written off: UGX ${result.writtenOffAmount.toLocaleString()}`);
-                }
+                if (result.success) alert(`✅ Tenant evacuated. Written off: UGX ${result.writtenOffAmount.toLocaleString()}`);
                 else alert('Failed to evacuate tenant');
                 closeEvacuateModal();
                 await loadProperty();
             }
         }
         
+        // ============ DELETE ROOM ============
         async function deleteRoomConfirm(roomIndex) {
             if (!confirm('⚠️ Permanently delete this room?')) return;
             const units = currentProperty.data.units;
-            const roomNumber = units[roomIndex].roomNumber;
+            const room = units[roomIndex];
+            const roomNumber = room.roomNumber;
             units.splice(roomIndex, 1);
             const updatedData = currentProperty.data;
             updatedData.units = units;
             const { error } = await window.supabaseClient.from('properties').update({ data: updatedData }).eq('id', currentPropertyId);
             if (error) alert('Failed: ' + error.message);
-            else {
-                await notifyRoomDeleted(currentPropertyId, currentProperty.name, roomNumber);
-                await notifyOwnerRoomDeleted(currentPropertyId, roomNumber);
-                alert('✅ Room deleted');
-                await loadProperty();
-            }
+            else { alert(`✅ Room ${roomNumber} deleted`); await loadProperty(); }
         }
         
+        // ============ VIEW PAYMENTS ============
         function viewPayments(roomIndex) {
             const room = currentProperty.data.units[roomIndex];
-            let paymentTable = `<div style="overflow-x:auto;"><table class="payment-table"><thead><tr><th><i class="fas fa-calendar-alt"></i> Month</th><th><i class="fas fa-coins"></i> Rent Due</th><th><i class="fas fa-money-bill-wave"></i> Amount Paid</th><th><i class="fas fa-percent"></i> Fee</th><th><i class="fas fa-paper-plane"></i> To Owner</th><th><i class="fas fa-hourglass-half"></i> Balance</th><th><i class="fas fa-check-circle"></i> Status</th><th><i class="fas fa-receipt"></i> Transaction ID</th></tr></thead><tbody>`;
+            let paymentTable = `<div style="overflow-x:auto;"><table class="payment-table"><thead><tr><th><i class="fas fa-calendar-alt"></i> Month</th><th><i class="fas fa-coins"></i> Rent Due</th><th><i class="fas fa-money-bill-wave"></i> Amount Paid</th><th><i class="fas fa-percent"></i> Fee</th><th><i class="fas fa-paper-plane"></i> To Owner</th><th><i class="fas fa-hourglass-half"></i> Balance</th><th><i class="fas fa-check-circle"></i> Status</th><th><i class="fas fa-receipt"></i> Transaction ID</th></td></thead><tbody>`;
             const payments = room.payments || {};
             const months = Object.keys(payments).sort().reverse();
             for (let month of months) {
@@ -1197,11 +1153,12 @@
                 let statusClass = p.status === 'paid' ? 'status-paid-bg' : 'status-unpaid-bg';
                 paymentTable += `<tr class="${statusClass}"><td><strong>${monthName} ${year}</strong></td><td>UGX ${(p.rentDue || 0).toLocaleString()}</td><td>UGX ${(p.paid || 0).toLocaleString()}</td><td>UGX ${(p.feeDeducted || 0).toLocaleString()}</td><td>UGX ${(p.amountToOwner || 0).toLocaleString()}</td><td>UGX ${(p.balance || 0).toLocaleString()}</td><td>${p.status === 'paid' ? '<i class="fas fa-check-circle"></i> PAID' : '<i class="fas fa-times-circle"></i> UNPAID'}</td><td>${p.transaction_id || '-'}</td></tr>`;
             }
-            paymentTable += `</tbody></table></div>`;
+            paymentTable += `</tbody><tr></div>`;
             const modalHtml = `<div id="paymentHistoryModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:flex; align-items:center; justify-content:center;"><div style="background:white; width:95%; max-width:500px; border-radius:16px; padding:1rem; max-height:80%; overflow-y:auto;"><h3><i class="fas fa-clock-rotate-left"></i> Payment History - ${room.roomNumber}</h3>${paymentTable}<button onclick="this.parentElement.parentElement.remove()" style="margin-top:1rem;"><i class="fas fa-times"></i> Close</button></div></div>`;
             document.body.insertAdjacentHTML('beforeend', modalHtml);
         }
         
+        // ============ LOAD PROPERTY ============
         async function loadProperty() {
             console.log("loadProperty called");
             if (!checkSession()) return;
@@ -1284,11 +1241,10 @@
             const pendingRemittance = financials.pendingToRemit || 0;
             const alreadyRemitted = financials.alreadyRemitted || 0;
             
+            // REMOVED: Edit Property and Edit Fee buttons (only Super Admin can edit these)
             let actionButtonsHtml = '';
             if (userIsSuperAdmin || userIsPropertyAdmin) {
                 actionButtonsHtml = `<div class="action-buttons">
-                    <button class="warning" onclick="openEditPropertyModal()"><i class="fas fa-edit"></i> Edit Property</button>
-                    <button class="warning" onclick="openEditFeeModal()"><i class="fas fa-percent"></i> Edit Fee</button>
                     <button class="warning" onclick="openBillModal()"><i class="fas fa-receipt"></i> Pay Bill</button>
                     <button class="success" onclick="openRemitModal()"><i class="fas fa-paper-plane"></i> Remit to Owner</button>
                     <button class="success" onclick="openStatementModal()"><i class="fas fa-file-invoice"></i> Month Statement</button>
@@ -1300,7 +1256,7 @@
             let mobileRoomsHtml = `<div class="rooms-mobile-list">`;
             
             if (units.length === 0) {
-                roomsTableHtml += `<tr><td colspan="9" style="text-align:center; padding:2rem;"><i class="fas fa-info-circle"></i> No rooms added yet. Click "Add Room" to get started.</td></tr>`;
+                roomsTableHtml += `<tr><td colspan="9" style="text-align:center; padding:2rem;"><i class="fas fa-info-circle"></i> No rooms added yet. Click "Add Room" to get started.17</tr>`;
                 mobileRoomsHtml += `<div style="text-align:center; padding:2rem;"><i class="fas fa-info-circle"></i> No rooms added yet. Click "Add Room" to get started.</div>`;
             }
             
@@ -1366,221 +1322,15 @@
             document.getElementById('propertyContent').innerHTML = html;
         }
         
-        function openEditPropertyModal() {
-            document.getElementById('editPropName').value = currentProperty.name;
-            document.getElementById('editPropLocation').value = currentProperty.location;
-            document.getElementById('editOwnerName').value = currentProperty.owner_name || '';
-            document.getElementById('editOwnerPhone').value = currentProperty.owner_phone || '';
-            document.getElementById('editOwnerPassword').value = '';
-            document.getElementById('editPropertyModal').style.display = 'flex';
-        }
-        
-        function closeEditPropertyModal() { document.getElementById('editPropertyModal').style.display = 'none'; }
-        
-        function openEditFeeModal() {
-            document.getElementById('editFeeAmount').value = currentProperty.management_fee || 5;
-            document.getElementById('editFeeModal').style.display = 'flex';
-        }
-        
-        function closeEditFeeModal() { document.getElementById('editFeeModal').style.display = 'none'; }
-        
-        // ============ ROOM CHANGE NOTIFICATIONS ============
-
-        async function notifyRoomAdded(propertyId, propertyName, roomNumber, rentAmount, actingUserId = null, actingUserName = null) {
-            const user = getCurrentUser();
-            
-            const { data: property } = await window.supabaseClient
-                .from('properties')
-                .select('admin_id')
-                .eq('id', propertyId)
-                .single();
-            
-            const { data: workers } = await window.supabaseClient
-                .from('users')
-                .select('id, full_name')
-                .eq('role', 'worker')
-                .eq('property_id', propertyId);
-            
-            const title = '🏠 New Room Added';
-            const message = `New room ${roomNumber} (UGX ${rentAmount.toLocaleString()}/month) has been added to ${propertyName}`;
-            
-            if (property?.admin_id && property.admin_id !== user?.id) {
-                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
-            }
-            
-            if (workers && workers.length > 0) {
-                for (let worker of workers) {
-                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
-                }
-            }
-            
-            await notifySuperAdminOfAction(
-                'room_added',
-                { roomNumber, rentAmount, propertyName },
-                propertyId,
-                actingUserId || user?.id,
-                actingUserName || user?.name
-            );
-        }
-
-        async function notifyRoomOccupied(propertyId, propertyName, roomNumber, tenantName, rentAmount, actingUserId = null, actingUserName = null) {
-            const user = getCurrentUser();
-            
-            const { data: property } = await window.supabaseClient
-                .from('properties')
-                .select('admin_id, owner_name, owner_phone')
-                .eq('id', propertyId)
-                .single();
-            
-            const { data: workers } = await window.supabaseClient
-                .from('users')
-                .select('id, full_name')
-                .eq('role', 'worker')
-                .eq('property_id', propertyId);
-            
-            const title = '👤 Room Now Occupied';
-            const message = `${roomNumber} has been occupied by ${tenantName} (Rent: UGX ${rentAmount.toLocaleString()}/month) at ${propertyName}`;
-            
-            if (property?.admin_id && property.admin_id !== user?.id) {
-                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
-            }
-            
-            if (workers && workers.length > 0) {
-                for (let worker of workers) {
-                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
-                }
-            }
-            
-            await notifySuperAdminOfAction(
-                'room_occupied',
-                { roomNumber, tenantName, propertyName },
-                propertyId,
-                actingUserId || user?.id,
-                actingUserName || user?.name
-            );
-        }
-
-        async function notifyRoomVacated(propertyId, propertyName, roomNumber, tenantName, actingUserId = null, actingUserName = null) {
-            const user = getCurrentUser();
-            
-            const { data: property } = await window.supabaseClient
-                .from('properties')
-                .select('admin_id')
-                .eq('id', propertyId)
-                .single();
-            
-            const { data: workers } = await window.supabaseClient
-                .from('users')
-                .select('id, full_name')
-                .eq('role', 'worker')
-                .eq('property_id', propertyId);
-            
-            const title = '🚪 Room Now Vacant';
-            const message = `${roomNumber} (previously occupied by ${tenantName}) is now vacant at ${propertyName}`;
-            
-            if (property?.admin_id && property.admin_id !== user?.id) {
-                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
-            }
-            
-            if (workers && workers.length > 0) {
-                for (let worker of workers) {
-                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
-                }
-            }
-            
-            await notifySuperAdminOfAction(
-                'room_vacated',
-                { roomNumber, propertyName },
-                propertyId,
-                actingUserId || user?.id,
-                actingUserName || user?.name
-            );
-        }
-
-        async function notifyRoomDeleted(propertyId, propertyName, roomNumber, actingUserId = null, actingUserName = null) {
-            const user = getCurrentUser();
-            
-            const { data: property } = await window.supabaseClient
-                .from('properties')
-                .select('admin_id')
-                .eq('id', propertyId)
-                .single();
-            
-            const { data: workers } = await window.supabaseClient
-                .from('users')
-                .select('id, full_name')
-                .eq('role', 'worker')
-                .eq('property_id', propertyId);
-            
-            const title = '🗑️ Room Deleted';
-            const message = `${roomNumber} has been removed from ${propertyName}`;
-            
-            if (property?.admin_id && property.admin_id !== user?.id) {
-                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
-            }
-            
-            if (workers && workers.length > 0) {
-                for (let worker of workers) {
-                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
-                }
-            }
-            
-            await notifySuperAdminOfAction(
-                'room_deleted',
-                { roomNumber, propertyName },
-                propertyId,
-                actingUserId || user?.id,
-                actingUserName || user?.name
-            );
-        }
-
-        async function notifyRoomRentChanged(propertyId, propertyName, roomNumber, oldRent, newRent, actingUserId = null, actingUserName = null) {
-            const user = getCurrentUser();
-            
-            const { data: property } = await window.supabaseClient
-                .from('properties')
-                .select('admin_id')
-                .eq('id', propertyId)
-                .single();
-            
-            const { data: workers } = await window.supabaseClient
-                .from('users')
-                .select('id, full_name')
-                .eq('role', 'worker')
-                .eq('property_id', propertyId);
-            
-            const title = '💰 Room Rent Changed';
-            const message = `${roomNumber} rent changed from UGX ${oldRent.toLocaleString()} to UGX ${newRent.toLocaleString()} at ${propertyName}`;
-            
-            if (property?.admin_id && property.admin_id !== user?.id) {
-                await sendPushNotification(property.admin_id, 'property_admin', title, message, 'room', null, propertyId);
-            }
-            
-            if (workers && workers.length > 0) {
-                for (let worker of workers) {
-                    await sendPushNotification(worker.id, 'worker', title, message, 'room', null, propertyId);
-                }
-            }
-            
-            await notifySuperAdminOfAction(
-                'rent_changed',
-                { roomNumber, oldRent, newRent, propertyName },
-                propertyId,
-                actingUserId || user?.id,
-                actingUserName || user?.name
-            );
-        }
-
         function escapeHtml(text) {
             if (!text) return '';
             return String(text).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
         }
         
+        // Make functions globally available
         window.viewPayments = viewPayments;
         window.openAddRoomModal = openAddRoomModal;
         window.openEvacuateModal = openEvacuateModal;
-        window.openEditPropertyModal = openEditPropertyModal;
-        window.openEditFeeModal = openEditFeeModal;
         window.openPropertyImageModal = openPropertyImageModal;
         window.openBillModal = openBillModal;
         window.resetToNewMonth = resetToNewMonth;
@@ -1615,10 +1365,6 @@
         window.removePropertyBackgroundImage = removePropertyBackgroundImage;
         window.closePropertyImageModal = closePropertyImageModal;
         window.uploadPropertyBgImage = uploadPropertyBgImage;
-        window.requestPropertyEditApproval = requestPropertyEditApproval;
-        window.closeEditPropertyModal = closeEditPropertyModal;
-        window.requestFeeChangeApproval = requestFeeChangeApproval;
-        window.closeEditFeeModal = closeEditFeeModal;
         window.toggleCustomBillType = toggleCustomBillType;
         
         window.addEventListener('load', () => { 

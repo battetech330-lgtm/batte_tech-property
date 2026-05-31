@@ -66,7 +66,7 @@
         .photo-preview { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-top: 5px; }
         .upload-btn { background: #f59e0b; color: white; border: none; padding: 10px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem; }
         
-        button { background: #0a2b4e; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
+        button { background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%); color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
         button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(10,43,78,0.3); }
         button.danger { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
         button.warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #1a2a3e; }
@@ -84,94 +84,6 @@
         .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 28px; padding: 1.5rem; max-height: 80%; overflow-y: auto; }
         .modal-content h3 { font-size: 1.2rem; margin-bottom: 1rem; color: #0a2b4e; display: flex; align-items: center; gap: 0.5rem; }
         
-        /* Activity Log Styles */
-        .activity-item {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.8rem;
-            border-left: 4px solid #2c7be5;
-            transition: all 0.2s ease;
-        }
-        .activity-item:hover {
-            background: #f1f5f9;
-            transform: translateX(5px);
-        }
-        .activity-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-        }
-        .activity-date {
-            font-size: 0.65rem;
-            color: #94a3b8;
-            margin-bottom: 0.3rem;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        .activity-user {
-            font-weight: 600;
-            color: #0a2b4e;
-            font-size: 0.85rem;
-        }
-        .activity-action {
-            font-size: 0.8rem;
-            color: #475569;
-            margin-top: 0.3rem;
-        }
-        .activity-details {
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 0.3rem;
-        }
-        
-        .main-footer { background: rgba(7, 30, 54, 0.95); backdrop-filter: blur(5px); color: white; margin-top: 2rem; padding: 1.5rem; text-align: center; }
-        .phones { display: flex; justify-content: center; gap: 2rem; margin: 0.5rem 0; flex-wrap: wrap; font-size: 0.8rem; }
-        .whatsapp-btn a { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 6px 16px; border-radius: 40px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; transition: all 0.3s ease; }
-        .whatsapp-btn a:hover { transform: scale(1.05); }
-        
-        .transfer-btn { background: #8b5cf6; margin-left: 0.5rem; }
-        
-        /* Filter bar for activity log */
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
-        }
-        .filter-group label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 0.3rem;
-        }
-        .filter-group select, .filter-group input {
-            width: 100%;
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            font-size: 0.8rem;
-        }
-        
-        @media (max-width: 700px) { 
-            .grid-2 { grid-template-columns: 1fr; }
-            .admin-header { flex-direction: column; text-align: center; }
-            .filter-bar { flex-direction: column; }
-        }
-
-        /* Image Manager Styles */
         .image-manager-toggle {
             position: fixed;
             bottom: 100px;
@@ -190,12 +102,7 @@
             font-weight: 600;
             font-size: 0.9rem;
         }
-
-        .image-manager-toggle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(139,92,246,0.4);
-        }
-
+        .image-manager-toggle:hover { transform: scale(1.05); }
         .image-manager-panel {
             position: fixed;
             bottom: 170px;
@@ -209,129 +116,26 @@
             z-index: 1001;
             display: none;
             overflow: hidden;
-            border: 1px solid #e2e8f0;
         }
-
-        .image-manager-header {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
+        .image-manager-header { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .image-manager-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .image-manager-content { padding: 15px; max-height: 480px; overflow-y: auto; }
+        .image-manager-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+        .image-manager-item { background: #f8fafc; border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #e2e8f0; transition: all 0.2s ease; }
+        .image-manager-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .image-manager-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+        .btn-upload-sm { background: #f59e0b; color: white; border: none; padding: 4px 8px; border-radius: 20px; font-size: 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; }
+        
+        .main-footer { background: rgba(7, 30, 54, 0.95); backdrop-filter: blur(5px); color: white; margin-top: 2rem; padding: 1.5rem; text-align: center; }
+        .phones { display: flex; justify-content: center; gap: 2rem; margin: 0.5rem 0; flex-wrap: wrap; font-size: 0.8rem; }
+        .whatsapp-btn a { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 6px 16px; border-radius: 40px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; transition: all 0.3s ease; }
+        .whatsapp-btn a:hover { transform: scale(1.05); }
+        
+        @media (max-width: 700px) { 
+            .grid-2 { grid-template-columns: 1fr; }
+            .admin-header { flex-direction: column; text-align: center; }
+            .image-manager-panel { width: calc(100vw - 40px); right: 20px; left: 20px; bottom: 170px; }
         }
-
-        .image-manager-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 0;
-            margin: 0;
-        }
-
-        .image-manager-content {
-            padding: 15px;
-            max-height: 480px;
-            overflow-y: auto;
-        }
-
-        .image-manager-section {
-            margin-bottom: 20px;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 15px;
-        }
-
-        .image-manager-section h4 {
-            color: #0a2b4e;
-            margin-bottom: 10px;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .image-manager-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-        }
-
-        .image-manager-item {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s ease;
-        }
-
-        .image-manager-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .image-manager-item img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 8px;
-        }
-
-        .image-manager-item .item-name {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #0a2b4e;
-            margin-bottom: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .image-manager-item .item-type {
-            font-size: 0.6rem;
-            color: #64748b;
-        }
-
-        .image-manager-actions {
-            margin-top: 8px;
-        }
-
-        .btn-upload-sm {
-            background: #f59e0b;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .btn-upload-sm:hover {
-            background: #d97706;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 30px;
-            color: #64748b;
-        }
-
-        @media (max-width: 600px) {
-            .image-manager-panel {
-                width: calc(100vw - 40px);
-                right: 20px;
-                left: 20px;
-                bottom: 170px;
-            }
-        }
-
     </style>
 </head>
 <body>
@@ -368,23 +172,6 @@
                     <button class="warning" onclick="openBroadcastModal()"><i class="fas fa-bullhorn"></i> Broadcast</button>
                     <span class="session-timer" id="sessionTimer"><i class="fas fa-clock"></i> Session: 5:00</span>
                     <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                </div>
-            </div>
-
-            <!-- Image Manager Toggle Button -->
-            <div class="image-manager-toggle" onclick="toggleImageManager()">
-                <i class="fas fa-images"></i>
-                <span>Image Manager</span>
-            </div>
-
-            <!-- Image Manager Panel (Hidden by default) -->
-            <div id="imageManagerPanel" class="image-manager-panel" style="display: none;">
-                <div class="image-manager-header">
-                    <span><i class="fas fa-images"></i> Image Manager</span>
-                    <button onclick="toggleImageManager()" class="image-manager-close">&times;</button>
-                </div>
-                <div id="imageManagerContent" class="image-manager-content">
-                    <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading images...</div>
                 </div>
             </div>
             
@@ -454,62 +241,10 @@
                 <div id="ownersList" class="grid-2"></div>
             </div>
             
-            <!-- ACTIVITY LOG WITH MANAGEMENT -->
+            <!-- ACTIVITY LOG -->
             <div class="section-card">
-                <div class="section-title">
-                    <i class="fas fa-list-check"></i> ACTIVITY LOG MANAGEMENT
-                    <span style="font-size: 0.7rem; background: #eef2ff; padding: 2px 8px; border-radius: 20px; margin-left: 0.5rem;">
-                        <i class="fas fa-chart-line"></i> Real-time
-                    </span>
-                </div>
-                
-                <!-- Filter Bar -->
-                <div class="filter-bar">
-                    <div class="filter-group">
-                        <label><i class="fas fa-user-tag"></i> Filter by Role</label>
-                        <select id="logFilterRole">
-                            <option value="all">All Roles</option>
-                            <option value="super_admin">👑 Super Admin</option>
-                            <option value="property_admin">🏢 Property Admin</option>
-                            <option value="worker">👷 Worker</option>
-                            <option value="owner">👤 Property Owner</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label><i class="fas fa-building"></i> Filter by Property</label>
-                        <select id="logFilterProperty">
-                            <option value="all">All Properties</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label><i class="fas fa-calendar-alt"></i> Date From</label>
-                        <input type="date" id="logDateFrom">
-                    </div>
-                    <div class="filter-group">
-                        <label><i class="fas fa-calendar-alt"></i> Date To</label>
-                        <input type="date" id="logDateTo">
-                    </div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.5rem;">
-                    <button onclick="printActivityLogs()" style="background: #2c7be5;"><i class="fas fa-print"></i> Print Logs</button>
-                    <button onclick="exportActivityLogsToCSV()" style="background: #10b981;"><i class="fas fa-file-excel"></i> Export CSV</button>
-                    <button onclick="manualDeleteOldActivityLogs()" class="danger"><i class="fas fa-trash"></i> Delete Old Logs</button>
-                    <button onclick="refreshActivityLogs()" style="background: #6c757d;"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-                
-                <!-- Activity Log List with Icons -->
-                <div id="activityLogList" style="max-height: 500px; overflow-y: auto;">
-                    <div class="activity-item" style="text-align: center;">
-                        <i class="fas fa-spinner fa-spin"></i> Loading activities...
-                    </div>
-                </div>
-                
-                <!-- Last Cleanup Info -->
-                <div id="cleanupInfo" style="margin-top: 1rem; font-size: 0.7rem; color: #94a3b8; text-align: center; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
-                    <i class="fas fa-info-circle"></i> Activity logs are automatically saved. Use the delete button to remove old logs.
-                </div>
+                <div class="section-title"><i class="fas fa-list-check"></i> ACTIVITY LOG</div>
+                <div id="activityLogList"></div>
             </div>
         </div>
     </div>
@@ -540,24 +275,6 @@
             <div style="display:flex; gap:0.8rem; margin-top:1rem;">
                 <button onclick="sendBroadcast()" style="background:#25D366;"><i class="fab fa-whatsapp"></i> Send Broadcast</button>
                 <button onclick="closeBroadcastModal()"><i class="fas fa-times"></i> Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Property Modal -->
-    <div id="editPropertyModal" class="modal">
-        <div class="modal-content">
-            <h3><i class="fas fa-edit"></i> Edit Property</h3>
-            <div class="form-row"><input type="text" id="editPropertyName" placeholder="Property Name"></div>
-            <div class="form-row"><input type="text" id="editPropertyLocation" placeholder="Location"></div>
-            <div class="form-row"><input type="text" id="editOwnerName" placeholder="Owner Name"></div>
-            <div class="form-row"><input type="text" id="editOwnerPhone" placeholder="Owner Phone"></div>
-            <div class="form-row"><input type="password" id="editOwnerPassword" placeholder="Owner Password (reset)"></div>
-            <div class="form-row"><select id="editAdminSelect"><option value="">-- Assign to Admin --</option></select></div>
-            <input type="hidden" id="editPropertyId">
-            <div style="display:flex; gap:0.8rem; margin-top:1rem;">
-                <button onclick="savePropertyEdit()" class="success"><i class="fas fa-save"></i> Save Changes</button>
-                <button onclick="closeEditPropertyModal()"><i class="fas fa-times"></i> Cancel</button>
             </div>
         </div>
     </div>
@@ -647,6 +364,20 @@
         </div>
     </div>
 
+    <!-- Image Manager Toggle -->
+    <div class="image-manager-toggle" onclick="toggleImageManager()">
+        <i class="fas fa-images"></i> Image Manager
+    </div>
+    <div id="imageManagerPanel" class="image-manager-panel" style="display: none;">
+        <div class="image-manager-header">
+            <span><i class="fas fa-images"></i> Image Manager</span>
+            <button onclick="toggleImageManager()" class="image-manager-close">&times;</button>
+        </div>
+        <div id="imageManagerContent" class="image-manager-content">
+            <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading images...</div>
+        </div>
+    </div>
+
     <footer class="main-footer">
         <div class="phones">
             <p><i class="fas fa-phone-alt"></i> <strong>MTN: 0794115704</strong></p>
@@ -681,233 +412,11 @@
         let currentTransferAdminId = null;
         let currentTransferAdminName = null;
         
-        // ============ HELPER FUNCTIONS ============
-        
         function escapeHtml(text) {
             if (!text) return '';
             return String(text).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
         }
         
-        function getActivityIcon(action) {
-            if (action.includes('payment')) return '<i class="fas fa-money-bill-wave" style="color: #10b981;"></i>';
-            if (action.includes('remittance')) return '<i class="fas fa-paper-plane" style="color: #8b5cf6;"></i>';
-            if (action.includes('bill')) return '<i class="fas fa-receipt" style="color: #f59e0b;"></i>';
-            if (action.includes('room')) return '<i class="fas fa-door-open" style="color: #2c7be5;"></i>';
-            if (action.includes('tenant')) return '<i class="fas fa-user" style="color: #10b981;"></i>';
-            if (action.includes('property')) return '<i class="fas fa-building" style="color: #0a2b4e;"></i>';
-            if (action.includes('worker')) return '<i class="fas fa-hard-hat" style="color: #f59e0b;"></i>';
-            if (action.includes('admin')) return '<i class="fas fa-user-shield" style="color: #8b5cf6;"></i>';
-            if (action.includes('broadcast')) return '<i class="fas fa-bullhorn" style="color: #ec489a;"></i>';
-            if (action.includes('approval')) return '<i class="fas fa-check-circle" style="color: #10b981;"></i>';
-            if (action.includes('reject')) return '<i class="fas fa-times-circle" style="color: #dc2626;"></i>';
-            return '<i class="fas fa-bell" style="color: #6c757d;"></i>';
-        }
-        
-        // ============ IMAGE MANAGER FUNCTIONS ============
-
-        let imageManagerExpanded = false;
-
-        function toggleImageManager() {
-            const panel = document.getElementById('imageManagerPanel');
-            if (!panel) return;
-
-            if (imageManagerExpanded) {
-                panel.style.display = 'none';
-                imageManagerExpanded = false;
-            } else {
-                panel.style.display = 'block';
-                imageManagerExpanded = true;
-                loadImageManagerContent();
-            }
-        }
-
-        async function loadImageManagerContent() {
-            const container = document.getElementById('imageManagerContent');
-            if (!container) return;
-
-            container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading images...</div>';
-
-            try {
-                const { data: properties } = await window.supabaseClient
-                    .from('properties')
-                    .select('id, name, property_image, data');
-
-                const { data: admins } = await window.supabaseClient
-                    .from('users')
-                    .select('id, full_name, photo_url')
-                    .eq('role', 'property_admin');
-
-                const { data: workers } = await window.supabaseClient
-                    .from('users')
-                    .select('id, full_name, photo_url')
-                    .eq('role', 'worker');
-
-                let html = '';
-
-                html += `<div class="image-manager-section">
-                    <h4><i class="fas fa-building"></i> Properties</h4>
-                    <div class="image-manager-grid">`;
-
-                for (let prop of (properties || [])) {
-                    html += `
-                        <div class="image-manager-item">
-                            <img src="${prop.property_image || 'https://placehold.co/80x80?text=No+Image'}" onerror="this.src='https://placehold.co/80x80?text=No+Image'">
-                            <div class="item-name">${escapeHtml((prop.name || '').substring(0, 20))}</div>
-                            <div class="item-type">Property</div>
-                            <div class="image-manager-actions">
-                                <button class="btn-upload-sm" onclick="uploadImageFor('property', '${prop.id}', 'property_image')"><i class="fas fa-upload"></i> Upload</button>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                html += `</div></div>`;
-
-                html += `<div class="image-manager-section">
-                    <h4><i class="fas fa-user-shield"></i> Property Admins</h4>
-                    <div class="image-manager-grid">`;
-
-                for (let admin of (admins || [])) {
-                    html += `
-                        <div class="image-manager-item">
-                            <img src="${admin.photo_url || 'https://placehold.co/80x80?text=No+Photo'}" onerror="this.src='https://placehold.co/80x80?text=No+Photo'">
-                            <div class="item-name">${escapeHtml((admin.full_name || '').substring(0, 20))}</div>
-                            <div class="item-type">Admin</div>
-                            <div class="image-manager-actions">
-                                <button class="btn-upload-sm" onclick="uploadImageFor('admin', '${admin.id}', 'photo_url')"><i class="fas fa-upload"></i> Upload</button>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                html += `</div></div>`;
-
-                html += `<div class="image-manager-section">
-                    <h4><i class="fas fa-hard-hat"></i> Workers</h4>
-                    <div class="image-manager-grid">`;
-
-                for (let worker of (workers || [])) {
-                    html += `
-                        <div class="image-manager-item">
-                            <img src="${worker.photo_url || 'https://placehold.co/80x80?text=No+Photo'}" onerror="this.src='https://placehold.co/80x80?text=No+Photo'">
-                            <div class="item-name">${escapeHtml((worker.full_name || '').substring(0, 20))}</div>
-                            <div class="item-type">Worker</div>
-                            <div class="image-manager-actions">
-                                <button class="btn-upload-sm" onclick="uploadImageFor('worker', '${worker.id}', 'photo_url')"><i class="fas fa-upload"></i> Upload</button>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                html += `</div></div>`;
-
-                html += `<div class="image-manager-section">
-                    <h4><i class="fas fa-door-open"></i> Room Images</h4>
-                    <div class="image-manager-grid">`;
-
-                for (let prop of (properties || [])) {
-                    const units = prop.data?.units || [];
-                    for (let i = 0; i < units.length; i++) {
-                        const room = units[i];
-                        const roomImages = room?.roomImages || [];
-                        if (roomImages.length > 0) {
-                            html += `
-                                <div class="image-manager-item">
-                                    <img src="${roomImages[0] || 'https://placehold.co/80x80?text=No+Image'}" onerror="this.src='https://placehold.co/80x80?text=No+Image'">
-                                    <div class="item-name">${escapeHtml(prop.name)} - ${escapeHtml(room.roomNumber)}</div>
-                                    <div class="item-type">Room</div>
-                                    <div class="image-manager-actions">
-                                        <button class="btn-upload-sm" onclick="uploadRoomImagesFromManager('${prop.id}', ${i})"><i class="fas fa-plus"></i> Add</button>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                    }
-                }
-
-                html += `</div></div>`;
-
-                container.innerHTML = html;
-            } catch (err) {
-                console.error('Error loading image manager:', err);
-                container.innerHTML = '<div class="loading-spinner" style="color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> Error loading images</div>';
-            }
-        }
-
-        async function uploadImageFor(type, id, field) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = async function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = async function(event) {
-                    const imageData = event.target.result;
-
-                    if (type === 'property') {
-                        await window.supabaseClient
-                            .from('properties')
-                            .update({ [field]: imageData })
-                            .eq('id', id);
-                    } else {
-                        await window.supabaseClient
-                            .from('users')
-                            .update({ [field]: imageData })
-                            .eq('id', id);
-                    }
-
-                    alert('✅ Image updated successfully!');
-                    loadImageManagerContent();
-                };
-                reader.readAsDataURL(file);
-            };
-            input.click();
-        }
-
-        async function uploadRoomImagesFromManager(propertyId, roomIndex) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
-            input.onchange = async function(e) {
-                const files = e.target.files;
-                if (!files || files.length === 0) return;
-
-                const { data: property } = await window.supabaseClient
-                    .from('properties')
-                    .select('data')
-                    .eq('id', propertyId)
-                    .single();
-
-                let propertyData = property?.data || { units: [] };
-                if (!propertyData.units[roomIndex].roomImages) {
-                    propertyData.units[roomIndex].roomImages = [];
-                }
-
-                for (let file of files) {
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        const imageData = await new Promise((resolve) => {
-                            reader.onload = () => resolve(reader.result);
-                            reader.readAsDataURL(file);
-                        });
-                        propertyData.units[roomIndex].roomImages.push(imageData);
-                    }
-                }
-
-                await window.supabaseClient
-                    .from('properties')
-                    .update({ data: propertyData })
-                    .eq('id', propertyId);
-
-                alert('✅ Images added to room!');
-                loadImageManagerContent();
-            };
-            input.click();
-        }
-
         // ============ SESSION MANAGEMENT ============
         
         function checkAdminSession() {
@@ -963,37 +472,9 @@
         
         // ============ LOAD DATA ============
         
-        async function loadSuperAdminData() {
-            if (!checkAdminSession()) return;
-            const userName = localStorage.getItem('battetech_user_name') || 'Super Admin';
-            document.getElementById('adminName').innerText = userName;
-            const events = ['click', 'keypress', 'scroll', 'mousemove', 'touchstart'];
-            events.forEach(event => document.addEventListener(event, resetInactivityTimer));
-            startTimer();
-            await getSuperAdminId();
-            await loadAllDataForBroadcast();
-            await loadMyProperties();
-            await loadAdmins();
-            await loadAllWorkers();
-            await loadOwners();
-            await loadPendingHistoryRequests();
-            await loadPendingBroadcastApprovals();
-            await populateSelects();
-            await initNotificationSystem();
-            await loadAllActivities();
-            await populatePropertyFilter();
-            initChatPanel();
-        }
-        
         async function getSuperAdminId() {
-            const { data, error } = await window.supabaseClient
-                .from('users')
-                .select('id')
-                .eq('role', 'super_admin')
-                .single();
-            if (!error && data) {
-                superAdminId = data.id;
-            }
+            const { data, error } = await window.supabaseClient.from('users').select('id').eq('role', 'super_admin').single();
+            if (!error && data) superAdminId = data.id;
             return superAdminId;
         }
         
@@ -1025,11 +506,8 @@
                             balance: isPaid ? 0 : (payment.balance || room.rentAmount)
                         };
                         allTenantsList.push(tenantInfo);
-                        if (!isPaid) {
-                            unpaidTenantsList.push(tenantInfo);
-                        } else {
-                            paidTenantsList.push(tenantInfo);
-                        }
+                        if (!isPaid) unpaidTenantsList.push(tenantInfo);
+                        else paidTenantsList.push(tenantInfo);
                     }
                 }
             }
@@ -1048,12 +526,6 @@
                 propertySelect.innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
             });
             
-            const editAdminSelect = document.getElementById('editAdminSelect');
-            editAdminSelect.innerHTML = '<option value="">-- Unassigned --</option>';
-            allPropertyAdmins.forEach(admin => {
-                editAdminSelect.innerHTML += `<option value="${admin.id}">${escapeHtml(admin.full_name)}</option>`;
-            });
-            
             const editWorkerPropSelect = document.getElementById('editWorkerPropertySelect');
             editWorkerPropSelect.innerHTML = '<option value="">-- Select Property --</option>';
             allProperties.forEach(prop => {
@@ -1061,14 +533,25 @@
             });
         }
         
-        async function populatePropertyFilter() {
-            const select = document.getElementById('logFilterProperty');
-            if (select) {
-                select.innerHTML = '<option value="all">All Properties</option>';
-                allProperties.forEach(prop => {
-                    select.innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
-                });
-            }
+        async function loadSuperAdminData() {
+            if (!checkAdminSession()) return;
+            const userName = localStorage.getItem('battetech_user_name') || 'Super Admin';
+            document.getElementById('adminName').innerText = userName;
+            const events = ['click', 'keypress', 'scroll', 'mousemove', 'touchstart'];
+            events.forEach(event => document.addEventListener(event, resetInactivityTimer));
+            startTimer();
+            await getSuperAdminId();
+            await loadAllDataForBroadcast();
+            await loadMyProperties();
+            await loadAdmins();
+            await loadAllWorkers();
+            await loadOwners();
+            await loadPendingHistoryRequests();
+            await loadPendingBroadcastApprovals();
+            await populateSelects();
+            await initNotificationSystem();
+            await loadAllActivities();
+            initChatPanel();
         }
         
         // ============ PENDING HISTORY ACCESS REQUESTS ============
@@ -1076,20 +559,13 @@
         async function loadPendingHistoryRequests() {
             const requests = await getPendingHistoryAccessRequests();
             const container = document.getElementById('pendingHistoryRequests');
-            
             if (!requests || requests.length === 0) {
                 container.innerHTML = '<div class="approval-card">No pending history access requests.</div>';
                 return;
             }
-            
             let html = '';
             for (let req of requests) {
-                const { data: property } = await window.supabaseClient
-                    .from('properties')
-                    .select('name')
-                    .eq('id', req.property_id)
-                    .single();
-                
+                const { data: property } = await window.supabaseClient.from('properties').select('name').eq('id', req.property_id).single();
                 html += `<div class="approval-card" style="border-left-color:#8b5cf6;">
                     <div><strong><i class="fas fa-history"></i> HISTORY ACCESS REQUEST</strong></div>
                     <div><i class="fas fa-user"></i> Requester: ${escapeHtml(req.requester_name)}</div>
@@ -1106,27 +582,19 @@
         
         async function approveHistoryAccessRequest(requestId) {
             const success = await approveHistoryAccess(requestId, superAdminId);
-            if (success) {
-                alert('✅ History access approved for 24 hours');
-                await loadPendingHistoryRequests();
-            } else {
-                alert('Failed to approve request');
-            }
+            if (success) { alert('✅ History access approved for 24 hours'); await loadPendingHistoryRequests(); }
+            else alert('Failed to approve request');
         }
         
         async function rejectHistoryAccessRequest(requestId) {
             const reason = prompt('Reason for rejection:');
             if (!reason) return;
             const success = await rejectHistoryAccess(requestId, superAdminId, reason);
-            if (success) {
-                alert('❌ History access rejected');
-                await loadPendingHistoryRequests();
-            } else {
-                alert('Failed to reject request');
-            }
+            if (success) { alert('❌ History access rejected'); await loadPendingHistoryRequests(); }
+            else alert('Failed to reject request');
         }
         
-        // ============ MY PROPERTIES ============
+        // ============ ALL PROPERTIES ============
         
         async function loadMyProperties() {
             const { data: properties, error } = await window.supabaseClient.from('properties').select('*').order('created_at', { ascending: false });
@@ -1156,7 +624,7 @@
                     <div><i class="fas fa-coins"></i> Collected This Month: UGX ${financials.currentMonthCollected.toLocaleString()} | <i class="fas fa-hourglass-half"></i> Pending: UGX ${financials.currentMonthPending.toLocaleString()}</div>
                     <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
                         <button onclick="goToPropertyDetail('${prop.id}')" style="font-size:0.7rem; background:#10b981;"><i class="fas fa-eye"></i> Manage Property</button>
-                        <button onclick="openEditPropertyModal('${prop.id}', '${escapeHtml(prop.name)}', '${escapeHtml(prop.location)}', '${escapeHtml(prop.owner_name || '')}', '${escapeHtml(prop.owner_phone || '')}', '${escapeHtml(prop.owner_password || '')}', '${prop.admin_id || ''}')" class="warning" style="font-size:0.7rem;"><i class="fas fa-edit"></i> Edit Property</button>
+                        <button onclick="openEditPropertyModal('${prop.id}', '${escapeHtml(prop.name)}', '${escapeHtml(prop.location)}', '${escapeHtml(prop.owner_name || '')}', '${escapeHtml(prop.owner_phone || '')}', '${escapeHtml(prop.owner_password || '')}', '${prop.admin_id || ''}', '${prop.management_fee || 5}')" class="warning" style="font-size:0.7rem;"><i class="fas fa-edit"></i> Edit Property</button>
                         <button onclick="deleteProperty('${prop.id}', '${escapeHtml(prop.name)}')" class="danger" style="font-size:0.7rem;"><i class="fas fa-trash"></i> Delete</button>
                     </div>
                 </div>`;
@@ -1169,32 +637,117 @@
             window.location.href = 'admin-property-detail.html';
         }
         
-        // ============ DELETE PROPERTY (FIXED WITH CASCADE) ============
+        // ============ EDIT PROPERTY MODAL (WITH FEE) ============
         
-        async function deleteProperty(propertyId, propertyName) {
-            if (!confirm(`⚠️ DELETE "${propertyName}" PERMANENTLY?\n\nThis will remove ALL data including rooms, tenants, payments, and statements.\n\nThis action CANNOT be undone!`)) {
-                return;
-            }
+        function openEditPropertyModal(propertyId, name, location, ownerName, ownerPhone, ownerPassword, adminId, currentFee) {
+            const modalHtml = `
+                <div id="editPropertyModal" class="modal" style="display:flex; z-index:3000;">
+                    <div class="modal-content">
+                        <h3><i class="fas fa-edit"></i> Edit Property</h3>
+                        <input type="hidden" id="editPropertyId" value="${propertyId}">
+                        <div class="form-row">
+                            <input type="text" id="editPropertyName" placeholder="Property Name" value="${escapeHtml(name)}">
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="editPropertyLocation" placeholder="Location" value="${escapeHtml(location)}">
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="editOwnerName" placeholder="Owner Name" value="${escapeHtml(ownerName)}">
+                            <input type="text" id="editOwnerPhone" placeholder="Owner Phone" value="${escapeHtml(ownerPhone)}">
+                        </div>
+                        <div class="form-row">
+                            <input type="password" id="editOwnerPassword" placeholder="New Owner Password (leave blank to keep same)">
+                        </div>
+                        <div class="form-row">
+                            <label><i class="fas fa-percent"></i> Management Fee (%)</label>
+                            <input type="number" id="editManagementFee" placeholder="Management Fee (%)" step="0.5" value="${currentFee}">
+                        </div>
+                        <div class="form-row">
+                            <select id="editAdminSelect">
+                                <option value="">-- Assign to Admin --</option>
+                                ${allPropertyAdmins.map(admin => `<option value="${admin.id}" ${admin.id === adminId ? 'selected' : ''}>${escapeHtml(admin.full_name)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:8px;">
+                            <small><i class="fas fa-shield-alt"></i> Changes will be applied immediately.</small>
+                        </div>
+                        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+                            <button onclick="savePropertyEdit()" class="success"><i class="fas fa-save"></i> Save Changes</button>
+                            <button onclick="closeEditPropertyModal()"><i class="fas fa-times"></i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            const existingModal = document.getElementById('editPropertyModal');
+            if (existingModal) existingModal.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        async function savePropertyEdit() {
+            const propertyId = document.getElementById('editPropertyId').value;
+            const newName = document.getElementById('editPropertyName').value.trim();
+            const newLocation = document.getElementById('editPropertyLocation').value.trim();
+            const newOwnerName = document.getElementById('editOwnerName').value.trim();
+            const newOwnerPhone = document.getElementById('editOwnerPhone').value.trim();
+            const newOwnerPassword = document.getElementById('editOwnerPassword').value;
+            const newManagementFee = parseFloat(document.getElementById('editManagementFee').value);
+            const newAdminId = document.getElementById('editAdminSelect').value;
             
-            const confirmText = prompt(`Type "DELETE ${propertyName.toUpperCase()}" to confirm:`);
-            if (confirmText !== `DELETE ${propertyName.toUpperCase()}`) {
-                alert('Deletion cancelled.');
-                return;
-            }
+            if (!newName || !newLocation) { alert('Property Name and Location are required'); return; }
+            if (isNaN(newManagementFee) || newManagementFee < 0) { alert('Please enter a valid management fee percentage'); return; }
+            if (!confirm(`Save changes to "${newName}"?`)) return;
             
             try {
-                // Delete related records first
+                const updateData = {
+                    name: newName,
+                    location: newLocation,
+                    owner_name: newOwnerName,
+                    owner_phone: newOwnerPhone,
+                    management_fee: newManagementFee,
+                    admin_id: newAdminId || null,
+                    updated_at: new Date().toISOString()
+                };
+                if (newOwnerPassword && newOwnerPassword.trim() !== '') updateData.owner_password = newOwnerPassword;
+                
+                const { error } = await window.supabaseClient.from('properties').update(updateData).eq('id', propertyId);
+                if (error) throw error;
+                
+                alert(`✅ Property "${newName}" updated successfully!\nManagement Fee: ${newManagementFee}%`);
+                closeEditPropertyModal();
+                await loadMyProperties();
+                await loadAdmins();
+                await loadOwners();
+                await loadAllDataForBroadcast();
+                await populateSelects();
+                await addActivityLog('property_updated', `Updated property: ${newName} (Fee: ${newManagementFee}%)`, propertyId);
+            } catch (err) {
+                console.error("Error updating property:", err);
+                alert('❌ Error: ' + err.message);
+            }
+        }
+        
+        function closeEditPropertyModal() {
+            const modal = document.getElementById('editPropertyModal');
+            if (modal) modal.remove();
+        }
+        
+        // ============ DELETE PROPERTY ============
+        
+        async function deleteProperty(propertyId, propertyName) {
+            if (!confirm(`⚠️ DELETE "${propertyName}" PERMANENTLY?\n\nThis will remove ALL data including rooms, tenants, payments, and statements.\n\nThis action CANNOT be undone!`)) return;
+            const confirmText = prompt(`Type "DELETE ${propertyName.toUpperCase()}" to confirm:`);
+            if (confirmText !== `DELETE ${propertyName.toUpperCase()}`) { alert('Deletion cancelled.'); return; }
+            
+            try {
                 await window.supabaseClient.from('approval_requests').delete().eq('property_id', propertyId);
                 await window.supabaseClient.from('activity_logs').delete().eq('property_id', propertyId);
                 await window.supabaseClient.from('updates').delete().eq('property_id', propertyId);
                 await window.supabaseClient.from('messages').delete().eq('property_id', propertyId);
                 await window.supabaseClient.from('notes').delete().eq('property_id', propertyId);
                 
-                // Delete property
                 const { error } = await window.supabaseClient.from('properties').delete().eq('id', propertyId);
                 if (error) throw error;
                 
-                // Remove from local caches
                 delete propertiesDB[propertyId];
                 allProperties = allProperties.filter(p => p.id !== propertyId);
                 ownersDB = ownersDB.filter(o => o.propertyId !== propertyId);
@@ -1207,55 +760,13 @@
                 await loadOwners();
                 await loadAllDataForBroadcast();
                 await populateSelects();
-                await populatePropertyFilter();
-                
                 alert(`✅ Property "${propertyName}" has been permanently deleted.`);
                 setTimeout(() => location.reload(), 1500);
-                
             } catch (err) {
                 console.error('Error deleting property:', err);
                 alert('❌ Error: ' + err.message);
             }
         }
-        
-        // ============ EDIT PROPERTY ============
-        
-        function openEditPropertyModal(propertyId, name, location, ownerName, ownerPhone, ownerPassword, adminId) {
-            document.getElementById('editPropertyId').value = propertyId;
-            document.getElementById('editPropertyName').value = name;
-            document.getElementById('editPropertyLocation').value = location;
-            document.getElementById('editOwnerName').value = ownerName;
-            document.getElementById('editOwnerPhone').value = ownerPhone;
-            document.getElementById('editOwnerPassword').value = '';
-            document.getElementById('editAdminSelect').value = adminId || '';
-            document.getElementById('editPropertyModal').style.display = 'flex';
-        }
-        
-        async function savePropertyEdit() {
-            const propertyId = document.getElementById('editPropertyId').value;
-            const updateData = {
-                name: document.getElementById('editPropertyName').value,
-                location: document.getElementById('editPropertyLocation').value,
-                owner_name: document.getElementById('editOwnerName').value,
-                owner_phone: document.getElementById('editOwnerPhone').value,
-                admin_id: document.getElementById('editAdminSelect').value || null
-            };
-            const newPassword = document.getElementById('editOwnerPassword').value;
-            if (newPassword) updateData.owner_password = newPassword;
-            
-            const { error } = await window.supabaseClient.from('properties').update(updateData).eq('id', propertyId);
-            if (error) alert('Failed: ' + error.message);
-            else {
-                alert('✅ Property updated');
-                closeEditPropertyModal();
-                await loadMyProperties();
-                await loadOwners();
-                await loadAllDataForBroadcast();
-                await addActivityLog('property_updated', `Updated property: ${updateData.name}`, propertyId);
-            }
-        }
-        
-        function closeEditPropertyModal() { document.getElementById('editPropertyModal').style.display = 'none'; }
         
         // ============ ADMINS LIST ============
         
@@ -1274,13 +785,13 @@
                     <div><span class="admin-name"><i class="fas fa-user-shield"></i> ${escapeHtml(admin.full_name)}</span></div>
                     <div><i class="fas fa-phone"></i> ${admin.phone || '-'}</div>
                     <div><i class="fas fa-key"></i> Password: <span class="password-badge">${escapeHtml(admin.password_hash || 'N/A')}</span></div>
-                    <div class="${admin.status === 'frozen' ? 'status-frozen' : 'status-active'}">${admin.status === 'frozen' ? '<i class="fas fa-snowflake"></i> FROZEN' : '<i class="fas fa-check-circle"></i> ACTIVE'}</div>
+                    <div>${admin.status === 'frozen' ? '<i class="fas fa-snowflake"></i> FROZEN' : '<i class="fas fa-check-circle"></i> ACTIVE'}</div>
                     <div style="margin-top:8px;">
                         <button onclick="event.stopPropagation(); openEditAdminModal('${admin.id}', '${escapeHtml(admin.full_name)}', '${admin.phone || ''}', '${escapeHtml(admin.password_hash || '')}')" class="warning small"><i class="fas fa-edit"></i> Edit</button>
                         <button onclick="event.stopPropagation(); freezeAdmin('${admin.id}', '${admin.status}')" class="warning small">${admin.status === 'frozen' ? '<i class="fas fa-sun"></i> Unfreeze' : '<i class="fas fa-snowflake"></i> Freeze'}</button>
                         <button onclick="event.stopPropagation(); openTransferAdminModal('${admin.id}', '${escapeHtml(admin.full_name)}')" class="transfer-btn small"><i class="fas fa-exchange-alt"></i> Transfer</button>
                     </div>
-                    <div id="admin-details-${admin.id}" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #ddd;">
+                    <div id="admin-details-${admin.id}" style="display:none; margin-top:10px;">
                         <strong><i class="fas fa-building"></i> Properties (${properties?.length || 0}):</strong> ${properties?.map(p => `<div>• ${escapeHtml(p.name)}</div>`).join('') || 'None'}
                         <strong><i class="fas fa-hard-hat"></i> Workers (${workers?.length || 0}):</strong> ${workers?.map(w => `<div>• ${escapeHtml(w.full_name)} (${w.status === 'frozen' ? 'Frozen' : 'Active'}) <i class="fas fa-key"></i> ${escapeHtml(w.password_hash || 'N/A')}</div>`).join('') || 'None'}
                     </div>
@@ -1294,7 +805,15 @@
             if (details) details.style.display = details.style.display === 'none' ? 'block' : 'none';
         }
         
-        // ============ EDIT ADMIN ============
+        async function freezeAdmin(adminId, currentStatus) {
+            const newStatus = currentStatus === 'frozen' ? 'active' : 'frozen';
+            if (confirm(`${newStatus === 'frozen' ? 'FREEZE' : 'UNFREEZE'} this admin?`)) {
+                await window.supabaseClient.from('users').update({ status: newStatus }).eq('id', adminId);
+                alert(`✅ Admin ${newStatus === 'frozen' ? 'frozen' : 'unfrozen'}`);
+                await loadAdmins();
+                await addActivityLog('admin_status_changed', `${newStatus === 'frozen' ? 'Froze' : 'Unfroze'} admin`);
+            }
+        }
         
         function openEditAdminModal(adminId, name, phone, passwordHash) {
             document.getElementById('editAdminId').value = adminId;
@@ -1310,15 +829,11 @@
             const newName = document.getElementById('editAdminName').value.trim();
             const newPhone = document.getElementById('editAdminPhone').value.trim();
             const newPassword = document.getElementById('editAdminPassword').value;
-            
             if (!newName) { alert('Admin name is required'); return; }
-            
             const updateData = { full_name: newName, phone: newPhone, updated_at: new Date().toISOString() };
-            if (newPassword && newPassword.trim() !== '') { updateData.password_hash = newPassword; }
-            
+            if (newPassword && newPassword.trim() !== '') updateData.password_hash = newPassword;
             const { error } = await window.supabaseClient.from('users').update(updateData).eq('id', adminId);
             if (error) { alert('Failed: ' + error.message); return; }
-            
             alert('✅ Admin updated successfully!');
             closeEditAdminModal();
             await loadAdmins();
@@ -1327,20 +842,6 @@
         
         function closeEditAdminModal() {
             document.getElementById('editAdminModal').style.display = 'none';
-            document.getElementById('editAdminId').value = '';
-            document.getElementById('editAdminName').value = '';
-            document.getElementById('editAdminPhone').value = '';
-            document.getElementById('editAdminPassword').value = '';
-        }
-        
-        async function freezeAdmin(adminId, currentStatus) {
-            const newStatus = currentStatus === 'frozen' ? 'active' : 'frozen';
-            if (confirm(`${newStatus === 'frozen' ? 'FREEZE' : 'UNFREEZE'} this admin?`)) {
-                await window.supabaseClient.from('users').update({ status: newStatus }).eq('id', adminId);
-                alert(`✅ Admin ${newStatus === 'frozen' ? 'frozen' : 'unfrozen'}`);
-                await loadAdmins();
-                await addActivityLog('admin_status_changed', `${newStatus === 'frozen' ? 'Froze' : 'Unfroze'} admin`);
-            }
         }
         
         async function createPropertyAdmin() {
@@ -1365,19 +866,10 @@
         async function assignAdminToProperty() {
             const adminId = document.getElementById('assignAdminSelect').value;
             const propertyId = document.getElementById('assignPropertySelect').value;
-            
-            if (!adminId || !propertyId) {
-                alert('Please select both an admin and a property');
-                return;
-            }
-            
+            if (!adminId || !propertyId) { alert('Please select both an admin and a property'); return; }
             const { error } = await window.supabaseClient.from('properties').update({ admin_id: adminId }).eq('id', propertyId);
             if (error) { alert('Failed: ' + error.message); }
-            else {
-                alert('✅ Admin assigned to property successfully');
-                await loadMyProperties();
-                await addActivityLog('admin_assigned', `Assigned admin to property`);
-            }
+            else { alert('✅ Admin assigned to property successfully'); await loadMyProperties(); await addActivityLog('admin_assigned', `Assigned admin to property`); }
         }
         
         // ============ TRANSFER WORKER ============
@@ -1386,19 +878,12 @@
             currentTransferWorkerId = workerId;
             currentTransferWorkerName = workerName;
             document.getElementById('transferWorkerName').innerText = workerName;
-            
             let adminOptions = '<option value="">-- Select New Admin --</option>';
             allPropertyAdmins.forEach(admin => {
-                if (admin.id !== currentAdminId) {
-                    adminOptions += `<option value="${admin.id}">${escapeHtml(admin.full_name)}</option>`;
-                }
+                if (admin.id !== currentAdminId) adminOptions += `<option value="${admin.id}">${escapeHtml(admin.full_name)}</option>`;
             });
-            
             let propertyOptions = '<option value="">-- Select New Property --</option>';
-            allProperties.forEach(prop => {
-                propertyOptions += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
-            });
-            
+            allProperties.forEach(prop => { propertyOptions += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`; });
             document.getElementById('newAdminSelect').innerHTML = adminOptions;
             document.getElementById('newPropertySelect').innerHTML = propertyOptions;
             document.getElementById('transferWorkerModal').style.display = 'flex';
@@ -1413,38 +898,17 @@
         async function confirmTransferWorker() {
             const newAdminId = document.getElementById('newAdminSelect').value;
             const newPropertyId = document.getElementById('newPropertySelect').value;
-            
-            if (!newAdminId || !newPropertyId) {
-                alert('Please select both a new admin and a new property');
-                return;
-            }
-            
+            if (!newAdminId || !newPropertyId) { alert('Please select both a new admin and a new property'); return; }
             const { data: worker } = await window.supabaseClient.from('users').select('parent_id, property_id, phone').eq('id', currentTransferWorkerId).single();
             const { data: oldAdmin } = await window.supabaseClient.from('users').select('full_name, phone').eq('id', worker.parent_id).single();
             const { data: newAdmin } = await window.supabaseClient.from('users').select('full_name, phone').eq('id', newAdminId).single();
             const { data: newProperty } = await window.supabaseClient.from('properties').select('name').eq('id', newPropertyId).single();
-            
             const { error } = await window.supabaseClient.from('users').update({ parent_id: newAdminId, property_id: newPropertyId, updated_at: new Date().toISOString() }).eq('id', currentTransferWorkerId);
             if (error) { alert('Transfer failed: ' + error.message); closeTransferModal(); return; }
-            
             const message = `🏢 BATTETECH - WORKER TRANSFER\n\nWorker: ${currentTransferWorkerName}\nTransferred from: ${oldAdmin?.full_name || 'Unknown'}\nTransferred to: ${newAdmin?.full_name}\nNew Property: ${newProperty?.name}`;
-            
-            if (worker.phone) {
-                let phone = worker.phone.replace(/\s/g, '');
-                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
-                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
-            }
-            if (oldAdmin?.phone) {
-                let phone = oldAdmin.phone.replace(/\s/g, '');
-                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
-                setTimeout(() => window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank'), 1500);
-            }
-            if (newAdmin?.phone) {
-                let phone = newAdmin.phone.replace(/\s/g, '');
-                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
-                setTimeout(() => window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank'), 3000);
-            }
-            
+            if (worker.phone) { let phone = worker.phone.replace(/\s/g, ''); if (phone.startsWith('0')) phone = '256' + phone.substring(1); window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank'); }
+            if (oldAdmin?.phone) { let phone = oldAdmin.phone.replace(/\s/g, ''); if (phone.startsWith('0')) phone = '256' + phone.substring(1); setTimeout(() => window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank'), 1500); }
+            if (newAdmin?.phone) { let phone = newAdmin.phone.replace(/\s/g, ''); if (phone.startsWith('0')) phone = '256' + phone.substring(1); setTimeout(() => window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank'), 3000); }
             await addActivityLog('worker_transferred', `Transferred worker ${currentTransferWorkerName} from ${oldAdmin?.full_name} to ${newAdmin?.full_name}`);
             alert(`✅ Worker ${currentTransferWorkerName} transferred successfully!`);
             closeTransferModal();
@@ -1457,13 +921,9 @@
             currentTransferAdminId = adminId;
             currentTransferAdminName = adminName;
             document.getElementById('transferAdminName').innerText = adminName;
-            
             let propertyOptions = '<option value="">-- Select Property --</option>';
-            allProperties.forEach(prop => {
-                propertyOptions += `<option value="${prop.id}">${escapeHtml(prop.name)} (Current: ${prop.admin_id === adminId ? 'Assigned' : 'Available'})</option>`;
-            });
+            allProperties.forEach(prop => { propertyOptions += `<option value="${prop.id}">${escapeHtml(prop.name)} (Current: ${prop.admin_id === adminId ? 'Assigned' : 'Available'})</option>`; });
             propertyOptions += `<option value="remove">-- Remove from All Properties --</option>`;
-            
             document.getElementById('adminPropertySelect').innerHTML = propertyOptions;
             document.getElementById('transferAdminModal').style.display = 'flex';
         }
@@ -1477,7 +937,6 @@
         async function confirmTransferAdmin() {
             const propertyValue = document.getElementById('adminPropertySelect').value;
             if (!propertyValue) { alert('Please select a property'); return; }
-            
             let message = '';
             if (propertyValue === 'remove') {
                 message = `Admin ${currentTransferAdminName} has been removed from all properties.`;
@@ -1486,14 +945,8 @@
                 const { data: property } = await window.supabaseClient.from('properties').select('name').eq('id', propertyValue).single();
                 message = `Admin ${currentTransferAdminName} has been assigned to property: ${property?.name}`;
             }
-            
             const { data: admin } = await window.supabaseClient.from('users').select('phone').eq('id', currentTransferAdminId).single();
-            if (admin?.phone) {
-                let phone = admin.phone.replace(/\s/g, '');
-                if (phone.startsWith('0')) phone = '256' + phone.substring(1);
-                window.open(`https://wa.me/${phone}?text=${encodeURIComponent('🏢 BATTETECH - ' + message)}`, '_blank');
-            }
-            
+            if (admin?.phone) { let phone = admin.phone.replace(/\s/g, ''); if (phone.startsWith('0')) phone = '256' + phone.substring(1); window.open(`https://wa.me/${phone}?text=${encodeURIComponent('🏢 BATTETECH - ' + message)}`, '_blank'); }
             await addActivityLog('admin_transferred', message);
             alert(`✅ ${message}`);
             closeAdminTransferModal();
@@ -1527,7 +980,7 @@
                     <div><i class="fas fa-key"></i> Password: <span class="password-badge">${escapeHtml(worker.password_hash || 'N/A')}</span></div>
                     <div><i class="fas fa-building"></i> Property: ${escapeHtml(propertyName)}</div>
                     <div><i class="fas fa-user-shield"></i> Admin: ${escapeHtml(adminName)}</div>
-                    <div class="${worker.status === 'frozen' ? 'status-frozen' : 'status-active'}">${worker.status === 'frozen' ? '<i class="fas fa-snowflake"></i> FROZEN' : '<i class="fas fa-check-circle"></i> ACTIVE'}</div>
+                    <div>${worker.status === 'frozen' ? '<i class="fas fa-snowflake"></i> FROZEN' : '<i class="fas fa-check-circle"></i> ACTIVE'}</div>
                     <div style="margin-top:8px;">
                         <button onclick="openTransferWorkerModal('${worker.id}', '${escapeHtml(worker.full_name)}', '${worker.parent_id || ''}', '${worker.property_id || ''}')" class="transfer-btn small"><i class="fas fa-exchange-alt"></i> Transfer</button>
                         <button onclick="openEditWorkerModal('${worker.id}', '${escapeHtml(worker.full_name)}', '${worker.phone || ''}', '${worker.property_id || ''}', '${escapeHtml(worker.password_hash || '')}')" class="warning small"><i class="fas fa-edit"></i> Edit</button>
@@ -1536,8 +989,6 @@
             }
             document.getElementById('allWorkersList').innerHTML = html;
         }
-        
-        // ============ EDIT WORKER ============
         
         function openEditWorkerModal(workerId, name, phone, propertyId, passwordHash) {
             document.getElementById('editWorkerId').value = workerId;
@@ -1555,15 +1006,11 @@
             const newPhone = document.getElementById('editWorkerPhone').value.trim();
             const newPassword = document.getElementById('editWorkerPassword').value;
             const newPropertyId = document.getElementById('editWorkerPropertySelect').value;
-            
             if (!newName) { alert('Worker name is required'); return; }
-            
             const updateData = { full_name: newName, phone: newPhone, property_id: newPropertyId || null, updated_at: new Date().toISOString() };
-            if (newPassword && newPassword.trim() !== '') { updateData.password_hash = newPassword; }
-            
+            if (newPassword && newPassword.trim() !== '') updateData.password_hash = newPassword;
             const { error } = await window.supabaseClient.from('users').update(updateData).eq('id', workerId);
             if (error) { alert('Failed: ' + error.message); return; }
-            
             alert('✅ Worker updated successfully!');
             closeEditWorkerModal();
             await loadAllWorkers();
@@ -1571,10 +1018,6 @@
         
         function closeEditWorkerModal() {
             document.getElementById('editWorkerModal').style.display = 'none';
-            document.getElementById('editWorkerId').value = '';
-            document.getElementById('editWorkerName').value = '';
-            document.getElementById('editWorkerPhone').value = '';
-            document.getElementById('editWorkerPassword').value = '';
         }
         
         // ============ PROPERTY OWNERS ============
@@ -1601,7 +1044,7 @@
             document.getElementById('ownersList').innerHTML = html;
         }
         
-        // ============ ACTIVITY LOG MANAGEMENT ============
+        // ============ ACTIVITY LOG ============
         
         async function loadAllActivities() {
             const { data, error } = await window.supabaseClient.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(100);
@@ -1610,148 +1053,17 @@
                 container.innerHTML = '<div class="activity-item"><i class="fas fa-info-circle"></i> No activities yet.</div>';
                 return;
             }
-            
             let html = '';
             for (let log of data) {
                 const date = new Date(log.created_at);
-                const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-                const iconHtml = getActivityIcon(log.action);
-                
                 html += `<div class="activity-item">
-                    <div style="display: flex; align-items: flex-start; gap: 10px;">
-                        <div class="activity-icon">${iconHtml}</div>
-                        <div style="flex: 1;">
-                            <div class="activity-date"><i class="fas fa-calendar-alt"></i> ${dateStr}</div>
-                            <div class="activity-user"><i class="fas fa-user"></i> ${escapeHtml(log.user_name || 'Unknown')} <span style="font-size:0.65rem; color:#64748b;">(${escapeHtml(log.user_role || '-')})</span></div>
-                            <div class="activity-action"><strong>${escapeHtml(log.action)}</strong></div>
-                            <div class="activity-details">${escapeHtml(log.details || '')}</div>
-                            ${log.transaction_id ? `<div class="activity-details"><i class="fas fa-receipt"></i> Transaction: ${escapeHtml(log.transaction_id)}</div>` : ''}
-                        </div>
-                    </div>
+                    <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small><br>
+                    <strong><i class="fas fa-user"></i> ${escapeHtml(log.user_name || 'Unknown')}</strong> - ${escapeHtml(log.action)}<br>
+                    ${escapeHtml(log.details || '')}
+                    ${log.transaction_id ? `<br><small><i class="fas fa-receipt"></i> Transaction ID: ${escapeHtml(log.transaction_id)}</small>` : ''}
                 </div>`;
             }
             container.innerHTML = html;
-        }
-        
-        async function refreshActivityLogs() {
-            await loadAllActivities();
-        }
-        
-        async function getFilteredActivityLogsForExport() {
-            const role = document.getElementById('logFilterRole').value;
-            const propertyId = document.getElementById('logFilterProperty').value;
-            const dateFrom = document.getElementById('logDateFrom').value;
-            const dateTo = document.getElementById('logDateTo').value;
-            
-            let query = window.supabaseClient.from('activity_logs').select('*').order('created_at', { ascending: false });
-            if (role !== 'all') query = query.eq('user_role', role);
-            if (propertyId !== 'all') query = query.eq('property_id', propertyId);
-            if (dateFrom) query = query.gte('created_at', `${dateFrom}T00:00:00`);
-            if (dateTo) query = query.lte('created_at', `${dateTo}T23:59:59`);
-            
-            const { data, error } = await query;
-            if (error) return [];
-            return data || [];
-        }
-        
-        async function printActivityLogs() {
-            const logs = await getFilteredActivityLogsForExport();
-            if (logs.length === 0) { alert('No activity logs found'); return; }
-            
-            const role = document.getElementById('logFilterRole').value;
-            const propertyId = document.getElementById('logFilterProperty').value;
-            const dateFrom = document.getElementById('logDateFrom').value;
-            const dateTo = document.getElementById('logDateTo').value;
-            
-            let filterText = '';
-            if (role !== 'all') filterText += `Role: ${role} | `;
-            if (propertyId !== 'all') filterText += `Property: ${propertyId} | `;
-            if (dateFrom) filterText += `From: ${dateFrom} | `;
-            if (dateTo) filterText += `To: ${dateTo}`;
-            if (filterText === '') filterText = 'All Records';
-            
-            let html = `
-                <!DOCTYPE html>
-                <html>
-                <head><title>BATTETECH Activity Log Report</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 40px; }
-                    h1 { color: #0a2b4e; }
-                    .header { text-align: center; margin-bottom: 30px; }
-                    .filters { background: #f0f4fa; padding: 10px; margin-bottom: 20px; border-radius: 8px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background: #0a2b4e; color: white; }
-                    .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
-                </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>BATTETECH PROPERTY CONSULTANTS</h1>
-                        <h2>Activity Log Report</h2>
-                        <p>Generated: ${new Date().toLocaleString()}</p>
-                        <div class="filters"><strong>Filters:</strong> ${filterText} | Total Records: ${logs.length}</div>
-                    </div>
-                    <table><thead><tr><th>Date & Time</th><th>User</th><th>Role</th><th>Action</th><th>Details</th></tr></thead><tbody>
-            `;
-            
-            for (let log of logs) {
-                const date = new Date(log.created_at);
-                html += `<tr><td>${date.toLocaleString()}</td><td>${escapeHtml(log.user_name || 'Unknown')}</td><td>${escapeHtml(log.user_role || '-')}</td><td>${escapeHtml(log.action)}</td><td>${escapeHtml(log.details || '-')}</td></tr>`;
-            }
-            
-            html += `</tbody></table><div class="footer"><p>BATTETECH Property Consultants - Activity Log Report</p></div></body></html>`;
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(html);
-            printWindow.document.close();
-            printWindow.print();
-        }
-        
-        async function exportActivityLogsToCSV() {
-            const logs = await getFilteredActivityLogsForExport();
-            if (logs.length === 0) { alert('No activity logs found'); return; }
-            
-            let csv = "Date,User,Role,Action,Details,Property ID,Transaction ID\n";
-            for (let log of logs) {
-                const date = new Date(log.created_at);
-                csv += `"${date.toLocaleString()}","${escapeCsv(log.user_name || 'Unknown')}","${escapeCsv(log.user_role || '-')}","${escapeCsv(log.action)}","${escapeCsv(log.details || '-')}","${escapeCsv(log.property_id || '-')}","${escapeCsv(log.transaction_id || '-')}"\n`;
-            }
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `activity_logs_${new Date().toISOString().slice(0,19)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            alert(`✅ Exported ${logs.length} records to CSV`);
-        }
-        
-        function escapeCsv(text) {
-            if (!text) return '';
-            return String(text).replace(/"/g, '""');
-        }
-        
-        async function manualDeleteOldActivityLogs() {
-            const days = prompt('Delete activity logs older than how many days?\n\nRecommended: 90 days\n\nEnter number of days:', '90');
-            if (!days) return;
-            if (isNaN(days) || days < 1) { alert('Please enter a valid number'); return; }
-            
-            if (!confirm(`⚠️ Delete ALL activity logs older than ${days} days?\n\nThis action cannot be undone!\n\nType "DELETE" to confirm:`)) return;
-            
-            const confirmation = prompt('Type "DELETE" to confirm:');
-            if (confirmation !== 'DELETE') { alert('Deletion cancelled'); return; }
-            
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - parseInt(days));
-            
-            const { error } = await window.supabaseClient.from('activity_logs').delete().lt('created_at', cutoffDate.toISOString());
-            if (error) { alert('Error: ' + error.message); return; }
-            
-            alert(`✅ Successfully deleted activity logs older than ${days} days`);
-            localStorage.setItem('battetech_last_log_cleanup', new Date().toISOString().split('T')[0]);
-            await loadAllActivities();
         }
         
         // ============ PENDING BROADCAST APPROVALS ============
@@ -1763,7 +1075,6 @@
                 container.innerHTML = '<div class="approval-card">No pending broadcast approvals.</div>';
                 return;
             }
-            
             let html = '';
             for (let req of data) {
                 const broadcastType = req.action_data?.broadcast_type === 'property_owners' ? 'PROPERTY OWNERS' : req.action_data?.broadcast_type;
@@ -1773,7 +1084,7 @@
                     <div><i class="fas fa-user"></i> Requested by: ${escapeHtml(req.action_data?.sender_name)} (${req.action_data?.sender_role})</div>
                     <div><i class="fas fa-tag"></i> Type: ${escapeHtml(broadcastType)}</div>
                     <div><i class="fas fa-users"></i> Recipients: ${recipientCount} person(s)</div>
-                    <div><i class="fas fa-comment"></i> Message: ${escapeHtml(req.action_data?.message?.substring(0, 200))}${req.action_data?.message?.length > 200 ? '...' : ''}</div>
+                    <div><i class="fas fa-comment"></i> Message: ${escapeHtml(req.action_data?.message?.substring(0, 200))}</div>
                     <div style="margin-top:8px; display:flex; gap:8px;">
                         <button onclick="approveBroadcast('${req.id}')" class="success small"><i class="fas fa-check"></i> Approve & Send</button>
                         <button onclick="rejectBroadcast('${req.id}')" class="danger small"><i class="fas fa-times"></i> Reject</button>
@@ -1787,11 +1098,9 @@
             if (!confirm(`Approve and send this broadcast?`)) return;
             const { data: request } = await window.supabaseClient.from('approval_requests').select('*').eq('id', requestId).single();
             if (!request) return;
-            
             const recipients = request.action_data?.recipients || [];
             const message = request.action_data?.message;
             const broadcastType = request.action_data?.broadcast_type;
-            
             let sentCount = 0;
             for (let i = 0; i < recipients.length; i++) {
                 const r = recipients[i];
@@ -1799,17 +1108,13 @@
                 if (phone) {
                     let cleanPhone = phone.replace(/\s/g, '');
                     if (cleanPhone.startsWith('0')) cleanPhone = '256' + cleanPhone.substring(1);
-                    const personalMsg = `🏢 BATTETECH APPROVED BROADCAST\n\nDear ${r.name},\n\n${message}\n\n- BattleTech Management`;
-                    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(personalMsg)}`, '_blank');
+                    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(`🏢 BATTETECH APPROVED BROADCAST\n\nDear ${r.name},\n\n${message}\n\n- BattleTech Management`)}`, '_blank');
                     sentCount++;
                     await new Promise(resolve => setTimeout(resolve, 1000));
                 }
             }
-            
             await window.supabaseClient.from('approval_requests').update({ status: 'approved', approved_by: superAdminId, approved_at: new Date() }).eq('id', requestId);
-            if (request.action_data?.sender_id) {
-                await addNotification(request.action_data.sender_id, request.action_data.sender_role, '✅ Broadcast Approved', `Your broadcast request to ${broadcastType} has been approved and sent to ${sentCount} recipients`, 'broadcast', requestId);
-            }
+            if (request.action_data?.sender_id) await addNotification(request.action_data.sender_id, request.action_data.sender_role, '✅ Broadcast Approved', `Your broadcast request to ${broadcastType} has been approved and sent to ${sentCount} recipients`, 'broadcast', requestId);
             await addActivityLog('broadcast_approved', `Approved and sent ${broadcastType} broadcast to ${sentCount} recipients`);
             alert(`✅ Broadcast approved and sent to ${sentCount} recipient(s)!`);
             await loadPendingBroadcastApprovals();
@@ -1821,9 +1126,7 @@
             if (!reason) return;
             const { data: request } = await window.supabaseClient.from('approval_requests').select('*').eq('id', requestId).single();
             await window.supabaseClient.from('approval_requests').update({ status: 'rejected', rejection_reason: reason, approved_by: superAdminId, approved_at: new Date() }).eq('id', requestId);
-            if (request && request.action_data?.sender_id) {
-                await addNotification(request.action_data.sender_id, request.action_data.sender_role, '❌ Broadcast Rejected', `Your broadcast request to ${request.action_data?.broadcast_type} was rejected. Reason: ${reason}`, 'broadcast', requestId);
-            }
+            if (request && request.action_data?.sender_id) await addNotification(request.action_data.sender_id, request.action_data.sender_role, '❌ Broadcast Rejected', `Your broadcast request to ${request.action_data?.broadcast_type} was rejected. Reason: ${reason}`, 'broadcast', requestId);
             await addActivityLog('broadcast_rejected', `Rejected broadcast request. Reason: ${reason}`);
             alert('❌ Broadcast rejected');
             await loadPendingBroadcastApprovals();
@@ -1845,7 +1148,6 @@
             const container = document.getElementById('recipientSelectContainer');
             const recipientList = document.getElementById('recipientList');
             const filtersDiv = document.getElementById('recipientFilters');
-            
             if (!type) { container.style.display = 'none'; return; }
             container.style.display = 'block';
             recipientList.innerHTML = '';
@@ -1876,7 +1178,7 @@
             else if (type === 'all_tenants') {
                 recipientList.innerHTML = `<div><strong>All Tenants (${allTenantsList.length} total)</strong></div>`;
                 allTenantsList.forEach(tenant => {
-                    recipientList.innerHTML += `<label style="display:block; margin:8px 0;"><input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}" data-property="${escapeHtml(tenant.property)}"> 🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - ${escapeHtml(tenant.property)} - 📞 ${tenant.phone}</label>`;
+                    recipientList.innerHTML += `<label style="display:block; margin:8px 0;"><input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}"> 🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - 📞 ${tenant.phone}</label>`;
                 });
                 recipientList.innerHTML += '<label style="display:block; margin:8px 0;"><input type="checkbox" id="selectAllTenants"> Select All Tenants</label>';
             }
@@ -1913,20 +1215,8 @@
             }
             
             setTimeout(() => {
-                const selectAllAdmins = document.getElementById('selectAllAdmins');
-                if (selectAllAdmins) selectAllAdmins.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
-                const selectAllWorkers = document.getElementById('selectAllWorkers');
-                if (selectAllWorkers) selectAllWorkers.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
-                const selectAllTenants = document.getElementById('selectAllTenants');
-                if (selectAllTenants) selectAllTenants.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
-                const selectAllUnpaid = document.getElementById('selectAllUnpaid');
-                if (selectAllUnpaid) selectAllUnpaid.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
-                const selectAllPaid = document.getElementById('selectAllPaid');
-                if (selectAllPaid) selectAllPaid.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
-                const selectAllOwners = document.getElementById('selectAllOwners');
-                if (selectAllOwners) selectAllOwners.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
-                const selectAllUsers = document.getElementById('selectAllUsers');
-                if (selectAllUsers) selectAllUsers.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
+                const selectAll = document.getElementById('selectAllAdmins') || document.getElementById('selectAllWorkers') || document.getElementById('selectAllTenants') || document.getElementById('selectAllUnpaid') || document.getElementById('selectAllPaid') || document.getElementById('selectAllOwners') || document.getElementById('selectAllUsers');
+                if (selectAll) selectAll.onclick = function() { document.querySelectorAll('.broadcastRecipient').forEach(cb => cb.checked = this.checked); };
             }, 100);
         }
         
@@ -1935,31 +1225,25 @@
             const message = document.getElementById('broadcastMessage').value.trim();
             const checkboxes = document.querySelectorAll('.broadcastRecipient:checked');
             const sender = getCurrentUser();
-            
             if (!broadcastType) { alert('Please select recipient type'); return; }
             if (!message) { alert('Please enter a message'); return; }
-            
             let recipients = [];
             for (let cb of checkboxes) {
                 const name = cb.dataset?.name || cb.closest('label')?.innerText?.split('-')[0]?.trim() || 'User';
                 const phone = cb.value;
                 if (phone && phone !== 'No phone') recipients.push({ name: name, phone: phone });
             }
-            
             if (recipients.length === 0) { alert('No valid recipients selected'); return; }
             if (!confirm(`Send broadcast to ${recipients.length} recipient(s)?`)) return;
-            
             let sentCount = 0;
             for (let i = 0; i < recipients.length; i++) {
                 const r = recipients[i];
                 let phone = r.phone.replace(/\s/g, '');
                 if (phone.startsWith('0')) phone = '256' + phone.substring(1);
-                const personalMsg = `🏢 BATTETECH SUPER ADMIN BROADCAST\n\nDear ${r.name},\n\n${message}\n\n- ${sender.name}\nBattleTech Management`;
-                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(personalMsg)}`, '_blank');
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`🏢 BATTETECH SUPER ADMIN BROADCAST\n\nDear ${r.name},\n\n${message}\n\n- ${sender.name}\nBattleTech Management`)}`, '_blank');
                 sentCount++;
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
-            
             await window.supabaseClient.from('broadcast_logs').insert({ sender_id: sender.id, sender_name: sender.name, sender_role: sender.role, recipient_type: broadcastType, recipient_count: recipients.length, message: message, sent_at: new Date().toISOString() });
             await addActivityLog('broadcast_sent', `Sent ${broadcastType} broadcast to ${sentCount} recipients`);
             alert(`✅ Broadcast sent to ${sentCount} recipient(s)!`);
@@ -1974,10 +1258,8 @@
             if (!container) return;
             const user = getCurrentUser();
             if (!user) { container.innerHTML = '<div style="padding: 15px; text-align: center;">Please login</div>'; return; }
-            
             const { data, error } = await window.supabaseClient.from('system_notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20);
             if (error || !data || data.length === 0) { container.innerHTML = '<div style="padding: 15px; text-align: center;"><i class="fas fa-bell-slash"></i> No notifications</div>'; return; }
-            
             let html = '';
             for (let notif of data) {
                 const date = new Date(notif.created_at);
@@ -2046,6 +1328,94 @@
             if (dropdown && bell && !bell.contains(e.target) && !dropdown.contains(e.target)) { dropdown.style.display = 'none'; }
         });
         
+        // ============ IMAGE MANAGER ============
+        
+        let imageManagerExpanded = false;
+        
+        function toggleImageManager() {
+            const panel = document.getElementById('imageManagerPanel');
+            if (imageManagerExpanded) {
+                panel.style.display = 'none';
+                imageManagerExpanded = false;
+            } else {
+                panel.style.display = 'block';
+                imageManagerExpanded = true;
+                loadImageManagerContent();
+            }
+        }
+        
+        async function loadImageManagerContent() {
+            const container = document.getElementById('imageManagerContent');
+            if (!container) return;
+            container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading images...</div>';
+            try {
+                const { data: properties } = await window.supabaseClient.from('properties').select('id, name, property_image');
+                const { data: admins } = await window.supabaseClient.from('users').select('id, full_name, photo_url').eq('role', 'property_admin');
+                const { data: workers } = await window.supabaseClient.from('users').select('id, full_name, photo_url').eq('role', 'worker');
+                let html = `<div class="image-manager-section"><h4><i class="fas fa-building"></i> Properties</h4><div class="image-manager-grid">`;
+                for (let prop of (properties || [])) {
+                    html += `<div class="image-manager-item">
+                        <img src="${prop.property_image || 'https://placehold.co/80x80?text=No+Image'}" onerror="this.src='https://placehold.co/80x80?text=No+Image'">
+                        <div class="item-name">${escapeHtml(prop.name.substring(0, 20))}</div>
+                        <div class="image-manager-actions">
+                            <button class="btn-upload-sm" onclick="uploadImageFor('property', '${prop.id}', 'property_image')"><i class="fas fa-upload"></i> Upload</button>
+                        </div>
+                    </div>`;
+                }
+                html += `</div></div><div class="image-manager-section"><h4><i class="fas fa-user-shield"></i> Property Admins</h4><div class="image-manager-grid">`;
+                for (let admin of (admins || [])) {
+                    html += `<div class="image-manager-item">
+                        <img src="${admin.photo_url || 'https://placehold.co/80x80?text=No+Photo'}" onerror="this.src='https://placehold.co/80x80?text=No+Photo'">
+                        <div class="item-name">${escapeHtml(admin.full_name.substring(0, 20))}</div>
+                        <div class="image-manager-actions">
+                            <button class="btn-upload-sm" onclick="uploadImageFor('admin', '${admin.id}', 'photo_url')"><i class="fas fa-upload"></i> Upload</button>
+                        </div>
+                    </div>`;
+                }
+                html += `</div></div><div class="image-manager-section"><h4><i class="fas fa-hard-hat"></i> Workers</h4><div class="image-manager-grid">`;
+                for (let worker of (workers || [])) {
+                    html += `<div class="image-manager-item">
+                        <img src="${worker.photo_url || 'https://placehold.co/80x80?text=No+Photo'}" onerror="this.src='https://placehold.co/80x80?text=No+Photo'">
+                        <div class="item-name">${escapeHtml(worker.full_name.substring(0, 20))}</div>
+                        <div class="image-manager-actions">
+                            <button class="btn-upload-sm" onclick="uploadImageFor('worker', '${worker.id}', 'photo_url')"><i class="fas fa-upload"></i> Upload</button>
+                        </div>
+                    </div>`;
+                }
+                html += `</div></div>`;
+                container.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading image manager:", err);
+                container.innerHTML = '<div class="loading-spinner" style="color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> Error loading images</div>';
+            }
+        }
+        
+        async function uploadImageFor(type, id, field) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async function(event) {
+                    const imageData = event.target.result;
+                    if (type === 'property') {
+                        await window.supabaseClient.from('properties').update({ [field]: imageData }).eq('id', id);
+                    } else {
+                        await window.supabaseClient.from('users').update({ [field]: imageData }).eq('id', id);
+                    }
+                    alert('✅ Image updated successfully!');
+                    loadImageManagerContent();
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+        
+        window.toggleImageManager = toggleImageManager;
+        window.uploadImageFor = uploadImageFor;
+        
         // ============ LOGOUT ============
         
         function logout() { 
@@ -2055,12 +1425,6 @@
             } 
         }
         
-        // Make Image Manager functions globally available
-        window.toggleImageManager = toggleImageManager;
-        window.uploadImageFor = uploadImageFor;
-        window.uploadRoomImagesFromManager = uploadRoomImagesFromManager;
-
-        // Initialize on page load
         window.addEventListener('load', () => { loadSuperAdminData(); });
     </script>
 </body>

@@ -4,47 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>Property Admin - BATTETECH</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f0f4fa; min-height: 100vh; padding-bottom: 70px; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: linear-gradient(135deg, #f0f4fa 0%, #e2e8f0 100%); min-height: 100vh; padding-bottom: 70px; }
         
-        header { background: #0a2b4e; color: white; padding: 0.8rem 1rem; text-align: center; position: sticky; top: 0; z-index: 100; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        header { background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%); color: white; padding: 0.8rem 1rem; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
         .logo-container { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
-        .logo-icon { font-size: 1.6rem; background: white; color: #0a2b4e; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
-        .logo-text h1 { font-size: 1.2rem; letter-spacing: 1px; }
-        .logo-text span { font-size: 0.55rem; letter-spacing: 2px; opacity: 0.8; }
+        .logo-icon { font-size: 1.6rem; background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%); color: #0a2b4e; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .logo-text h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 1px; }
+        .logo-text span { font-size: 0.6rem; letter-spacing: 2px; opacity: 0.8; }
         
-        .dashboard-container { max-width: 1200px; margin: 1rem auto; padding: 0 1rem; }
-        .welcome-card { background: white; border-radius: 24px; padding: 2rem; margin-bottom: 1.5rem; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-        .welcome-greeting { font-size: 1.8rem; font-weight: 800; color: #0a2b4e; margin-bottom: 0.5rem; }
+        .dashboard-container { max-width: 1400px; margin: 1rem auto; padding: 0 1rem; }
+        .welcome-card { background: white; border-radius: 24px; padding: 1.8rem; margin-bottom: 1.5rem; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.05); }
+        .welcome-greeting { font-size: 1.8rem; font-weight: 800; color: #0a2b4e; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
         .welcome-greeting span { color: #2c7be5; }
-        .session-timer { background: #f59e0b; color: #1a2a3e; padding: 6px 12px; border-radius: 40px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-top: 1rem; }
-        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; border-radius: 40px; cursor: pointer; margin-left: 1rem; }
+        .session-timer { background: #f59e0b; color: #1a2a3e; padding: 6px 12px; border-radius: 40px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 1rem; }
+        .logout-btn { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border: none; padding: 8px 20px; border-radius: 40px; cursor: pointer; margin-left: 1rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
+        .logout-btn:hover { transform: scale(1.02); }
         
-        .section-card { background: white; border-radius: 20px; padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .section-title { font-size: 1.2rem; color: #0a2b4e; margin-bottom: 1rem; border-left: 4px solid #2c7be5; padding-left: 0.8rem; font-weight: bold; }
+        .section-card { background: white; border-radius: 24px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+        .section-card:hover { transform: translateY(-3px); }
+        .section-title { font-size: 1.2rem; color: #0a2b4e; margin-bottom: 1rem; border-left: 4px solid #2c7be5; padding-left: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
         
         .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        .form-row input, .form-row select, .form-row textarea { padding: 12px; border-radius: 10px; border: 1px solid #ddd; flex: 1; min-width: 200px; font-size: 0.9rem; }
+        .form-row input, .form-row select, .form-row textarea { padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; flex: 1; min-width: 200px; font-size: 0.9rem; transition: all 0.2s ease; }
+        .form-row input:focus, .form-row select:focus { outline: none; border-color: #2c7be5; box-shadow: 0 0 0 3px rgba(44,123,229,0.1); }
         .photo-preview { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-top: 5px; }
-        .upload-btn { background: #f59e0b; color: white; border: none; padding: 10px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
+        .upload-btn { background: #f59e0b; color: white; border: none; padding: 10px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem; }
         
-        button { background: #0a2b4e; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        button:hover { transform: scale(1.02); }
-        button.danger { background: #dc2626; }
-        button.warning { background: #f59e0b; color: #1a2a3e; }
-        button.success { background: #10b981; }
-        button.small { padding: 4px 12px; font-size: 0.7rem; }
+        button { background: linear-gradient(135deg, #0a2b4e 0%, #1e3a5f 100%); color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(10,43,78,0.3); }
+        button.danger { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
+        button.warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #1a2a3e; }
+        button.success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        button.small { padding: 6px 12px; font-size: 0.7rem; }
         
-        .property-card, .worker-card, .activity-item, .approval-card { background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 0.8rem; border-left: 4px solid #2c7be5; cursor: pointer; transition: 0.2s; }
+        .property-card, .worker-card, .activity-item, .approval-card { background: #f8fafc; border-radius: 16px; padding: 1rem; margin-bottom: 0.8rem; border-left: 4px solid #2c7be5; cursor: pointer; transition: all 0.2s ease; }
         .property-card:hover, .worker-card:hover { transform: translateX(5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .property-name { font-weight: bold; color: #0a2b4e; font-size: 1rem; }
-        .password-badge { background: #eef3fc; padding: 4px 10px; border-radius: 20px; font-family: monospace; font-size: 0.75rem; display: inline-block; margin: 4px 0; }
+        .property-name { font-weight: 700; color: #0a2b4e; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .password-badge { background: #eef3fc; padding: 4px 10px; border-radius: 20px; font-family: monospace; font-size: 0.7rem; display: inline-block; margin: 4px 0; }
         
         .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1rem; }
         
+        /* Notification Styles */
         .notification-bell { position: relative; display: inline-block; margin-right: 15px; }
-        .notification-btn { background: #2c7be5; position: relative; padding: 8px 16px; border-radius: 40px; cursor: pointer; border: none; color: white; font-weight: bold; }
+        .notification-btn { background: #2c7be5; position: relative; padding: 8px 16px; border-radius: 40px; cursor: pointer; border: none; color: white; font-weight: bold; display: inline-flex; align-items: center; gap: 0.3rem; }
         .notification-badge { position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: none; align-items: center; justify-content: center; }
         .notification-dropdown { display: none; position: absolute; right: 0; top: 45px; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-height: 400px; overflow-y: auto; }
         .notification-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
@@ -52,12 +59,13 @@
         .notification-item:hover { background: #f0f4fa; }
         .mark-all-read { width: 100%; background: #f59e0b; border: none; padding: 10px; border-radius: 0 0 12px 12px; cursor: pointer; font-weight: bold; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 20px; padding: 1.5rem; max-height: 80%; overflow-y: auto; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 28px; padding: 1.5rem; max-height: 80%; overflow-y: auto; }
         
-        .main-footer { background: #071e36; color: white; margin-top: 2rem; padding: 1rem; text-align: center; }
-        .phones { display: flex; justify-content: center; gap: 1rem; margin: 0.3rem 0; flex-wrap: wrap; font-size: 0.7rem; }
-        .whatsapp-btn a { background: #25D366; color: white; padding: 6px 14px; border-radius: 40px; text-decoration: none; font-size: 0.7rem; display: inline-block; }
+        .main-footer { background: linear-gradient(135deg, #071e36 0%, #0a2b4e 100%); color: white; margin-top: 2rem; padding: 1.5rem; text-align: center; }
+        .phones { display: flex; justify-content: center; gap: 2rem; margin: 0.5rem 0; flex-wrap: wrap; font-size: 0.85rem; }
+        .whatsapp-btn a { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 8px 20px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
+        .whatsapp-btn a:hover { transform: scale(1.05); }
         
         .history-btn { background: #8b5cf6; margin-left: 0.5rem; }
         
@@ -65,6 +73,7 @@
             .grid-2 { grid-template-columns: 1fr; } 
             .welcome-greeting { font-size: 1.5rem; } 
             .form-row { flex-direction: column; }
+            .welcome-card div { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
         }
     </style>
 </head>
@@ -72,7 +81,7 @@
 
 <header>
     <div class="logo-container">
-        <div class="logo-icon">🏢</div>
+        <div class="logo-icon"><i class="fas fa-building"></i></div>
         <div class="logo-text">
             <h1>BATTETECH</h1>
             <span>MANAGEMENT</span>
@@ -82,33 +91,35 @@
 
 <div class="dashboard-container">
     <div class="welcome-card">
-        <div class="welcome-greeting">WELCOME, <span id="adminNameDisplay">ADMIN</span></div>
+        <div class="welcome-greeting">
+            <i class="fas fa-hand-peace"></i> WELCOME, <span id="adminNameDisplay">ADMIN</span>
+        </div>
         <div>
             <div class="notification-bell">
-                <button id="enableNotificationsBtn" onclick="requestPushNotificationPermission()" style="background: #2c7be5; margin-right: 0.5rem;">
-                    <i class="fas fa-bell"></i> Enable Notifications
-                </button>
                 <button class="notification-btn" id="notificationBell">
-                    🔔 Notifications
+                    <i class="fas fa-bell"></i> Notifications
                     <span id="notificationBadge" class="notification-badge">0</span>
                 </button>
                 <div id="notificationDropdown" class="notification-dropdown">
                     <div id="notificationList"></div>
+                    <button class="mark-all-read" onclick="markAllNotificationsAsRead()">Mark All Read</button>
                 </div>
             </div>
-            <button class="history-btn" onclick="requestHistoryAccess()">📜 Request History Access</button>
-            <span class="session-timer" id="sessionTimer">Session: 5:00</span>
-            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+            <button class="history-btn" onclick="requestHistoryAccess()"><i class="fas fa-history"></i> Request History Access</button>
+            <span class="session-timer" id="sessionTimer"><i class="fas fa-clock"></i> Session: 5:00</span>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
     </div>
     
+    <!-- MY PROPERTIES -->
     <div class="section-card">
-        <div class="section-title">📋 MY PROPERTIES</div>
+        <div class="section-title"><i class="fas fa-building"></i> MY PROPERTIES</div>
         <div id="propertiesList" class="grid-2"></div>
     </div>
     
+    <!-- BROADCAST SECTION -->
     <div class="section-card">
-        <div class="section-title">📢 BROADCAST MESSAGES</div>
+        <div class="section-title"><i class="fas fa-bullhorn"></i> BROADCAST MESSAGES</div>
         <div class="form-row">
             <select id="broadcastPropertySelect" style="flex:1;">
                 <option value="">-- Select Property First --</option>
@@ -116,32 +127,36 @@
         </div>
         <div id="broadcastOptions" style="display: none;">
             <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem;">
-                <button onclick="openBroadcastModal('workers')" style="background:#0a2b4e;">👷 Broadcast to Workers</button>
-                <button onclick="openBroadcastModal('unpaid_tenants')" style="background:#dc2626;">⚠️ Broadcast to Unpaid Tenants</button>
-                <button onclick="openBroadcastModal('paid_tenants')" style="background:#10b981;">✅ Broadcast to Paid Tenants</button>
-                <button onclick="openBroadcastModal('all_tenants')" style="background:#1a4a7a;">🏠 Broadcast to ALL Tenants</button>
-                <button onclick="openBroadcastModal('property_owners')" style="background:#8b5cf6;">👤 Broadcast to Property Owner (Approval Required)</button>
+                <button onclick="openBroadcastModal('workers')" style="background:#0a2b4e;"><i class="fas fa-hard-hat"></i> Broadcast to Workers</button>
+                <button onclick="openBroadcastModal('unpaid_tenants')" style="background:#dc2626;"><i class="fas fa-exclamation-triangle"></i> Broadcast to Unpaid Tenants</button>
+                <button onclick="openBroadcastModal('paid_tenants')" style="background:#10b981;"><i class="fas fa-check-circle"></i> Broadcast to Paid Tenants</button>
+                <button onclick="openBroadcastModal('all_tenants')" style="background:#1a4a7a;"><i class="fas fa-users"></i> Broadcast to ALL Tenants</button>
+                <button onclick="openBroadcastModal('property_owners')" style="background:#8b5cf6;"><i class="fas fa-user-tie"></i> Broadcast to Property Owner (Approval Required)</button>
             </div>
         </div>
     </div>
     
+    <!-- PENDING PAYMENT APPROVALS -->
     <div class="section-card">
-        <div class="section-title">⏳ PENDING PAYMENT APPROVALS</div>
+        <div class="section-title"><i class="fas fa-clock"></i> PENDING PAYMENT APPROVALS</div>
         <div id="pendingApprovalsList"></div>
     </div>
     
+    <!-- PENDING EVACUATION APPROVALS -->
     <div class="section-card">
-        <div class="section-title">🚪 PENDING EVACUATION REQUESTS</div>
+        <div class="section-title"><i class="fas fa-door-open"></i> PENDING EVACUATION REQUESTS</div>
         <div id="pendingEvacuationsList"></div>
     </div>
     
+    <!-- PENDING WORKER BROADCAST APPROVALS -->
     <div class="section-card">
-        <div class="section-title">📢 PENDING WORKER BROADCAST APPROVALS</div>
+        <div class="section-title"><i class="fas fa-bullhorn"></i> PENDING WORKER BROADCAST APPROVALS</div>
         <div id="pendingWorkerBroadcasts"></div>
     </div>
     
+    <!-- CREATE NEW WORKER -->
     <div class="section-card">
-        <div class="section-title">👷 CREATE NEW WORKER</div>
+        <div class="section-title"><i class="fas fa-user-plus"></i> CREATE NEW WORKER</div>
         <div class="form-row">
             <input type="text" id="workerName" placeholder="Worker Full Name">
             <input type="tel" id="workerPhone" placeholder="Phone Number">
@@ -153,28 +168,30 @@
             </select>
         </div>
         <div class="form-row">
-            <button type="button" class="upload-btn" onclick="uploadWorkerPhoto()">📷 Upload Worker Photo</button>
+            <button type="button" class="upload-btn" onclick="uploadWorkerPhoto()"><i class="fas fa-camera"></i> Upload Worker Photo</button>
             <input type="file" id="workerPhotoInput" accept="image/*" style="display:none;" onchange="previewWorkerPhoto(event)">
             <div id="workerPhotoPreview"></div>
         </div>
-        <button onclick="createWorker()">✅ Create Worker</button>
+        <button onclick="createWorker()"><i class="fas fa-check"></i> Create Worker</button>
     </div>
     
+    <!-- MY WORKERS (WITH PASSWORDS) -->
     <div class="section-card">
-        <div class="section-title">👷 MY WORKERS & PASSWORDS</div>
+        <div class="section-title"><i class="fas fa-hard-hat"></i> MY WORKERS & PASSWORDS</div>
         <div id="workersList" class="grid-2"></div>
     </div>
     
+    <!-- ACTIVITY LOG -->
     <div class="section-card">
-        <div class="section-title">📋 ACTIVITY LOG</div>
+        <div class="section-title"><i class="fas fa-list-check"></i> ACTIVITY LOG</div>
         <div id="activityLogList"></div>
     </div>
 </div>
 
-<!-- Modals -->
+<!-- Edit Worker Modal -->
 <div id="editWorkerModal" class="modal">
     <div class="modal-content">
-        <h3>✏️ Edit / Reset Worker</h3>
+        <h3><i class="fas fa-user-edit"></i> Edit / Reset Worker</h3>
         <div class="form-row">
             <input type="text" id="editWorkerName" placeholder="Full Name">
             <input type="tel" id="editWorkerPhone" placeholder="Phone">
@@ -184,40 +201,42 @@
             <select id="editWorkerPropertySelect"><option value="">-- Select Property --</option></select>
         </div>
         <div class="form-row">
-            <button type="button" class="upload-btn" onclick="uploadEditWorkerPhoto()">📷 Change Worker Photo</button>
+            <button type="button" class="upload-btn" onclick="uploadEditWorkerPhoto()"><i class="fas fa-camera"></i> Change Worker Photo</button>
             <input type="file" id="editWorkerPhotoInput" accept="image/*" style="display:none;" onchange="previewEditWorkerPhoto(event)">
             <div id="editWorkerPhotoPreview"></div>
         </div>
         <div class="form-row">
             <div style="background:#f0f4fa; padding:10px; border-radius:10px; width:100%;">
-                <strong>🔑 Current Password:</strong> 
+                <strong><i class="fas fa-key"></i> Current Password:</strong> 
                 <span id="currentWorkerPassword" style="font-family:monospace; background:white; padding:4px 8px; border-radius:8px; display:inline-block;"></span>
-                <button onclick="copyWorkerPassword()" class="warning small" style="margin-left:8px;">📋 Copy</button>
+                <button onclick="copyWorkerPassword()" class="warning small" style="margin-left:8px;"><i class="fas fa-copy"></i> Copy</button>
             </div>
         </div>
         <input type="hidden" id="editWorkerId">
         <div style="display:flex; gap:0.8rem; margin-top:1rem;">
-            <button onclick="saveWorkerEdit()" class="success">💾 Save Changes</button>
-            <button onclick="closeEditWorkerModal()">Cancel</button>
+            <button onclick="saveWorkerEdit()" class="success"><i class="fas fa-save"></i> Save Changes</button>
+            <button onclick="closeEditWorkerModal()"><i class="fas fa-times"></i> Cancel</button>
         </div>
     </div>
 </div>
 
+<!-- Broadcast Modal -->
 <div id="broadcastModal" class="modal">
     <div class="modal-content">
-        <h3 id="broadcastModalTitle">📢 Broadcast Message</h3>
+        <h3 id="broadcastModalTitle"><i class="fas fa-bullhorn"></i> Broadcast Message</h3>
         <div id="broadcastRecipientsList" style="max-height:200px; overflow-y:auto; border:1px solid #ddd; border-radius:10px; padding:10px; margin:10px 0;"></div>
         <textarea id="broadcastMessageText" rows="4" placeholder="Type your message here..." style="width:100%; padding:10px; border-radius:10px;"></textarea>
         <div style="display:flex; gap:0.8rem; margin-top:1rem;">
-            <button onclick="sendBroadcast()" style="background:#25D366;">📱 Send Broadcast</button>
-            <button onclick="closeBroadcastModal()">Cancel</button>
+            <button onclick="sendBroadcast()" style="background:#25D366;"><i class="fab fa-whatsapp"></i> Send Broadcast</button>
+            <button onclick="closeBroadcastModal()"><i class="fas fa-times"></i> Cancel</button>
         </div>
     </div>
 </div>
 
+<!-- History Access Modal -->
 <div id="historyAccessModal" class="modal">
     <div class="modal-content">
-        <h2>📜 Request History Access</h2>
+        <h2><i class="fas fa-history"></i> Request History Access</h2>
         <p>Your request will be sent to Super Admin for approval.</p>
         <div class="form-row">
             <select id="historyPropertySelect">
@@ -228,16 +247,21 @@
             <textarea id="historyAccessReason" placeholder="Reason for requesting history access..."></textarea>
         </div>
         <div style="display:flex; gap:0.8rem; margin-top:1rem;">
-            <button onclick="submitHistoryAccessRequest()" style="background:#8b5cf6;">📤 Request Access</button>
-            <button onclick="closeHistoryAccessModal()">Cancel</button>
+            <button onclick="submitHistoryAccessRequest()" style="background:#8b5cf6;"><i class="fas fa-paper-plane"></i> Request Access</button>
+            <button onclick="closeHistoryAccessModal()"><i class="fas fa-times"></i> Cancel</button>
         </div>
     </div>
 </div>
 
 <footer class="main-footer">
-    <div class="phones"><p><strong>📱 MTN: 0794115704</strong></p><p><strong>📱 AIRTEL: 0756182284</strong></p></div>
-    <p><strong>📧 battetech330@gmail.com</strong></p>
-    <div class="whatsapp-btn"><a href="https://wa.me/256756182282" target="_blank">💬 WhatsApp</a></div>
+    <div class="phones">
+        <p><i class="fas fa-phone-alt"></i> <strong>MTN: 0794115704</strong></p>
+        <p><i class="fas fa-phone-alt"></i> <strong>AIRTEL: 0756182284</strong></p>
+    </div>
+    <p><i class="fas fa-envelope"></i> <strong>battetech330@gmail.com</strong></p>
+    <div class="whatsapp-btn">
+        <a href="https://wa.me/256756182282" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -270,6 +294,39 @@
         return String(text).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
     }
     
+    // ============ HISTORY ACCESS ============
+    
+    function requestHistoryAccess() {
+        document.getElementById('historyPropertySelect').innerHTML = '<option value="">-- Select Property --</option>';
+        for (let prop of allProperties) {
+            document.getElementById('historyPropertySelect').innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
+        }
+        document.getElementById('historyAccessModal').style.display = 'flex';
+    }
+    
+    function closeHistoryAccessModal() {
+        document.getElementById('historyAccessModal').style.display = 'none';
+    }
+    
+    async function submitHistoryAccessRequest() {
+        const propertyId = document.getElementById('historyPropertySelect').value;
+        const reason = document.getElementById('historyAccessReason').value;
+        const user = getCurrentUser();
+        
+        if (!propertyId) {
+            alert('Please select a property');
+            return;
+        }
+        
+        const success = await requestHistoryViewAccess(propertyId, user.id, user.name);
+        if (success) {
+            alert('✅ History access request sent to Super Admin. You will be notified when approved.');
+            closeHistoryAccessModal();
+        } else {
+            alert('Failed to send request. Please try again.');
+        }
+    }
+    
     // ============ SESSION MANAGEMENT ============
     
     function checkAdminSession() {
@@ -297,7 +354,11 @@
             const secs = Math.floor((remaining % 60000) / 1000);
             const timerDisplay = document.getElementById('sessionTimer');
             if (timerDisplay) {
-                timerDisplay.textContent = `Session: ${minutes}:${secs.toString().padStart(2, '0')}`;
+                timerDisplay.innerHTML = `<i class="fas fa-clock"></i> Session: ${minutes}:${secs.toString().padStart(2, '0')}`;
+                if (remaining <= 60000) {
+                    timerDisplay.style.background = '#dc2626';
+                    timerDisplay.style.color = 'white';
+                }
             }
             if (remaining <= 0) { 
                 clearInterval(timerInterval); 
@@ -337,6 +398,27 @@
         }
     }
     
+    // ============ NOTIFICATION BELL ============
+    
+    document.getElementById('notificationBell')?.addEventListener('click', async function(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('notificationDropdown');
+        if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+            await displayNotificationsInDropdown('notificationList');
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    });
+    
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('notificationDropdown');
+        const bell = document.getElementById('notificationBell');
+        if (dropdown && bell && !bell.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+    
     // ============ LOAD DATA ============
     
     async function loadPropertyAdminData() {
@@ -355,24 +437,6 @@
         await loadActivityLog();
         await initNotificationSystem();
         initChatPanel();
-
-        const notificationBell = document.getElementById('notificationBell');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        if (notificationBell && notificationDropdown) {
-            notificationBell.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const isOpen = notificationDropdown.style.display === 'block';
-                notificationDropdown.style.display = isOpen ? 'none' : 'block';
-                if (!isOpen) {
-                    await displayNotificationsInDropdown('notificationList');
-                }
-            });
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.notification-bell')) {
-                    notificationDropdown.style.display = 'none';
-                }
-            });
-        }
         
         const { data: superAdmin } = await window.supabaseClient.from('users').select('id, full_name, phone').eq('role', 'super_admin').single();
         superAdminData = superAdmin;
@@ -417,12 +481,12 @@
             broadcastSelect.innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
             
             html += `<div class="property-card" onclick="goToPropertyDetail('${prop.id}')">
-                <div class="property-name">🏢 ${escapeHtml(prop.name)}</div>
-                <div>📍 ${escapeHtml(prop.location)}</div>
-                <div>📊 ${occupied} occupied | ${vacant} vacant</div>
-                <div>💰 Fee: ${prop.management_fee || 5}%</div>
+                <div class="property-name"><i class="fas fa-building"></i> ${escapeHtml(prop.name)}</div>
+                <div><i class="fas fa-map-marker-alt"></i> ${escapeHtml(prop.location)}</div>
+                <div><i class="fas fa-chart-bar"></i> ${occupied} occupied | ${vacant} vacant</div>
+                <div><i class="fas fa-percent"></i> Fee: ${prop.management_fee || 5}%</div>
                 <div style="margin-top:8px;">
-                    <button onclick="event.stopPropagation(); goToPropertyDetail('${prop.id}')" style="font-size:0.7rem; background:#10b981;">📋 Manage Property</button>
+                    <button onclick="event.stopPropagation(); goToPropertyDetail('${prop.id}')" style="font-size:0.7rem; background:#10b981;"><i class="fas fa-eye"></i> Manage Property</button>
                 </div>
             </div>`;
         }
@@ -518,16 +582,16 @@
         let recipientsHtml = '';
         
         if (type === 'workers') {
-            title = '📢 Broadcast to Workers';
+            title = '<i class="fas fa-hard-hat"></i> Broadcast to Workers';
             if (currentWorkersList.length === 0) {
-                recipientsHtml = '<p style="color:#dc2626;">No workers found under your management for this property.</p>';
+                recipientsHtml = '<p style="color:#dc2626;"><i class="fas fa-exclamation-triangle"></i> No workers found under your management for this property.</p>';
             } else {
                 recipientsHtml = '<div><strong>Select Workers:</strong></div>';
                 currentWorkersList.forEach(worker => {
                     recipientsHtml += `
                         <label style="display:block; margin:8px 0;">
                             <input type="checkbox" value="${worker.id}" class="broadcastRecipient">
-                            👷 ${escapeHtml(worker.full_name)} - 📞 ${worker.phone || 'No phone'}
+                            <i class="fas fa-hard-hat"></i> ${escapeHtml(worker.full_name)} - <i class="fas fa-phone"></i> ${worker.phone || 'No phone'}
                         </label>
                     `;
                 });
@@ -535,16 +599,16 @@
             }
         } 
         else if (type === 'unpaid_tenants') {
-            title = '⚠️ Broadcast to Unpaid Tenants';
+            title = '<i class="fas fa-exclamation-triangle"></i> Broadcast to Unpaid Tenants';
             if (currentUnpaidTenantsList.length === 0) {
-                recipientsHtml = '<p style="color:#10b981;">No unpaid tenants! All tenants have paid.</p>';
+                recipientsHtml = '<p style="color:#10b981;"><i class="fas fa-check-circle"></i> No unpaid tenants! All tenants have paid.</p>';
             } else {
                 recipientsHtml = '<div><strong>Select Unpaid Tenants:</strong></div>';
                 currentUnpaidTenantsList.forEach(tenant => {
                     recipientsHtml += `
                         <label style="display:block; margin:8px 0;">
                             <input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}" data-balance="${tenant.balance}">
-                            🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - Balance: UGX ${tenant.balance.toLocaleString()} - 📞 ${tenant.phone}
+                            <i class="fas fa-home"></i> ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - Balance: UGX ${tenant.balance.toLocaleString()} - <i class="fas fa-phone"></i> ${tenant.phone}
                         </label>
                     `;
                 });
@@ -552,16 +616,16 @@
             }
         }
         else if (type === 'paid_tenants') {
-            title = '✅ Broadcast to Paid Tenants (Next Month Reminder)';
+            title = '<i class="fas fa-check-circle"></i> Broadcast to Paid Tenants (Next Month Reminder)';
             if (currentPaidTenantsList.length === 0) {
-                recipientsHtml = '<p style="color:#dc2626;">No paid tenants found.</p>';
+                recipientsHtml = '<p style="color:#dc2626;"><i class="fas fa-exclamation-triangle"></i> No paid tenants found.</p>';
             } else {
                 recipientsHtml = '<div><strong>Select Paid Tenants:</strong></div>';
                 currentPaidTenantsList.forEach(tenant => {
                     recipientsHtml += `
                         <label style="display:block; margin:8px 0;">
                             <input type="checkbox" value="${tenant.phone}" class="broadcastRecipient" data-name="${escapeHtml(tenant.name)}" data-room="${escapeHtml(tenant.room)}">
-                            🏠 ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - 📞 ${tenant.phone}
+                            <i class="fas fa-home"></i> ${escapeHtml(tenant.name)} (${escapeHtml(tenant.room)}) - <i class="fas fa-phone"></i> ${tenant.phone}
                         </label>
                     `;
                 });
@@ -569,20 +633,20 @@
             }
         }
         else if (type === 'all_tenants') {
-            title = '🏠 Broadcast to ALL Tenants';
+            title = '<i class="fas fa-users"></i> Broadcast to ALL Tenants';
             if (currentAllTenantsList.length === 0) {
-                recipientsHtml = '<p style="color:#dc2626;">No tenants found in this property.</p>';
+                recipientsHtml = '<p style="color:#dc2626;"><i class="fas fa-exclamation-triangle"></i> No tenants found in this property.</p>';
             } else {
-                recipientsHtml = `<div><strong>This will send to ${currentAllTenantsList.length} tenant(s) in this property.</strong></div>`;
+                recipientsHtml = `<div><strong><i class="fas fa-info-circle"></i> This will send to ${currentAllTenantsList.length} tenant(s) in this property.</strong></div>`;
                 window.pendingAllTenants = currentAllTenantsList;
             }
         }
         else if (type === 'property_owners') {
-            title = '👤 Broadcast to Property Owner (Requires Super Admin Approval)';
+            title = '<i class="fas fa-user-tie"></i> Broadcast to Property Owner (Requires Super Admin Approval)';
             if (currentPropertyOwnersList.length === 0) {
-                recipientsHtml = '<p style="color:#dc2626;">No property owner found with phone number.</p>';
+                recipientsHtml = '<p style="color:#dc2626;"><i class="fas fa-exclamation-triangle"></i> No property owner found with phone number.</p>';
             } else {
-                recipientsHtml = `<div><strong>This will send to the property owner. Super Admin must approve.</strong></div>`;
+                recipientsHtml = `<div><strong><i class="fas fa-info-circle"></i> This will send to the property owner. Super Admin must approve.</strong></div>`;
                 window.pendingPropertyOwners = currentPropertyOwnersList;
             }
         }
@@ -788,15 +852,15 @@
             }
             
             html += `<div class="worker-card">
-                <div><strong>👤 ${escapeHtml(worker.full_name)}</strong> ${worker.photo_url ? `<img src="${worker.photo_url}" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-left:8px;">` : ''}</div>
-                <div>📞 ${worker.phone || '-'}</div>
-                <div>🏢 Property: <strong style="color:#2c7be5;">${escapeHtml(propertyName)}</strong></div>
-                <div class="password-badge">🔑 Password: <strong>${escapeHtml(worker.password_hash)}</strong></div>
-                <div class="${worker.status === 'frozen' ? 'status-frozen' : 'status-active'}">${worker.status === 'frozen' ? '❄️ FROZEN' : '✅ ACTIVE'}</div>
+                <div><strong><i class="fas fa-hard-hat"></i> ${escapeHtml(worker.full_name)}</strong> ${worker.photo_url ? `<img src="${worker.photo_url}" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-left:8px;">` : ''}</div>
+                <div><i class="fas fa-phone"></i> ${worker.phone || '-'}</div>
+                <div><i class="fas fa-building"></i> Property: <strong style="color:#2c7be5;">${escapeHtml(propertyName)}</strong></div>
+                <div class="password-badge"><i class="fas fa-key"></i> Password: <strong>${escapeHtml(worker.password_hash)}</strong></div>
+                <div class="${worker.status === 'frozen' ? 'status-frozen' : 'status-active'}">${worker.status === 'frozen' ? '<i class="fas fa-snowflake"></i> FROZEN' : '<i class="fas fa-check-circle"></i> ACTIVE'}</div>
                 <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
-                    <button onclick="openEditWorkerModal('${worker.id}', '${escapeHtml(worker.full_name)}', '${worker.phone || ''}', '${worker.property_id || ''}', '${escapeHtml(worker.password_hash)}', '${worker.photo_url || ''}')" class="warning small">✏️ Edit / Reset Password</button>
-                    <button onclick="freezeWorker('${worker.id}', '${worker.status}')" class="warning small">${worker.status === 'frozen' ? '❄️ Unfreeze' : '🔒 Freeze'}</button>
-                    <button onclick="fireWorker('${worker.id}', '${escapeHtml(worker.full_name)}')" class="danger small">🔥 Fire</button>
+                    <button onclick="openEditWorkerModal('${worker.id}', '${escapeHtml(worker.full_name)}', '${worker.phone || ''}', '${worker.property_id || ''}', '${escapeHtml(worker.password_hash)}', '${worker.photo_url || ''}')" class="warning small"><i class="fas fa-edit"></i> Edit</button>
+                    <button onclick="freezeWorker('${worker.id}', '${worker.status}')" class="warning small">${worker.status === 'frozen' ? '<i class="fas fa-sun"></i> Unfreeze' : '<i class="fas fa-snowflake"></i> Freeze'}</button>
+                    <button onclick="fireWorker('${worker.id}', '${escapeHtml(worker.full_name)}')" class="danger small"><i class="fas fa-fire"></i> Fire</button>
                 </div>
             </div>`;
         }
@@ -928,15 +992,6 @@
         } else {
             alert(`✅ Worker "${name}" created!\nPassword: ${password}`);
             
-            const adminUser = getCurrentUser();
-            await notifySuperAdminOfAction(
-                'worker_created',
-                { workerName: name },
-                propertyId,
-                adminUser?.id,
-                adminUser?.name
-            );
-            
             document.getElementById('workerName').value = '';
             document.getElementById('workerPhone').value = '';
             document.getElementById('workerPassword').value = '';
@@ -1002,16 +1057,16 @@
         let html = '';
         for (let req of requests) {
             html += `<div class="approval-card" style="border-left-color:#f59e0b; margin-bottom:15px;">
-                <div><strong>🚪 EVACUATION REQUEST</strong></div>
-                <div>👤 Worker: ${escapeHtml(req.worker_name)}</div>
-                <div>🏠 Room: ${escapeHtml(req.action_data?.roomNumber)}</div>
-                <div>👥 Tenant: ${escapeHtml(req.action_data?.tenantName)}</div>
-                <div>💰 Written Off Amount: UGX ${req.action_data?.writtenOffAmount?.toLocaleString() || 0}</div>
-                <div>📝 Reason: ${escapeHtml(req.action_data?.reason)}</div>
-                <div>📅 Requested: ${new Date(req.created_at).toLocaleString()}</div>
+                <div><strong><i class="fas fa-door-open"></i> EVACUATION REQUEST</strong></div>
+                <div><i class="fas fa-user"></i> Worker: ${escapeHtml(req.worker_name)}</div>
+                <div><i class="fas fa-door-open"></i> Room: ${escapeHtml(req.action_data?.roomNumber)}</div>
+                <div><i class="fas fa-user"></i> Tenant: ${escapeHtml(req.action_data?.tenantName)}</div>
+                <div><i class="fas fa-coins"></i> Written Off Amount: UGX ${req.action_data?.writtenOffAmount?.toLocaleString() || 0}</div>
+                <div><i class="fas fa-comment"></i> Reason: ${escapeHtml(req.action_data?.reason)}</div>
+                <div><i class="fas fa-calendar"></i> Requested: ${new Date(req.created_at).toLocaleString()}</div>
                 <div style="margin-top:12px; display:flex; gap:10px;">
-                    <button onclick="approveEvacuation('${req.id}')" class="success small" style="background:#10b981; padding:8px 16px;">✅ Approve Evacuation</button>
-                    <button onclick="rejectEvacuation('${req.id}')" class="danger small" style="background:#dc2626; padding:8px 16px;">❌ Reject</button>
+                    <button onclick="approveEvacuation('${req.id}')" class="success small" style="background:#10b981; padding:8px 16px;"><i class="fas fa-check"></i> Approve Evacuation</button>
+                    <button onclick="rejectEvacuation('${req.id}')" class="danger small" style="background:#dc2626; padding:8px 16px;"><i class="fas fa-times"></i> Reject</button>
                 </div>
             </div>`;
         }
@@ -1146,18 +1201,18 @@
         let html = '';
         for (let req of requests) {
             html += `<div class="approval-card" style="border-left-color:#f59e0b; margin-bottom:15px;">
-                <div><strong>💰 PAYMENT APPROVAL REQUEST</strong></div>
-                <div>👤 Worker: ${escapeHtml(req.worker_name)}</div>
-                <div>🏠 Room: ${escapeHtml(req.action_data?.roomNumber)}</div>
-                <div>👥 Tenant: ${escapeHtml(req.action_data?.tenantName)}</div>
-                <div>💰 Amount: UGX ${req.action_data?.amount?.toLocaleString()}</div>
-                <div>📅 Month: ${req.action_data?.month}</div>
-                <div>💳 Method: ${req.action_data?.method}</div>
-                <div>🆔 Reference: ${req.action_data?.reference || 'N/A'}</div>
-                <div>📅 Requested: ${new Date(req.created_at).toLocaleString()}</div>
+                <div><strong><i class="fas fa-money-bill-wave"></i> PAYMENT APPROVAL REQUEST</strong></div>
+                <div><i class="fas fa-user"></i> Worker: ${escapeHtml(req.worker_name)}</div>
+                <div><i class="fas fa-door-open"></i> Room: ${escapeHtml(req.action_data?.roomNumber)}</div>
+                <div><i class="fas fa-user"></i> Tenant: ${escapeHtml(req.action_data?.tenantName)}</div>
+                <div><i class="fas fa-coins"></i> Amount: UGX ${req.action_data?.amount?.toLocaleString()}</div>
+                <div><i class="fas fa-calendar"></i> Month: ${req.action_data?.month}</div>
+                <div><i class="fas fa-credit-card"></i> Method: ${req.action_data?.method}</div>
+                <div><i class="fas fa-hashtag"></i> Reference: ${req.action_data?.reference || 'N/A'}</div>
+                <div><i class="fas fa-clock"></i> Requested: ${new Date(req.created_at).toLocaleString()}</div>
                 <div style="margin-top:12px; display:flex; gap:10px;">
-                    <button onclick="approvePayment('${req.id}', ${req.action_data?.amount}, '${req.action_data?.month}', ${req.action_data?.roomIndex}, '${req.action_data?.method}', '${req.action_data?.reference}')" class="success small" style="background:#10b981; padding:8px 16px;">✅ Approve Payment</button>
-                    <button onclick="rejectPayment('${req.id}')" class="danger small" style="background:#dc2626; padding:8px 16px;">❌ Reject</button>
+                    <button onclick="approvePayment('${req.id}', ${req.action_data?.amount}, '${req.action_data?.month}', ${req.action_data?.roomIndex}, '${req.action_data?.method}', '${req.action_data?.reference}')" class="success small" style="background:#10b981; padding:8px 16px;"><i class="fas fa-check"></i> Approve Payment</button>
+                    <button onclick="rejectPayment('${req.id}')" class="danger small" style="background:#dc2626; padding:8px 16px;"><i class="fas fa-times"></i> Reject</button>
                 </div>
             </div>`;
         }
@@ -1169,7 +1224,7 @@
         document.getElementById('pendingApprovalsList').innerHTML = html;
     }
     
-    // ============ APPROVE PAYMENT (FIXED) ============
+    // ============ APPROVE PAYMENT ============
     
     async function approvePayment(requestId, amount, month, roomIndex, method, reference) {
         console.log("=== approvePayment START ===");
@@ -1223,11 +1278,8 @@
                     })
                     .eq('id', requestId);
                 
-                const adminUser = getCurrentUser();
-                
-                // Notify the worker
                 if (request.worker_id) {
-                    await sendPushNotification(
+                    await addNotification(
                         request.worker_id,
                         'worker',
                         '✅ Payment Approved',
@@ -1237,23 +1289,6 @@
                         request.property_id
                     );
                 }
-                
-                // Notify Super Admin
-                if (superAdminData && superAdminData.id) {
-                    await sendPushNotification(
-                        superAdminData.id,
-                        'super_admin',
-                        '💰 Payment Approved',
-                        `${adminUser?.name || 'Admin'} approved payment of UGX ${actualAmount?.toLocaleString()} for property`,
-                        'payment',
-                        requestId,
-                        request.property_id
-                    );
-                }
-                
-                // Notify Property Owner
-                const roomNumber = request.action_data?.roomNumber || 'Unknown room';
-                await notifyOwnerPaymentReceived(request.property_id, roomNumber, actualAmount, transactionId);
                 
                 await addActivityLog('payment_approved', `Approved payment of UGX ${actualAmount?.toLocaleString()} - Transaction: ${transactionId}`, request.property_id, transactionId);
                 
@@ -1351,13 +1386,13 @@
         for (let req of requests) {
             if (req.action_data?.broadcast_type === 'worker_tenant_notice') {
                 html += `<div class="approval-card" style="border-left-color:#25D366;">
-                    <div><strong>📢 WORKER BROADCAST APPROVAL REQUEST</strong></div>
-                    <div>👤 Worker: ${escapeHtml(req.worker_name)}</div>
-                    <div>👥 Recipients: ${req.action_data?.recipients?.length || 0} tenant(s)</div>
-                    <div>📝 Message: ${escapeHtml(req.action_data?.message?.substring(0, 200))}</div>
+                    <div><strong><i class="fas fa-bullhorn"></i> WORKER BROADCAST APPROVAL REQUEST</strong></div>
+                    <div><i class="fas fa-user"></i> Worker: ${escapeHtml(req.worker_name)}</div>
+                    <div><i class="fas fa-users"></i> Recipients: ${req.action_data?.recipients?.length || 0} tenant(s)</div>
+                    <div><i class="fas fa-comment"></i> Message: ${escapeHtml(req.action_data?.message?.substring(0, 200))}</div>
                     <div style="margin-top:8px; display:flex; gap:8px;">
-                        <button onclick="approveWorkerBroadcast('${req.id}')" class="success small">✅ Approve & Send</button>
-                        <button onclick="rejectWorkerBroadcast('${req.id}')" class="danger small">❌ Reject</button>
+                        <button onclick="approveWorkerBroadcast('${req.id}')" class="success small"><i class="fas fa-check"></i> Approve & Send</button>
+                        <button onclick="rejectWorkerBroadcast('${req.id}')" class="danger small"><i class="fas fa-times"></i> Reject</button>
                     </div>
                 </div>`;
             }
@@ -1465,54 +1500,31 @@
         const container = document.getElementById('activityLogList');
         
         if (error || !data || data.length === 0) {
-            container.innerHTML = '<div class="activity-item">No activities yet.</div>';
+            container.innerHTML = '<div class="activity-item"><i class="fas fa-info-circle"></i> No activities yet.</div>';
             return;
         }
         
         let html = '';
         for (let log of data) {
             const date = new Date(log.created_at);
+            const icon = getActivityIcon(log.action);
             html += `<div class="activity-item">
-                <small>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small><br>
-                <strong>👤 ${escapeHtml(log.user_name)}</strong> - ${escapeHtml(log.action)}<br>
+                <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small><br>
+                <strong>${icon} ${escapeHtml(log.user_name)}</strong> - ${escapeHtml(log.action)}<br>
                 ${escapeHtml(log.details || '')}
-                ${log.transaction_id ? `<br><small>Transaction ID: ${escapeHtml(log.transaction_id)}</small>` : ''}
+                ${log.transaction_id ? `<br><small><i class="fas fa-receipt"></i> Transaction ID: ${escapeHtml(log.transaction_id)}</small>` : ''}
             </div>`;
         }
         container.innerHTML = html;
     }
     
-    // ============ HISTORY ACCESS ============
-    
-    function requestHistoryAccess() {
-        document.getElementById('historyPropertySelect').innerHTML = '<option value="">-- Select Property --</option>';
-        for (let prop of allProperties) {
-            document.getElementById('historyPropertySelect').innerHTML += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
-        }
-        document.getElementById('historyAccessModal').style.display = 'flex';
-    }
-    
-    function closeHistoryAccessModal() {
-        document.getElementById('historyAccessModal').style.display = 'none';
-    }
-    
-    async function submitHistoryAccessRequest() {
-        const propertyId = document.getElementById('historyPropertySelect').value;
-        const reason = document.getElementById('historyAccessReason').value;
-        const user = getCurrentUser();
-        
-        if (!propertyId) {
-            alert('Please select a property');
-            return;
-        }
-        
-        const success = await requestHistoryViewAccess(propertyId, user.id, user.name);
-        if (success) {
-            alert('✅ History access request sent to Super Admin. You will be notified when approved.');
-            closeHistoryAccessModal();
-        } else {
-            alert('Failed to send request. Please try again.');
-        }
+    function getActivityIcon(action) {
+        if (action.includes('payment')) return '<i class="fas fa-money-bill-wave" style="color:#10b981;"></i>';
+        if (action.includes('room')) return '<i class="fas fa-door-open" style="color:#2c7be5;"></i>';
+        if (action.includes('worker')) return '<i class="fas fa-hard-hat" style="color:#f59e0b;"></i>';
+        if (action.includes('broadcast')) return '<i class="fas fa-bullhorn" style="color:#8b5cf6;"></i>';
+        if (action.includes('evacuation')) return '<i class="fas fa-door-open" style="color:#dc2626;"></i>';
+        return '<i class="fas fa-bell" style="color:#6c757d;"></i>';
     }
     
     function logout() { 
@@ -1520,133 +1532,6 @@
             localStorage.clear(); 
             window.location.href = 'login.html'; 
         } 
-    }
-
-    // ============ FIXED NOTIFICATION FUNCTIONS ============
-
-    // Override the displayNotificationsInDropdown function
-    async function displayNotificationsInDropdown(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        
-        try {
-            const user = getCurrentUser();
-            if (!user) {
-                container.innerHTML = '<div style="padding: 15px; text-align: center;">Please login to see notifications</div>';
-                return;
-            }
-            
-            const { data, error } = await window.supabaseClient
-                .from('system_notifications')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false })
-                .limit(20);
-            
-            if (error) throw error;
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="padding: 15px; text-align: center; color: #666;"><i class="fas fa-bell-slash"></i> No notifications</div>';
-                return;
-            }
-            
-            let html = '';
-            for (let notif of data) {
-                const date = new Date(notif.created_at);
-                const isUnread = !notif.is_read;
-                const icon = getNotificationIcon(notif.type);
-                
-                html += `
-                    <div class="notification-item ${isUnread ? 'unread' : ''}" data-id="${notif.id}" onclick="markNotificationAsRead('${notif.id}')" style="padding: 12px; border-bottom: 1px solid #eee; background: ${isUnread ? '#fff3cd' : 'white'}; cursor: pointer;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 1.2rem;">${icon}</span>
-                            <div style="flex: 1;">
-                                <div style="font-weight: bold; font-size: 0.85rem;">${escapeHtml(notif.title)}</div>
-                                <div style="font-size: 0.75rem; color: #555;">${escapeHtml(notif.message)}</div>
-                                <div style="font-size: 0.65rem; color: #999; margin-top: 5px;">${date.toLocaleString()}</div>
-                            </div>
-                            ${!isUnread ? '<span style="font-size: 0.7rem; color: #10b981;"><i class="fas fa-check-circle"></i></span>' : '<span style="font-size: 0.7rem; color: #f59e0b;"><i class="fas fa-circle"></i></span>'}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += `<button class="mark-all-read" onclick="markAllNotificationsAsRead()" style="width: 100%; background: #f59e0b; border: none; padding: 10px; border-radius: 0 0 12px 12px; cursor: pointer; font-weight: bold;"><i class="fas fa-check-double"></i> Mark All Read</button>`;
-            
-            container.innerHTML = html;
-            
-        } catch (err) {
-            console.error("Error loading notifications:", err);
-            container.innerHTML = '<div style="padding: 15px; text-align: center; color: red;">Error loading notifications</div>';
-        }
-    }
-
-    function getNotificationIcon(type) {
-        switch(type) {
-            case 'payment': return '💰';
-            case 'broadcast': return '📢';
-            case 'approval': return '✅';
-            case 'system': return '🔔';
-            default: return '📬';
-        }
-    }
-
-    // Make sure markNotificationAsRead is defined
-    async function markNotificationAsRead(notificationId) {
-        try {
-            await window.supabaseClient
-                .from('system_notifications')
-                .update({ is_read: true })
-                .eq('id', notificationId);
-            
-            await displayNotificationsInDropdown('notificationList');
-            await updateNotificationBadge();
-        } catch (err) {
-            console.error("Error marking notification as read:", err);
-        }
-    }
-
-    async function markAllNotificationsAsRead() {
-        try {
-            const user = getCurrentUser();
-            if (!user) return;
-            
-            await window.supabaseClient
-                .from('system_notifications')
-                .update({ is_read: true })
-                .eq('user_id', user.id)
-                .eq('is_read', false);
-            
-            await displayNotificationsInDropdown('notificationList');
-            await updateNotificationBadge();
-            alert('✅ All notifications marked as read');
-        } catch (err) {
-            console.error("Error marking all as read:", err);
-        }
-    }
-
-    async function updateNotificationBadge() {
-        try {
-            const user = getCurrentUser();
-            if (!user) return;
-            
-            const { data, error } = await window.supabaseClient
-                .from('system_notifications')
-                .select('id', { count: 'exact' })
-                .eq('user_id', user.id)
-                .eq('is_read', false);
-            
-            if (error) throw error;
-            
-            const count = data?.length || 0;
-            const badge = document.getElementById('notificationBadge');
-            if (badge) {
-                badge.textContent = count;
-                badge.style.display = count > 0 ? 'flex' : 'none';
-            }
-        } catch (err) {
-            console.error("Error updating badge:", err);
-        }
     }
     
     window.addEventListener('load', () => { loadPropertyAdminData(); });

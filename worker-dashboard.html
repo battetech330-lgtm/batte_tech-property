@@ -39,8 +39,8 @@
             border-radius: 14px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .logo-text h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
-        .logo-text span { font-size: 0.55rem; letter-spacing: 2px; opacity: 0.8; }
+        .logo-text h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 1px; }
+        .logo-text span { font-size: 0.6rem; letter-spacing: 2px; opacity: 0.8; }
         
         .dashboard-container { max-width: 1400px; margin: 1rem auto; padding: 0 1rem; }
         .worker-header { 
@@ -176,9 +176,10 @@
         }
         .btn-statement:hover { transform: scale(1.02); }
         
-        .status-paid { color: #10b981; font-weight: 600; }
-        .status-unpaid { color: #dc2626; font-weight: 600; }
+        .status-paid { color: #10b981; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem; }
+        .status-unpaid { color: #dc2626; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem; }
         .days-overdue { font-size: 0.7rem; color: #dc2626; margin-top: 3px; display: flex; align-items: center; gap: 0.2rem; }
+        .paid-until { font-size: 0.7rem; color: #10b981; margin-top: 3px; display: flex; align-items: center; gap: 0.2rem; }
         
         .activity-item { 
             background: #f8fafc; 
@@ -242,6 +243,9 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .modal-btn.request { background: #f59e0b; color: #1a2a3e; }
         .modal-btn.cancel { background: #6c757d; color: white; }
@@ -311,9 +315,6 @@
                 <span class="session-timer" id="sessionTimer"><i class="fas fa-clock"></i> Session: 5:00</span>
             </div>
         </div>
-        <button id="enableNotificationsBtn" onclick="requestPushNotificationPermission()" style="background: #2c7be5; margin-right: 0.5rem; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-weight: bold;">
-            <i class="fas fa-bell"></i> Enable Notifications
-        </button>
         <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
     
@@ -397,9 +398,10 @@
         <h3><i class="fas fa-money-bill-wave"></i> Request Payment</h3>
         <div><strong><i class="fas fa-door-open"></i> Room:</strong> <span id="paymentRoom"></span></div>
         <div><strong><i class="fas fa-user"></i> Tenant:</strong> <span id="paymentTenant"></span></div>
+        <div><strong><i class="fas fa-phone"></i> Tenant Phone:</strong> <span id="paymentTenantPhone"></span></div>
         <div><strong><i class="fas fa-coins"></i> Amount Due:</strong> <span id="paymentAmountDue"></span></div>
         <label><i class="fas fa-calendar-alt"></i> Payment Date:</label>
-        <input type="date" id="paymentDate">
+        <input type="date" id="paymentDate" value="">
         <input type="number" id="paymentAmount" placeholder="Amount to Pay (UGX)">
         <select id="paymentMethod">
             <option><i class="fas fa-money-bill-wave"></i> Cash</option>
@@ -422,6 +424,7 @@
         <h3><i class="fas fa-door-open"></i> Tenant Evacuation</h3>
         <div><strong><i class="fas fa-door-open"></i> Room:</strong> <span id="evacuateRoom"></span></div>
         <div><strong><i class="fas fa-user"></i> Tenant:</strong> <span id="evacuateTenant"></span></div>
+        <div><strong><i class="fas fa-phone"></i> Tenant Phone:</strong> <span id="evacuateTenantPhone"></span></div>
         <div><strong><i class="fas fa-coins"></i> Current Balance:</strong> <span id="evacuateBalance" style="color:#dc2626;"></span></div>
         <textarea id="evacuateReason" rows="2" placeholder="Reason for evacuation..."></textarea>
         <div style="margin-top:10px; padding:10px; background:#fff3cd; border-radius:12px;">
@@ -568,7 +571,6 @@
         await loadMyActivityLog();
         
         initChatPanel();
-        await initNotificationSystem();
         
         const events = ['click', 'keypress', 'scroll', 'mousemove', 'touchstart'];
         events.forEach(event => document.addEventListener(event, resetInactivityTimer));
@@ -629,7 +631,7 @@
             }
             
             const statusText = isPaid ? 'PAID' : 'UNPAID';
-            const statusClass = isPaid ? 'status-paid' : 'status-unpaid';
+            const statusIcon = isPaid ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
             
             if (isPaid) {
                 totalCollectedThisMonth += room.rentAmount;
@@ -647,6 +649,7 @@
             
             const paidUntilDisplay = paidUntilDate ? new Date(paidUntilDate).toLocaleDateString() : 'Expired';
             const overdueDisplay = daysOverdue > 0 ? `<div class="days-overdue"><i class="fas fa-exclamation-triangle"></i> ${daysOverdue} days overdue</div>` : '';
+            const paidUntilClass = paidUntilDate && !isPaid ? 'days-overdue' : (paidUntilDate ? 'paid-until' : '');
             
             html += `
                 <tr>
@@ -654,7 +657,7 @@
                     <td><i class="fas fa-user"></i> ${escapeHtml(room.tenant)}</td>
                     <td><i class="fas fa-phone"></i> ${escapeHtml(room.tenantPhone || '-')}</td>
                     <td><i class="fas fa-coins"></i> UGX ${(room.rentAmount || 0).toLocaleString()}</td>
-                    <td class="${statusClass}">${isPaid ? '<i class="fas fa-check-circle"></i> PAID' : '<i class="fas fa-times-circle"></i> UNPAID'}</td>
+                    <td class="${isPaid ? 'status-paid' : 'status-unpaid'}">${statusIcon} ${statusText}</td>
                     <td>
                         ${paidUntilDisplay}
                         ${overdueDisplay}
@@ -683,6 +686,7 @@
         currentEvacuateRoomIndex = roomIndex;
         document.getElementById('evacuateRoom').innerText = room.roomNumber;
         document.getElementById('evacuateTenant').innerText = room.tenant;
+        document.getElementById('evacuateTenantPhone').innerHTML = room.tenantPhone || 'No phone';
         document.getElementById('evacuateBalance').innerHTML = `UGX ${room.rentAmount.toLocaleString()}`;
         document.getElementById('evacuateReason').value = '';
         document.getElementById('evacuateModal').style.display = 'flex';
@@ -708,6 +712,7 @@
                 roomIndex: roomIndex,
                 roomNumber: room.roomNumber,
                 tenantName: room.tenant,
+                tenantPhone: room.tenantPhone,
                 reason: reason,
                 writtenOffAmount: room.rentAmount,
                 workerName: user.name,
@@ -856,7 +861,7 @@
                             <th style="padding:8px;"><i class="fas fa-credit-card"></i> Method</th>
                             <th style="padding:8px;"><i class="fas fa-hashtag"></i> Reference</th>
                             <th style="padding:8px;"><i class="fas fa-chart-simple"></i> Status</th>
-                         </tr>
+                         </table>
                     </thead>
                     <tbody>
         `;
@@ -898,6 +903,7 @@
         currentPaymentRoomIndex = roomIndex;
         document.getElementById('paymentRoom').innerText = room.roomNumber;
         document.getElementById('paymentTenant').innerText = room.tenant;
+        document.getElementById('paymentTenantPhone').innerHTML = room.tenantPhone || 'No phone';
         document.getElementById('paymentAmountDue').innerHTML = `UGX ${room.rentAmount.toLocaleString()}`;
         document.getElementById('paymentDate').value = getTodayDate();
         document.getElementById('paymentAmount').value = room.rentAmount;
@@ -928,6 +934,7 @@
                 roomIndex: roomIndex,
                 roomNumber: room.roomNumber,
                 tenantName: room.tenant,
+                tenantPhone: room.tenantPhone,
                 amount: amount,
                 month: paymentMonth,
                 paymentDate: paymentDate,
@@ -972,13 +979,22 @@
         let html = '';
         for (let log of data) {
             const date = new Date(log.created_at);
+            const icon = getActivityIconForLog(log.action);
             html += `<div class="activity-item">
                 <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small><br>
-                <strong><i class="fas fa-tag"></i> ${escapeHtml(log.action)}</strong><br>
+                <strong>${icon} ${escapeHtml(log.action)}</strong><br>
                 <i class="fas fa-info-circle"></i> ${escapeHtml(log.details || '')}
             </div>`;
         }
         container.innerHTML = html;
+    }
+    
+    function getActivityIconForLog(action) {
+        if (action.includes('payment')) return '<i class="fas fa-money-bill-wave" style="color:#10b981;"></i>';
+        if (action.includes('evacuation')) return '<i class="fas fa-door-open" style="color:#f59e0b;"></i>';
+        if (action.includes('notice')) return '<i class="fas fa-bullhorn" style="color:#8b5cf6;"></i>';
+        if (action.includes('message')) return '<i class="fas fa-envelope" style="color:#2c7be5;"></i>';
+        return '<i class="fas fa-bell" style="color:#6c757d;"></i>';
     }
     
     function logout() {
