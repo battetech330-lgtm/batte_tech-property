@@ -1,9 +1,13 @@
-# TODO - Super Admin Image Manager
+# TODO - Notification updates
 
-- [ ] Inspect `super-admin-dashboard.html` for `admin-header` and `<style>` / `<script>` sections.
-- [ ] Add the requested Image Manager toggle + panel HTML right after `.admin-header`.
-- [ ] Add the requested Image Manager CSS into the `<style>` section.
-- [ ] Add the requested Image Manager JavaScript into the existing `<script>` (and ensure functions are globally accessible at the end).
-- [ ] Wire up `window.supabaseClient` usage assumptions (ensure it already exists on the page).
-- [ ] Validate there are no duplicate function names or missing dependencies (`escapeHtml`).
+- [x] Inspect `notifications.js` for existing notification trigger functions and messaging helpers
 
+- [x] Implement `notifyAllRelevantUsers(propertyId, action, details, amount, roomNumber, tenantName)` in `notifications.js`
+
+- [x] Add missing helper functions used by the dispatcher (`getNotificationTitle`, `getNotificationMessage`) consistent with existing action keys
+
+- [x] Refactor existing trigger functions (payment/room/evacuation/remittance/bill) to delegate to `notifyAllRelevantUsers`
+
+- [ ] Ensure `window.*` exports include the new dispatcher
+- [ ] Sanity check by running a quick search for unresolved references in `notifications.js`
+- [ ] Manual functional test checklist (payment request/approve/reject, room occupied/vacated, evacuation, remittance, bill paid)

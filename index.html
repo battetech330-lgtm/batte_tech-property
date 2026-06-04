@@ -129,6 +129,7 @@
         .brand {
             margin-bottom: 2rem;
             animation: fadeInUp 1s ease;
+            cursor: pointer;
         }
 
         @keyframes fadeInUp {
@@ -140,6 +141,15 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        @keyframes vibrate {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
         }
 
         .brand-icon {
@@ -154,19 +164,14 @@
             border-radius: 35px;
             margin: 0 auto 1.5rem;
             border: 1px solid rgba(255,255,255,0.2);
-            animation: pulse 2s infinite;
+            animation: vibrate 3s infinite ease-in-out;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255,255,255,0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 15px rgba(255,255,255,0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255,255,255,0);
-            }
+        .brand-icon:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.05);
         }
 
         .brand h1 {
@@ -385,7 +390,7 @@
     </header>
 
     <div class="hero">
-        <div class="brand">
+        <div class="brand" onclick="window.location.href='login.html'">
             <div class="brand-icon"><i class="fas fa-building"></i></div>
             <h1>BATTETECH</h1>
             <span>PROPERTY CONSULTANTS</span>
@@ -395,9 +400,6 @@
         </div>
         <div class="action-buttons">
             <a href="rentals.html" class="action-btn primary"><i class="fas fa-home"></i> View Rentals</a>
-            <a href="login.html" class="action-btn secondary"><i class="fas fa-lock"></i> Owner Login</a>
-        </div>
-        <div class="action-buttons">
             <a href="about.html" class="action-btn about"><i class="fas fa-info-circle"></i> About BATTETECH</a>
         </div>
     </div>

@@ -577,7 +577,10 @@
         startTimer();
     }
     
+    
     async function loadRoomsTable(property) {
+
+
         const propData = property.data || { units: [] };
         roomsData = propData.units;
         
@@ -586,6 +589,11 @@
         let totalPendingThisMonth = 0;
         let html = '';
         unpaidTenantsList = [];
+        
+        // Get current month key
+        const currentYear = new Date().getFullYear();
+        const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+        const currentMonthKey = `${currentYear}-${currentMonth}`;
         
         const occupiedRooms = roomsData.filter(room => !room.vacant);
         
@@ -596,19 +604,28 @@
             return;
         }
         
-        const displayYear = property.current_display_year || new Date().getFullYear();
-        const displayMonth = property.current_display_month || new Date().getMonth() + 1;
-        const monthKey = `${displayYear}-${String(displayMonth).padStart(2, '0')}`;
-        
         for (let i = 0; i < roomsData.length; i++) {
             const room = roomsData[i];
             if (room.vacant) continue;
+            
+            // ***** USE THE SAME PAYMENT CHECK AS ADMIN DASHBOARD *****
+            // Check room.payments object (NOT paymentsByMonth)
+            const monthPayment = room.payments?.[currentMonthKey];
             
             let isPaid = false;
             let paidUntilDate = null;
             let daysOverdue = 0;
             
-            if (room.paymentHistory && room.paymentHistory.length > 0) {
+            if (monthPayment) {
+                // Payment exists for this month
+                isPaid = monthPayment.status === 'paid' || monthPayment.balance === 0;
+                if (isPaid) {
+                    paidUntilDate = monthPayment.paidDate ? addDays(new Date(monthPayment.paidDate), 30).toISOString().split('T')[0] : null;
+                }
+            }
+            
+            // Also check paymentHistory for backwards compatibility
+            if (!isPaid && room.paymentHistory && room.paymentHistory.length > 0) {
                 const sortedPayments = [...room.paymentHistory].sort((a, b) => new Date(b.paidUntilDate) - new Date(a.paidUntilDate));
                 for (let payment of sortedPayments) {
                     if (payment.paidUntilDate && payment.paidUntilDate >= today) {
@@ -619,11 +636,7 @@
                 }
             }
             
-            if (!isPaid && room.paymentsByMonth) {
-                const monthPayment = room.paymentsByMonth[monthKey];
-                if (monthPayment && monthPayment.status === 'paid') isPaid = true;
-            }
-            
+            // Calculate days overdue if not paid
             if (!isPaid && paidUntilDate) {
                 daysOverdue = calculateDaysOverdue(paidUntilDate);
             } else if (!isPaid) {
@@ -633,37 +646,66 @@
             const statusText = isPaid ? 'PAID' : 'UNPAID';
             const statusIcon = isPaid ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
             
+            // Calculate totals for this month (based on remaining balance for current month)
+            const monthRemainingBalance = monthPayment ? (monthPayment.balance ?? room.rentAmount) : room.rentAmount;
             if (isPaid) {
                 totalCollectedThisMonth += room.rentAmount;
             } else {
-                totalPendingThisMonth += room.rentAmount;
+                totalPendingThisMonth += monthRemainingBalance;
                 unpaidTenantsList.push({
                     index: i,
                     roomNumber: room.roomNumber,
                     tenantName: room.tenant,
                     phone: room.tenantPhone,
-                    balance: room.rentAmount,
+                    balance: monthRemainingBalance,
                     daysOverdue: daysOverdue
                 });
             }
-            
-            const paidUntilDisplay = paidUntilDate ? new Date(paidUntilDate).toLocaleDateString() : 'Expired';
+
+            // Calculate total owed across all months (including previous)
+            let totalOwed = monthRemainingBalance;
+            if (room.payments) {
+                for (let month in room.payments) {
+                    if (month !== currentMonthKey && room.payments[month]?.balance > 0) {
+                        totalOwed += room.payments[month].balance;
+                    }
+                }
+            }
+
+            // Status text replacement (PAID / PARTIAL / UNPAID)
+            let remainingBalance = monthRemainingBalance; // default: full rent for current month
+            let paidAmount = 0;
+            if (monthPayment) {
+                paidAmount = monthPayment.paid ?? 0;
+                remainingBalance = monthPayment.balance ?? room.rentAmount;
+                // keep isPaid based on balance
+                isPaid = (remainingBalance === 0);
+            }
+
+            const isPartial = !isPaid && (paidAmount > 0 || remainingBalance < (room.rentAmount || 0));
+            const statusTextFinal = isPaid ? 'PAID' : (isPartial ? `PARTIAL (UGX ${remainingBalance.toLocaleString()} left)` : 'UNPAID');
+            const statusClass = isPaid ? 'status-paid' : 'status-unpaid';
+            const statusIconFinal = isPaid ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-clock"></i>';
+
+            // Store the remaining balance for the payment modal
+            const remainingForPayment = remainingBalance;
+
+            const paidUntilDisplay = paidUntilDate ? new Date(paidUntilDate).toLocaleDateString() : (isPaid ? 'Current month paid' : 'Not paid');
             const overdueDisplay = daysOverdue > 0 ? `<div class="days-overdue"><i class="fas fa-exclamation-triangle"></i> ${daysOverdue} days overdue</div>` : '';
-            const paidUntilClass = paidUntilDate && !isPaid ? 'days-overdue' : (paidUntilDate ? 'paid-until' : '');
-            
+
             html += `
                 <tr>
                     <td><strong><i class="fas fa-door-open"></i> ${escapeHtml(room.roomNumber)}</strong></td>
                     <td><i class="fas fa-user"></i> ${escapeHtml(room.tenant)}</td>
                     <td><i class="fas fa-phone"></i> ${escapeHtml(room.tenantPhone || '-')}</td>
                     <td><i class="fas fa-coins"></i> UGX ${(room.rentAmount || 0).toLocaleString()}</td>
-                    <td class="${isPaid ? 'status-paid' : 'status-unpaid'}">${statusIcon} ${statusText}</td>
+                    <td class="${statusClass}">${statusIconFinal} ${statusTextFinal}</td>
                     <td>
                         ${paidUntilDisplay}
                         ${overdueDisplay}
                     </td>
                     <td>
-                        ${!isPaid ? `<button class="btn-pay" onclick="openPaymentModal(${i})"><i class="fas fa-money-bill-wave"></i> Request Payment</button>` : ''}
+                        ${!isPaid ? `<button class="btn-pay" onclick="openPaymentModal(${i}, ${remainingForPayment})"><i class="fas fa-money-bill-wave"></i> Pay UGX ${remainingForPayment.toLocaleString()}</button>` : ''}
                         <button class="btn-evacuate" onclick="openEvacuateModal(${i})"><i class="fas fa-door-open"></i> Evacuate</button>
                         <button class="btn-statement" onclick="showPaymentHistory(${i})"><i class="fas fa-clock-rotate-left"></i> History</button>
                     </td>
@@ -678,6 +720,13 @@
         document.getElementById('roomsTableBody').innerHTML = html;
         document.getElementById('totalCollected').innerHTML = `<i class="fas fa-coins"></i> UGX ${totalCollectedThisMonth.toLocaleString()}`;
         document.getElementById('totalPending').innerHTML = `<i class="fas fa-hourglass-half"></i> UGX ${totalPendingThisMonth.toLocaleString()}`;
+    }
+    
+    // Helper function to add days (if not already present)
+    function addDays(date, days) {
+        const result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
     }
     
     function openEvacuateModal(roomIndex) {
@@ -898,16 +947,23 @@
     
     function closePaymentHistoryModal() { document.getElementById('paymentHistoryModal').style.display = 'none'; }
     
-    function openPaymentModal(roomIndex) {
+    function openPaymentModal(roomIndex, remainingBalance) {
         const room = roomsData[roomIndex];
         currentPaymentRoomIndex = roomIndex;
+        const remaining = typeof remainingBalance === 'number' ? remainingBalance : (remainingBalance ?? room.rentAmount);
+
         document.getElementById('paymentRoom').innerText = room.roomNumber;
         document.getElementById('paymentTenant').innerText = room.tenant;
         document.getElementById('paymentTenantPhone').innerHTML = room.tenantPhone || 'No phone';
-        document.getElementById('paymentAmountDue').innerHTML = `UGX ${room.rentAmount.toLocaleString()}`;
+        document.getElementById('paymentAmountDue').innerHTML = `UGX ${remaining.toLocaleString()}`;
         document.getElementById('paymentDate').value = getTodayDate();
-        document.getElementById('paymentAmount').value = room.rentAmount;
+        document.getElementById('paymentAmount').value = remaining;
+        document.getElementById('paymentAmount').max = remaining; // Set max attribute
         document.getElementById('paymentModal').style.display = 'flex';
+
+        // Add validation message
+        const amountInput = document.getElementById('paymentAmount');
+        amountInput.placeholder = `Max: UGX ${remaining.toLocaleString()}`;
     }
     
     function closePaymentModal() { document.getElementById('paymentModal').style.display = 'none'; }
@@ -916,45 +972,126 @@
         const roomIndex = currentPaymentRoomIndex;
         const room = roomsData[roomIndex];
         const paymentDate = document.getElementById('paymentDate').value;
-        const amount = parseInt(document.getElementById('paymentAmount').value);
+        const requestedAmount = parseInt(document.getElementById('paymentAmount').value);
         const method = document.getElementById('paymentMethod').value;
         const reference = document.getElementById('paymentReference').value;
         const user = getCurrentUser();
-        
-        if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
-        if (!paymentDate) { alert('Select payment date'); return; }
-        
+
+        if (!requestedAmount || requestedAmount <= 0) { 
+            alert('Please enter valid amount'); 
+            return; 
+        }
+
+        if (!paymentDate) { 
+            alert('Select payment date'); 
+            return; 
+        }
+
+        // Use the payment month key in the same YYYY-MM format used by room.payments
         const paymentDateObj = new Date(paymentDate);
         const paymentMonth = `${paymentDateObj.getFullYear()}-${String(paymentDateObj.getMonth() + 1).padStart(2, '0')}`;
-        
-        const { error } = await window.supabaseClient.from('approval_requests').insert({
-            property_id: currentPropertyId,
-            action_type: 'payment_approval',
-            action_data: {
-                roomIndex: roomIndex,
-                roomNumber: room.roomNumber,
-                tenantName: room.tenant,
-                tenantPhone: room.tenantPhone,
-                amount: amount,
-                month: paymentMonth,
-                paymentDate: paymentDate,
-                method: method,
-                reference: reference,
-                workerName: user.name,
-                workerId: user.id
-            },
-            worker_id: user.id,
-            worker_name: user.name,
-            status: 'pending',
-            created_at: new Date().toISOString()
-        });
-        
+
+        // Get the current remaining balance for the selected payment month
+        const monthPayment = room.payments?.[paymentMonth];
+        const remainingBalance = monthPayment ? (monthPayment.balance ?? room.rentAmount) : room.rentAmount;
+
+        // Validate amount against remaining balance
+        if (requestedAmount > remainingBalance) {
+            const excessAmount = requestedAmount - remainingBalance;
+            const confirmExcess = confirm(
+                `⚠️ Amount exceeds remaining balance!\n\n` +
+                `Remaining balance: UGX ${remainingBalance.toLocaleString()}\n` +
+                `Requested amount: UGX ${requestedAmount.toLocaleString()}\n` +
+                `Excess amount: UGX ${excessAmount.toLocaleString()}\n\n` +
+                `Do you want to request approval for this excess payment?\n` +
+                `(This will require admin approval with a reason)`
+            );
+
+            if (!confirmExcess) return;
+
+            const reason = prompt('Reason for excess payment (e.g., advance payment, penalty, etc.):');
+            if (!reason) {
+                alert('Reason is required for excess payment approval');
+                return;
+            }
+
+            const { error } = await window.supabaseClient
+                .from('approval_requests')
+                .insert({
+                    property_id: currentPropertyId,
+                    action_type: 'payment_approval',
+                    action_data: {
+                        roomIndex: roomIndex,
+                        roomNumber: room.roomNumber,
+                        tenantName: room.tenant,
+                        tenantPhone: room.tenantPhone,
+                        amount: requestedAmount,
+                        remainingBalance: remainingBalance,
+                        excessAmount: excessAmount,
+                        excessReason: reason,
+                        month: paymentMonth,
+                        paymentDate: paymentDate,
+                        method: method,
+                        reference: reference,
+                        workerName: user.name,
+                        workerId: user.id,
+                        isExcess: true
+                    },
+                    worker_id: user.id,
+                    worker_name: user.name,
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                });
+
+            if (error) {
+                alert('Failed: ' + error.message);
+            } else {
+                alert('✅ Excess payment request sent to admin for approval!');
+                closePaymentModal();
+                await addActivityLog(
+                    'payment_requested',
+                    `Requested excess payment of UGX ${requestedAmount.toLocaleString()} for ${room.tenant} (excess: UGX ${excessAmount.toLocaleString()}, reason: ${reason})`
+                );
+            }
+            return;
+        }
+
+        // Normal payment (amount <= remaining balance)
+        const { error } = await window.supabaseClient
+            .from('approval_requests')
+            .insert({
+                property_id: currentPropertyId,
+                action_type: 'payment_approval',
+                action_data: {
+                    roomIndex: roomIndex,
+                    roomNumber: room.roomNumber,
+                    tenantName: room.tenant,
+                    tenantPhone: room.tenantPhone,
+                    amount: requestedAmount,
+                    remainingBalance: remainingBalance,
+                    month: paymentMonth,
+                    paymentDate: paymentDate,
+                    method: method,
+                    reference: reference,
+                    workerName: user.name,
+                    workerId: user.id,
+                    isExcess: false
+                },
+                worker_id: user.id,
+                worker_name: user.name,
+                status: 'pending',
+                created_at: new Date().toISOString()
+            });
+
         if (error) {
             alert('Failed: ' + error.message);
         } else {
-            alert('✅ Payment request sent to admin!');
+            alert(`✅ Payment request for UGX ${requestedAmount.toLocaleString()} sent to admin!`);
             closePaymentModal();
-            await addActivityLog('payment_requested', `Requested payment for ${room.tenant} - UGX ${amount.toLocaleString()}`);
+            await addActivityLog(
+                'payment_requested',
+                `Requested payment of UGX ${requestedAmount.toLocaleString()} for ${room.tenant} (remaining: UGX ${remainingBalance.toLocaleString()})`
+            );
         }
     }
     

@@ -459,6 +459,62 @@
     <div id="propertiesGrid" class="properties-grid"></div>
 </div>
 
+<!-- ACTIVITY LOG -->
+<div class="section-title" style="margin-top: 1rem;">📋 Activity Log</div>
+<div id="activityLogList" style="max-width:1200px; margin:0 auto; padding: 0 1rem;"></div>
+
+<!-- Print Activity Modal -->
+<div id="printActivityModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3><i class="fas fa-print"></i> Print Activity Log</h3>
+        <div class="form-row">
+            <select id="printFilterType" onchange="updatePrintFilterOptions()">
+                <option value="all">All Activities</option>
+                <option value="property">By Property</option>
+                <option value="user">By User</option>
+                <option value="role">By Role</option>
+                <option value="date_range">By Date Range</option>
+            </select>
+        </div>
+        <div id="printFilterOptions" style="display: none;">
+            <!-- Dynamic options will appear here -->
+        </div>
+        <div class="form-row" id="dateRangeFields" style="display: none;">
+            <input type="date" id="startDate" placeholder="Start Date">
+            <input type="date" id="endDate" placeholder="End Date">
+        </div>
+        <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
+            <button onclick="printActivityLog()" class="success"><i class="fas fa-print"></i> Print</button>
+            <button onclick="closePrintActivityModal()"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Activity Log Confirmation Modal -->
+<div id="resetActivityModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-exclamation-triangle"></i> Reset Activity Log</h3>
+        <p style="margin-bottom: 1rem;">⚠️ WARNING: This will permanently delete ALL activity logs from the database. This action cannot be undone!</p>
+        <div class="form-row">
+            <input type="text" id="resetConfirmText" placeholder='Type "DELETE ALL LOGS" to confirm'>
+        </div>
+        <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
+            <button onclick="resetActivityLog()" class="danger"><i class="fas fa-trash-alt"></i> Permanently Delete</button>
+            <button onclick="closeResetActivityModal()"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Log Buttons -->
+<div style="max-width:1200px; margin: 0 auto; padding: 0 1rem; display:flex; gap:0.8rem; margin-top: 0.8rem; flex-wrap: wrap;">
+    <button onclick="openPrintActivityModal()" style="background:#8b5cf6; color:white; border:none; padding:10px 20px; border-radius:50px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:0.5rem;">
+        <i class="fas fa-print"></i> Print
+    </button>
+    <button onclick="confirmResetActivityLog()" style="background:#dc2626; color:white; border:none; padding:10px 20px; border-radius:50px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:0.5rem;">
+        <i class="fas fa-trash-alt"></i> Reset All
+    </button>
+</div>
+
 <!-- Add Property Modal -->
 <div id="addPropertyModal" class="modal">
     <div class="modal-content">
@@ -541,10 +597,11 @@
     </div>
 </footer>
 
-<script>
+    <script>
     // ============ SESSION MANAGEMENT ============
     
     function checkAdminSession() {
+
         const isLoggedIn = localStorage.getItem('battetech_admin_session');
         const sessionTime = parseInt(localStorage.getItem('battetech_admin_session_time') || '0');
         
@@ -842,13 +899,331 @@
     // ============ LOGOUT ============
     
     function adminLogout() {
+
         if (confirm('Logout from Admin Dashboard?')) {
+
             localStorage.removeItem('battetech_admin_session');
             localStorage.removeItem('battetech_admin_session_time');
             window.location.href = 'login.html';
         }
     }
     
+    // ============ ACTIVITY LOG (PRINT + RESET) ============
+
+    let currentActivitiesForPrint = [];
+
+    async function loadActivityLogWithDetails() {
+        const userRole = localStorage.getItem('battetech_user_role');
+        const userId = localStorage.getItem('battetech_user_id');
+
+        let query = window.supabaseClient
+            .from('activity_logs')
+            .select(`*, properties:property_id (name)`)
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+        if (userRole === 'property_admin') {
+            const { data: properties } = await window.supabaseClient
+                .from('properties')
+                .select('id')
+                .eq('admin_id', userId);
+            const propertyIds = properties?.map(p => p.id) || [];
+            query = query.in('property_id', propertyIds);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('Error loading activity logs:', error);
+            return [];
+        }
+
+        currentActivitiesForPrint = data || [];
+        return currentActivitiesForPrint;
+    }
+
+    async function displayActivityLogWithDetails(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const logs = await loadActivityLogWithDetails();
+
+        if (!logs || logs.length === 0) {
+            container.innerHTML = '<div class="activity-item"><i class="fas fa-info-circle"></i> No activities yet.</div>';
+            return;
+        }
+
+        let html = '';
+        for (let log of logs) {
+            const date = new Date(log.created_at);
+            const propertyName = log.properties?.name || 'N/A';
+            const icon = getActivityIcon(log.action);
+
+            html += `
+                <div class="activity-item" style="margin-bottom: 0.8rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                        <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small>
+                        <small><i class="fas fa-building"></i> ${escapeHtml(propertyName)}</small>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <strong>${icon} ${escapeHtml(log.user_name || 'System')}</strong> (${escapeHtml(log.user_role || 'unknown')})
+                    </div>
+                    <div><i class="fas fa-tag"></i> ${escapeHtml(log.action)}</div>
+                    <div><i class="fas fa-info-circle"></i> ${escapeHtml(log.details || '')}</div>
+                    ${log.transaction_id ? `<div><small><i class="fas fa-receipt"></i> TXN: ${escapeHtml(log.transaction_id)}</small></div>` : ''}
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    function openPrintActivityModal() {
+        document.getElementById('printActivityModal').style.display = 'flex';
+        updatePrintFilterOptions();
+    }
+
+    function closePrintActivityModal() {
+        document.getElementById('printActivityModal').style.display = 'none';
+    }
+
+    async function updatePrintFilterOptions() {
+        const filterType = document.getElementById('printFilterType').value;
+        const optionsDiv = document.getElementById('printFilterOptions');
+        const dateRangeDiv = document.getElementById('dateRangeFields');
+
+        optionsDiv.innerHTML = '';
+        dateRangeDiv.style.display = 'none';
+
+        if (filterType === 'property') {
+            optionsDiv.style.display = 'block';
+            const { data: properties } = await window.supabaseClient
+                .from('properties')
+                .select('id, name');
+
+            let html = '<select id="printPropertySelect" style="width:100%; padding:10px;">';
+            html += '<option value="all">-- All Properties --</option>';
+            for (let prop of properties || []) {
+                html += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
+            }
+            html += '</select>';
+            optionsDiv.innerHTML = html;
+        } else if (filterType === 'user') {
+            optionsDiv.style.display = 'block';
+            const { data: users } = await window.supabaseClient
+                .from('users')
+                .select('id, full_name, role');
+
+            let html = '<select id="printUserSelect" style="width:100%; padding:10px;">';
+            html += '<option value="all">-- All Users --</option>';
+            for (let user of users || []) {
+                html += `<option value="${user.id}">${escapeHtml(user.full_name)} (${user.role})</option>`;
+            }
+            html += '</select>';
+            optionsDiv.innerHTML = html;
+        } else if (filterType === 'role') {
+            optionsDiv.style.display = 'block';
+            let html = '<select id="printRoleSelect" style="width:100%; padding:10px;">';
+            html += '<option value="all">-- All Roles --</option>';
+            html += '<option value="super_admin">Super Admin</option>';
+            html += '<option value="property_admin">Property Admin</option>';
+            html += '<option value="worker">Worker</option>';
+            html += '<option value="owner">Property Owner</option>';
+            html += '</select>';
+            optionsDiv.innerHTML = html;
+        } else if (filterType === 'date_range') {
+            dateRangeDiv.style.display = 'block';
+            optionsDiv.style.display = 'none';
+        } else {
+            optionsDiv.style.display = 'none';
+        }
+    }
+
+    async function printActivityLog() {
+        const filterType = document.getElementById('printFilterType').value;
+        let filteredLogs = [...currentActivitiesForPrint];
+
+        if (filterType === 'property') {
+            const propertyId = document.getElementById('printPropertySelect')?.value;
+            if (propertyId && propertyId !== 'all') {
+                filteredLogs = filteredLogs.filter(log => log.property_id === propertyId);
+            }
+        } else if (filterType === 'user') {
+            const userId = document.getElementById('printUserSelect')?.value;
+            if (userId && userId !== 'all') {
+                filteredLogs = filteredLogs.filter(log => log.user_id === userId);
+            }
+        } else if (filterType === 'role') {
+            const role = document.getElementById('printRoleSelect')?.value;
+            if (role && role !== 'all') {
+                filteredLogs = filteredLogs.filter(log => log.user_role === role);
+            }
+        } else if (filterType === 'date_range') {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (startDate) {
+                filteredLogs = filteredLogs.filter(log => new Date(log.created_at) >= new Date(startDate));
+            }
+            if (endDate) {
+                filteredLogs = filteredLogs.filter(log => new Date(log.created_at) <= new Date(endDate + 'T23:59:59'));
+            }
+        }
+
+        const printWindow = window.open('', '_blank');
+        const now = new Date();
+
+        let printHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Activity Log Report - BATTETECH</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: 'Courier New', monospace; padding: 20px; background: white; }
+                    .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+                    .header h1 { color: #0a2b4e; }
+                    .header p { color: #666; margin-top: 5px; }
+                    .summary { background: #f0f4fa; padding: 10px; margin-bottom: 20px; border-radius: 8px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; }
+                    th { background: #0a2b4e; color: white; }
+                    tr:nth-child(even) { background: #f9f9f9; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+                    @media print {
+                        body { margin: 0; padding: 10px; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>🏢 BATTETECH ACTIVITY LOG REPORT</h1>
+                    <p>Generated on: ${now.toLocaleString()}</p>
+                    <p>Filter: ${filterType.replace('_', ' ').toUpperCase()}</p>
+                </div>
+                <div class="summary">
+                    <strong>📊 Summary:</strong> Total ${filteredLogs.length} activities found
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date & Time</th>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Property</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>Transaction ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        for (let i = 0; i < filteredLogs.length; i++) {
+            const log = filteredLogs[i];
+            const date = new Date(log.created_at);
+            printHtml += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</td>
+                    <td>${escapeHtml(log.user_name || '-')}</td>
+                    <td>${escapeHtml(log.user_role || '-')}</td>
+                    <td>${escapeHtml(log.properties?.name || '-')}</td>
+                    <td>${escapeHtml(log.action)}</td>
+                    <td>${escapeHtml((log.details || '').substring(0, 100))}</td>
+                    <td>${escapeHtml(log.transaction_id || '-')}</td>
+                </tr>
+            `;
+        }
+
+        printHtml += `
+                    </tbody>
+                </table>
+                <div class="footer">
+                    <p>BATTETECH Property Management System - Confidential Report</p>
+                    <p>This report was generated automatically. For inquiries, contact battetech330@gmail.com</p>
+                </div>
+                <div class="no-print" style="text-align: center; margin-top: 20px;">
+                    <button onclick="window.print()" style="padding: 10px 20px;">🖨️ Print / Save as PDF</button>
+                    <button onclick="window.close()" style="padding: 10px 20px;">Close</button>
+                </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.write(printHtml);
+        printWindow.document.close();
+        closePrintActivityModal();
+    }
+
+    function confirmResetActivityLog() {
+        document.getElementById('resetActivityModal').style.display = 'flex';
+        document.getElementById('resetConfirmText').value = '';
+    }
+
+    function closeResetActivityModal() {
+        document.getElementById('resetActivityModal').style.display = 'none';
+    }
+
+    async function resetActivityLog() {
+        const confirmText = document.getElementById('resetConfirmText').value;
+        const userRole = localStorage.getItem('battetech_user_role');
+
+        if (confirmText !== 'DELETE ALL LOGS') {
+            alert('Please type "DELETE ALL LOGS" to confirm');
+            return;
+        }
+
+        if (!confirm('⚠️ FINAL WARNING: This will permanently delete ALL activity logs. This cannot be undone! Are you absolutely sure?')) {
+            return;
+        }
+
+        try {
+            let query = window.supabaseClient.from('activity_logs').delete();
+
+            if (userRole === 'property_admin') {
+                const userId = localStorage.getItem('battetech_user_id');
+                const { data: properties } = await window.supabaseClient
+                    .from('properties')
+                    .select('id')
+                    .eq('admin_id', userId);
+                const propertyIds = properties?.map(p => p.id) || [];
+                query = query.in('property_id', propertyIds);
+            }
+
+            const { error } = await query;
+
+            if (error) {
+                alert('Failed to reset activity log: ' + error.message);
+            } else {
+                alert('✅ Activity log has been reset successfully!');
+                closeResetActivityModal();
+                await displayActivityLogWithDetails('activityLogList');
+
+                await addActivityLog('activity_log_reset', 'Activity log was reset by ' + localStorage.getItem('battetech_user_name'));
+            }
+        } catch (err) {
+            console.error('Error resetting activity log:', err);
+            alert('Error: ' + err.message);
+        }
+    }
+
+    function getActivityIcon(action) {
+        if (action.includes('payment')) return '<i class="fas fa-money-bill-wave" style="color:#10b981;"></i>';
+        if (action.includes('room')) return '<i class="fas fa-door-open" style="color:#2c7be5;"></i>';
+        if (action.includes('worker')) return '<i class="fas fa-hard-hat" style="color:#f59e0b;"></i>';
+        if (action.includes('broadcast')) return '<i class="fas fa-bullhorn" style="color:#8b5cf6;"></i>';
+        if (action.includes('evacuation')) return '<i class="fas fa-door-open" style="color:#dc2626;"></i>';
+        return '<i class="fas fa-bell" style="color:#6c757d;"></i>';
+    }
+
     // ============ INITIALIZATION ============
     
     window.onload = async function() {
@@ -860,6 +1235,7 @@
         
         startTimer();
         renderPropertiesGrid();
+        await displayActivityLogWithDetails('activityLogList');
         await initNotificationSystem();
     };
 </script>

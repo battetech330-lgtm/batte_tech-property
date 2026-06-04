@@ -13,6 +13,22 @@
             min-height: 100vh; 
             padding-bottom: 70px;
         }
+
+        /* Financial stat cards (clickable) */
+        .stat-card.clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card.clickable:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.clickable:active {
+            transform: translateY(-2px);
+        }
+
         
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
@@ -592,8 +608,10 @@
     <script src="supabase-data.js"></script>
     <script src="activity-log.js"></script>
     <script src="notifications.js"></script>
+    <script src="sliding-panel.js"></script>
 
     <script>
+
         // ============ GLOBAL VARIABLES ============
         let currentPropertyId = null;
         let currentProperty = null;
@@ -937,34 +955,107 @@
             const method = document.getElementById('paymentMethod').value;
             const reference = document.getElementById('paymentReference').value;
             const paidDate = document.getElementById('paymentDate').value;
+            
             if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
             if (!monthYear) { alert('Select payment month'); return; }
+            
             const managementFee = currentProperty.management_fee || 5;
-            if (!room.payments) room.payments = {};
-            if (!room.payments[monthYear]) { room.payments[monthYear] = { rentDue: room.rentAmount, paid: 0, balance: room.rentAmount, status: "unpaid", paidDate: null, feeDeducted: 0, amountToOwner: 0 }; }
-            const payment = room.payments[monthYear];
-            let paymentAmount = Math.min(amount, payment.balance);
-            const feeAmount = (paymentAmount * managementFee) / 100;
-            const amountToOwner = paymentAmount - feeAmount;
+            const feeAmount = (amount * managementFee) / 100;
+            const amountToOwner = amount - feeAmount;
             const transactionId = 'TXN-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-            payment.paid += paymentAmount;
-            payment.balance -= paymentAmount;
-            payment.feeDeducted += feeAmount;
-            payment.amountToOwner += amountToOwner;
+            
+            // CRITICAL FIX: Get FRESH property data from database, not from memory
+            console.log("Fetching fresh property data from database...");
+            const { data: property, error } = await window.supabaseClient
+                .from('properties')
+                .select('*')
+                .eq('id', currentPropertyId)
+                .single();
+            
+            if (error) {
+                alert('Error loading property: ' + error.message);
+                return;
+            }
+            
+            // Get current counters from FRESH database data
+            let currentCollected = property.total_collected_since_last_remit || 0;
+            let currentFee = property.total_fee_since_last_remit || 0;
+            
+            // Calculate NEW totals (ADD, not replace)
+            const newCollected = currentCollected + amount;
+            const newFee = currentFee + feeAmount;
+            
+            console.log(`Current totals from DB: Collected=${currentCollected}, Fee=${currentFee}`);
+            console.log(`Adding: +${amount} to collected, +${feeAmount} to fee`);
+            console.log(`New totals: Collected=${newCollected}, Fee=${newFee}`);
+            
+            // Update room payment record
+            let propertyData = property.data || { units: [] };
+            let units = propertyData.units;
+            
+            if (!units[roomIndex].payments) units[roomIndex].payments = {};
+            if (!units[roomIndex].payments[monthYear]) {
+                units[roomIndex].payments[monthYear] = {
+                    rentDue: units[roomIndex].rentAmount,
+                    paid: 0,
+                    balance: units[roomIndex].rentAmount,
+                    status: "unpaid",
+                    paidDate: null,
+                    feeDeducted: 0,
+                    amountToOwner: 0
+                };
+            }
+            
+            const payment = units[roomIndex].payments[monthYear];
+            payment.paid += amount;
+            payment.balance = Math.max(0, payment.rentDue - payment.paid);
+            payment.feeDeducted = (payment.feeDeducted || 0) + feeAmount;
+            payment.amountToOwner = (payment.amountToOwner || 0) + amountToOwner;
+            payment.paidDate = paidDate;
             payment.transaction_id = transactionId;
             payment.payment_method = method;
             payment.reference = reference;
-            payment.paidDate = paidDate;
-            if (payment.balance <= 0) { payment.status = "paid"; } else { payment.status = "partial"; }
-            if (!room.paymentHistory) room.paymentHistory = [];
-            room.paymentHistory.push({ date: new Date().toISOString(), amount: paymentAmount, feeDeducted: feeAmount, amountToOwner: amountToOwner, method: method, reference: reference, month: monthYear, transaction_id: transactionId });
-            currentProperty.totalCollectedSinceLastRemit = (currentProperty.totalCollectedSinceLastRemit || 0) + paymentAmount;
-            currentProperty.totalFeeSinceLastRemit = (currentProperty.totalFeeSinceLastRemit || 0) + feeAmount;
-            const updatedData = currentProperty.data;
-            updatedData.units = currentProperty.data.units;
-            const { error } = await window.supabaseClient.from('properties').update({ data: updatedData, total_collected_since_last_remit: currentProperty.totalCollectedSinceLastRemit, total_fee_since_last_remit: currentProperty.totalFeeSinceLastRemit }).eq('id', currentPropertyId);
-            if (error) alert('Failed: ' + error.message);
-            else { alert(`✅ Payment recorded!\nAmount: UGX ${amount.toLocaleString()}\nFee: UGX ${feeAmount.toLocaleString()}\nTo Owner: UGX ${amountToOwner.toLocaleString()}\nTransaction ID: ${transactionId}`); closePaymentModal(); await loadProperty(); }
+            
+            if (payment.balance <= 0) {
+                payment.status = "paid";
+            } else {
+                payment.status = "partial";
+            }
+            
+            if (!units[roomIndex].paymentHistory) units[roomIndex].paymentHistory = [];
+            units[roomIndex].paymentHistory.push({
+                id: Date.now(),
+                amount: amount,
+                feeDeducted: feeAmount,
+                amountToOwner: amountToOwner,
+                method: method,
+                reference: reference,
+                paymentDate: paidDate,
+                month: monthYear,
+                transaction_id: transactionId
+            });
+            
+            // Update database with NEW totals (ADDING)
+            const { error: updateError } = await window.supabaseClient
+                .from('properties')
+                .update({
+                    data: propertyData,
+                    total_collected_since_last_remit: newCollected,
+                    total_fee_since_last_remit: newFee,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', currentPropertyId);
+            
+            if (updateError) {
+                alert('Failed: ' + updateError.message);
+            } else {
+                alert(`✅ Payment recorded!\nAmount: UGX ${amount.toLocaleString()}\nFee: UGX ${feeAmount.toLocaleString()}\nTo Owner: UGX ${amountToOwner.toLocaleString()}\nTransaction ID: ${transactionId}`);
+                closePaymentModal();
+                
+                // CRITICAL: Reload the page completely to get fresh data
+                // This ensures the next payment will start with correct totals
+                window.location.reload();
+            }
         }
         
         // ============ REMIT TO OWNER ============
@@ -1033,6 +1124,7 @@
             input.click();
         }
         
+        // ============ CONFIRM BILL PAYMENT WITH DEDUCTION ============
         async function confirmBillPayment() {
             let billType = document.getElementById('billType').value;
             if (billType === 'Other') {
@@ -1040,14 +1132,91 @@
                 if (!customType) { alert('Please enter a custom bill type'); return; }
                 billType = customType;
             }
+            
             const amount = parseInt(document.getElementById('billAmount').value);
             const description = document.getElementById('billDescription').value.trim();
             const receiptImage = document.getElementById('billReceipt').value;
+            
             if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
-            await addBillPayment(currentPropertyId, billType, amount, receiptImage, description);
-            alert(`✅ ${billType} bill UGX ${amount.toLocaleString()} recorded`);
-            closeBillModal();
-            await loadProperty();
+            
+            if (!confirm(`Pay ${billType} bill of UGX ${amount.toLocaleString()}? This will be deducted from pending remittance.`)) return;
+            
+            try {
+                // Get current property data
+                const { data: property, error } = await window.supabaseClient
+                    .from('properties')
+                    .select('*')
+                    .eq('id', currentPropertyId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Get current total collected since last remit (this is the field we must update)
+                let currentTotalCollected = property.total_collected_since_last_remit || 0;
+                let currentDebt = property.debt_amount || 0;
+
+                // Calculate new values
+                let newTotalCollected = currentTotalCollected - amount;
+                let newDebt = currentDebt;
+                let deductionMessage = '';
+
+                if (newTotalCollected >= 0) {
+                    // Bill fully covered by pending remittance
+                    deductionMessage = `Deducted UGX ${amount.toLocaleString()} from pending remittance (was UGX ${currentTotalCollected.toLocaleString()}, now UGX ${newTotalCollected.toLocaleString()})`;
+                } else {
+                    // Bill exceeds available - create debt
+                    const debtDelta = amount - currentTotalCollected;
+                    newDebt = currentDebt + debtDelta;
+                    newTotalCollected = 0;
+                    deductionMessage = `Pending remittance (UGX ${currentTotalCollected.toLocaleString()}) was insufficient. Created debt of UGX ${debtDelta.toLocaleString()} that will be deducted from future remittances.`;
+                }
+                
+                
+                // Record the bill payment
+                await addBillPayment(currentPropertyId, billType, amount, receiptImage, description);
+                
+                // Update property with new financials
+                const { error: updateError } = await window.supabaseClient
+                    .from('properties')
+                    .update({
+                        total_collected_since_last_remit: newPendingToRemit,
+                        debt_amount: newDebt,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentPropertyId);
+                
+                if (updateError) throw updateError;
+                
+                // Add activity log with deduction details
+                await addActivityLog(
+                    'bill_paid_with_deduction',
+                    `${billType} bill of UGX ${amount.toLocaleString()} paid. ${deductionMessage} ${description ? 'Description: ' + description : ''}`,
+                    currentPropertyId
+                );
+                
+                // Also create a notification for the property owner
+                const { data: propertyOwner } = await window.supabaseClient
+                    .from('properties')
+                    .select('owner_name, owner_phone')
+                    .eq('id', currentPropertyId)
+                    .single();
+                
+                if (propertyOwner && propertyOwner.owner_phone) {
+                    let phone = propertyOwner.owner_phone.replace(/\s/g, '');
+                    if (phone.startsWith('0')) phone = '256' + phone.substring(1);
+                    const whatsappMsg = `🏢 BATTETECH BILL PAYMENT\n\nDear ${propertyOwner.owner_name || 'Owner'},\n\n${billType} bill of UGX ${amount.toLocaleString()} has been paid on your behalf.\n\n${deductionMessage}\n\nThank you.`;
+                    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
+                }
+                
+                alert(`✅ ${billType} bill of UGX ${amount.toLocaleString()} recorded!\n\n${deductionMessage}`);
+                
+                closeBillModal();
+                await loadProperty(); // Refresh the page
+                
+            } catch (err) {
+                console.error("Error paying bill:", err);
+                alert('❌ Error: ' + err.message);
+            }
         }
         
         // ============ STATEMENT & RESET MONTH ============
@@ -1248,7 +1417,7 @@
                     <button class="warning" onclick="openBillModal()"><i class="fas fa-receipt"></i> Pay Bill</button>
                     <button class="success" onclick="openRemitModal()"><i class="fas fa-paper-plane"></i> Remit to Owner</button>
                     <button class="success" onclick="openStatementModal()"><i class="fas fa-file-invoice"></i> Month Statement</button>
-                    <button class="warning" onclick="openPropertyImageModal()"><i class="fas fa-image"></i> Background Image</button>
+                    ${userIsSuperAdmin ? '<button class="warning" onclick="openPropertyImageModal()"><i class="fas fa-image"></i> Background Image</button>' : ''}
                 </div>`;
             }
             
@@ -1304,12 +1473,36 @@
                 ${actionButtonsHtml}
             </div>
             <div class="stats-grid">
-                <div class="stat-card collected"><div class="stat-number"><i class="fas fa-coins"></i> UGX ${currentMonthCollected.toLocaleString()}</div><div class="stat-label">Collected This Month</div></div>
-                <div class="stat-card pending"><div class="stat-number"><i class="fas fa-hourglass-half"></i> UGX ${currentMonthPending.toLocaleString()}</div><div class="stat-label">Pending This Month</div></div>
-                <div class="stat-card"><div class="stat-number"><i class="fas fa-wallet"></i> UGX ${financials.totalCollectedSinceLastRemit.toLocaleString()}</div><div class="stat-label">Total Collected (Since Last Remit)</div></div>
-                <div class="stat-card fee"><div class="stat-number"><i class="fas fa-percent"></i> UGX ${financials.totalFeeSinceLastRemit.toLocaleString()}</div><div class="stat-label">Management Fee</div></div>
-                <div class="stat-card"><div class="stat-number"><i class="fas fa-paper-plane"></i> UGX ${pendingRemittance.toLocaleString()}</div><div class="stat-label">Pending to Remit</div></div>
-                <div class="stat-card remitted"><div class="stat-number"><i class="fas fa-circle-check"></i> UGX ${alreadyRemitted.toLocaleString()}</div><div class="stat-label">Already Remitted</div></div>
+                <div class="stat-card collected clickable" onclick="showFinancialDetails('collected_this_month', currentPropertyId, currentProperty?.name)">
+                    <div class="stat-number"><i class="fas fa-coins"></i> UGX ${currentMonthCollected.toLocaleString()}</div>
+                    <div class="stat-label">Collected This Month</div>
+                </div>
+                <div class="stat-card pending clickable" onclick="showFinancialDetails('pending_this_month', currentPropertyId, currentProperty?.name)">
+                    <div class="stat-number"><i class="fas fa-hourglass-half"></i> UGX ${currentMonthPending.toLocaleString()}</div>
+                    <div class="stat-label">Pending This Month</div>
+                </div>
+                <div class="stat-card clickable" onclick="showFinancialDetails('total_collected', currentPropertyId, currentProperty?.name)">
+                    <div class="stat-number"><i class="fas fa-wallet"></i> UGX ${financials.totalCollectedSinceLastRemit.toLocaleString()}</div>
+                    <div class="stat-label">Total Collected (Since Last Remit)</div>
+                </div>
+                <div class="stat-card fee clickable" onclick="showFinancialDetails('management_fee', currentPropertyId, currentProperty?.name)">
+                    <div class="stat-number"><i class="fas fa-percent"></i> UGX ${financials.totalFeeSinceLastRemit.toLocaleString()}</div>
+                    <div class="stat-label">Management Fee</div>
+                </div>
+                ${financials.debtAmount > 0 ? `
+                <div class="stat-card" style="background: #fee2e2;">
+                    <div class="stat-number" style="color:#dc2626;"><i class="fas fa-exclamation-triangle"></i> UGX ${financials.debtAmount.toLocaleString()}</div>
+                    <div class="stat-label">Outstanding Debt (from bills)</div>
+                </div>
+                ` : ''}
+                <div class="stat-card clickable" onclick="showFinancialDetails('pending_to_remit', currentPropertyId, currentProperty?.name)">
+                    <div class="stat-number"><i class="fas fa-paper-plane"></i> UGX ${pendingRemittance.toLocaleString()}</div>
+                    <div class="stat-label">Pending to Remit</div>
+                </div>
+                <div class="stat-card remitted clickable" onclick="showFinancialDetails('already_remitted', currentPropertyId, currentProperty?.name)">
+                    <div class="stat-number"><i class="fas fa-circle-check"></i> UGX ${alreadyRemitted.toLocaleString()}</div>
+                    <div class="stat-label">Already Remitted</div>
+                </div>
             </div>
             <div class="section-card">
                 <div class="section-title"><i class="fas fa-door-open"></i> Rooms Management</div>
@@ -1367,9 +1560,10 @@
         window.uploadPropertyBgImage = uploadPropertyBgImage;
         window.toggleCustomBillType = toggleCustomBillType;
         
-        window.addEventListener('load', () => { 
+        window.addEventListener('load', () => {
             console.log("Page loaded, starting loadProperty");
-            loadProperty(); 
+            try { initSlidingPanel(); } catch(e) { console.warn('initSlidingPanel failed', e); }
+            loadProperty();
         });
     </script>
 </body>

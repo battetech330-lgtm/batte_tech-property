@@ -183,10 +183,63 @@
     
     <!-- ACTIVITY LOG -->
     <div class="section-card">
-        <div class="section-title"><i class="fas fa-list-check"></i> ACTIVITY LOG</div>
+        <div class="section-title">
+            <i class="fas fa-list-check"></i> ACTIVITY LOG
+            <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+                <button onclick="openPrintActivityModal()" class="warning small" style="background:#8b5cf6;">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button onclick="confirmResetActivityLog()" class="danger small">
+                    <i class="fas fa-trash-alt"></i> Reset All
+                </button>
+            </div>
+        </div>
         <div id="activityLogList"></div>
     </div>
+
+    <!-- Print Activity Modal -->
+    <div id="printActivityModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3><i class="fas fa-print"></i> Print Activity Log</h3>
+            <div class="form-row">
+                <select id="printFilterType" onchange="updatePrintFilterOptions()">
+                    <option value="all">All Activities</option>
+                    <option value="property">By Property</option>
+                    <option value="user">By User</option>
+                    <option value="role">By Role</option>
+                    <option value="date_range">By Date Range</option>
+                </select>
+            </div>
+            <div id="printFilterOptions" style="display: none;">
+                <!-- Dynamic options will appear here -->
+            </div>
+            <div class="form-row" id="dateRangeFields" style="display: none;">
+                <input type="date" id="startDate" placeholder="Start Date">
+                <input type="date" id="endDate" placeholder="End Date">
+            </div>
+            <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
+                <button onclick="printActivityLog()" class="success"><i class="fas fa-print"></i> Print</button>
+                <button onclick="closePrintActivityModal()"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Activity Log Confirmation Modal -->
+    <div id="resetActivityModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Reset Activity Log</h3>
+            <p style="margin-bottom: 1rem;">⚠️ WARNING: This will permanently delete ALL activity logs from the database. This action cannot be undone!</p>
+            <div class="form-row">
+                <input type="text" id="resetConfirmText" placeholder='Type "DELETE ALL LOGS" to confirm'>
+            </div>
+            <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
+                <button onclick="resetActivityLog()" class="danger"><i class="fas fa-trash-alt"></i> Permanently Delete</button>
+                <button onclick="closeResetActivityModal()"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 <!-- Edit Worker Modal -->
 <div id="editWorkerModal" class="modal">
@@ -434,7 +487,7 @@
         await loadPendingEvacuations();
         await loadPendingWorkerBroadcasts();
         await populatePropertySelect();
-        await loadActivityLog();
+        await displayActivityLogWithDetails('activityLogList');
         await initNotificationSystem();
         initChatPanel();
         
@@ -451,12 +504,14 @@
     
     async function loadProperties() {
         const adminId = localStorage.getItem('battetech_user_id');
+        console.log("Loading properties for admin:", adminId);
+        
         const { data, error } = await window.supabaseClient
             .from('properties')
             .select('*')
             .eq('admin_id', adminId)
             .order('created_at', { ascending: false });
-        
+
         if (error) {
             console.error('Error loading properties:', error);
             return;
@@ -1167,7 +1222,7 @@
         await loadActivityLog();
     }
     
-    // ============ PENDING APPROVALS ============
+    // ============ PENDING APPROVALS (FIXED) ============
     
     async function loadPendingApprovals() {
         const adminId = localStorage.getItem('battetech_user_id');
@@ -1224,14 +1279,19 @@
         document.getElementById('pendingApprovalsList').innerHTML = html;
     }
     
-    // ============ APPROVE PAYMENT ============
+    // ============ APPROVE PAYMENT (FIXED - ADDS TO TOTALS) ============
     
     async function approvePayment(requestId, amount, month, roomIndex, method, reference) {
         console.log("=== approvePayment START ===");
+        console.log("Request ID:", requestId);
+        console.log("Amount:", amount);
+        console.log("Month:", month);
+        console.log("Room Index:", roomIndex);
         
         if (!confirm(`Approve payment of UGX ${amount?.toLocaleString()} for ${month}?`)) return;
         
         try {
+            // Get the approval request
             const { data: request, error: reqError } = await window.supabaseClient
                 .from('approval_requests')
                 .select('*')
@@ -1245,8 +1305,7 @@
             
             console.log("Request found. Property ID:", request.property_id);
             
-            const transactionId = 'TXN-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-            
+            // Use values from request if parameters are undefined
             const actualRoomIndex = roomIndex !== undefined ? roomIndex : request.action_data?.roomIndex;
             const actualMonth = month || request.action_data?.month;
             const actualAmount = amount || request.action_data?.amount;
@@ -1254,56 +1313,170 @@
             const actualReference = reference || request.action_data?.reference || '';
             const paymentDate = request.action_data?.paymentDate || new Date().toISOString().split('T')[0];
             
-            console.log("Processing payment for room index:", actualRoomIndex);
-            console.log("Payment date:", paymentDate);
+            // Generate unique transaction ID
+            const transactionId = 'TXN-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
             
-            const success = await window.processApprovedPayment(
+            console.log("Processing payment with:");
+            console.log("  Property ID:", request.property_id);
+            console.log("  Room Index:", actualRoomIndex);
+            console.log("  Amount:", actualAmount);
+            console.log("  Month:", actualMonth);
+            
+            // Get CURRENT property data from database (FRESH)
+            const { data: property, error: propError } = await window.supabaseClient
+                .from('properties')
+                .select('*')
+                .eq('id', request.property_id)
+                .single();
+            
+            if (propError || !property) {
+                alert('Property not found');
+                return;
+            }
+            
+            // Get current financial counters
+            let currentCollected = property.total_collected_since_last_remit || 0;
+            let currentFee = property.total_fee_since_last_remit || 0;
+            const managementFee = property.management_fee || 5;
+            const feeAmount = (actualAmount * managementFee) / 100;
+            const amountToOwner = actualAmount - feeAmount;
+            
+            // CALCULATE NEW TOTALS (ADD, NOT REPLACE)
+            const newCollected = currentCollected + actualAmount;
+            const newFee = currentFee + feeAmount;
+            
+            console.log(`Current totals: Collected=${currentCollected}, Fee=${currentFee}`);
+            console.log(`Adding: +${actualAmount} to collected, +${feeAmount} to fee`);
+            console.log(`New totals: Collected=${newCollected}, Fee=${newFee}`);
+            
+            // Update the room's payment record
+            let propertyData = property.data || { units: [] };
+            let units = propertyData.units || [];
+            
+            if (!units[actualRoomIndex]) {
+                alert('Room not found');
+                return;
+            }
+            
+            const room = units[actualRoomIndex];
+            const paymentDateObj = new Date(paymentDate);
+            const paymentMonthKey = `${paymentDateObj.getFullYear()}-${String(paymentDateObj.getMonth() + 1).padStart(2, '0')}`;
+            
+            // Initialize payments if needed
+            if (!room.payments) room.payments = {};
+            if (!room.payments[paymentMonthKey]) {
+                room.payments[paymentMonthKey] = {
+                    rentDue: room.rentAmount,
+                    paid: 0,
+                    balance: room.rentAmount,
+                    status: "unpaid",
+                    paidDate: null,
+                    feeDeducted: 0,
+                    amountToOwner: 0
+                };
+            }
+            
+            const monthPayment = room.payments[paymentMonthKey];
+            
+            // ADD to existing payment
+            monthPayment.paid += actualAmount;
+            monthPayment.balance = Math.max(0, monthPayment.rentDue - monthPayment.paid);
+            monthPayment.feeDeducted = (monthPayment.feeDeducted || 0) + feeAmount;
+            monthPayment.amountToOwner = (monthPayment.amountToOwner || 0) + amountToOwner;
+            monthPayment.paidDate = paymentDate;
+            monthPayment.transaction_id = transactionId;
+            monthPayment.payment_method = actualMethod;
+            monthPayment.reference = actualReference;
+            
+            if (monthPayment.balance <= 0) {
+                monthPayment.status = "paid";
+            } else {
+                monthPayment.status = "partial";
+            }
+            
+            // Add to payment history
+            if (!room.paymentHistory) room.paymentHistory = [];
+            room.paymentHistory.push({
+                id: Date.now(),
+                amount: actualAmount,
+                feeDeducted: feeAmount,
+                amountToOwner: amountToOwner,
+                method: actualMethod,
+                reference: actualReference,
+                paymentDate: paymentDate,
+                month: paymentMonthKey,
+                transaction_id: transactionId
+            });
+            
+            // Update room status
+            room.isPaid = monthPayment.balance === 0;
+            room.paid = monthPayment.balance === 0;
+            
+            propertyData.units = units;
+            
+            // Update the approval request status
+            await window.supabaseClient
+                .from('approval_requests')
+                .update({ 
+                    status: 'approved', 
+                    approved_by: localStorage.getItem('battetech_user_id'), 
+                    approved_at: new Date().toISOString()
+                })
+                .eq('id', requestId);
+            
+            // Update the property with NEW totals (ADDING)
+            const { error: updateError } = await window.supabaseClient
+                .from('properties')
+                .update({ 
+                    data: propertyData,
+                    total_collected_since_last_remit: newCollected,
+                    total_fee_since_last_remit: newFee,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', request.property_id);
+            
+            if (updateError) {
+                console.error("Error updating property:", updateError);
+                alert('Failed to update property: ' + updateError.message);
+                return;
+            }
+            
+            // Add activity log
+            const approverName = localStorage.getItem('battetech_user_name') || 'Admin';
+            const approverRole = localStorage.getItem('battetech_user_role') || 'property_admin';
+            
+            await addActivityLog(
+                'payment_approved',
+                `${approverName} (${approverRole}) approved payment of UGX ${actualAmount.toLocaleString()} for room ${room.roomNumber}. Fee: UGX ${feeAmount.toLocaleString()}, To Owner: UGX ${amountToOwner.toLocaleString()}. Transaction ID: ${transactionId}`,
                 request.property_id,
-                actualRoomIndex,
-                actualAmount,
-                actualMonth,
-                actualMethod,
-                actualReference,
-                transactionId,
-                paymentDate
+                transactionId
             );
             
-            if (success) {
-                await window.supabaseClient
-                    .from('approval_requests')
-                    .update({ 
-                        status: 'approved', 
-                        approved_by: localStorage.getItem('battetech_user_id'), 
-                        approved_at: new Date().toISOString()
-                    })
-                    .eq('id', requestId);
-                
-                if (request.worker_id) {
-                    await addNotification(
-                        request.worker_id,
-                        'worker',
-                        '✅ Payment Approved',
-                        `Your payment of UGX ${actualAmount?.toLocaleString()} has been approved. Transaction ID: ${transactionId}`,
-                        'payment',
-                        requestId,
-                        request.property_id
-                    );
-                }
-                
-                await addActivityLog('payment_approved', `Approved payment of UGX ${actualAmount?.toLocaleString()} - Transaction: ${transactionId}`, request.property_id, transactionId);
-                
-                alert(`✅ Payment approved!\nAmount: UGX ${actualAmount?.toLocaleString()}\nTransaction ID: ${transactionId}`);
-                
-                await loadPendingApprovals();
-                await loadProperties();
-                await loadActivityLog();
-                
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
-            } else {
-                alert('❌ Failed to process payment. Please try again.');
+            // Send notification to worker
+            if (request.worker_id) {
+                await addNotification(
+                    request.worker_id,
+                    'worker',
+                    '✅ Payment Approved',
+                    `Your payment of UGX ${actualAmount.toLocaleString()} has been approved. Transaction ID: ${transactionId}`,
+                    'payment',
+                    requestId,
+                    request.property_id
+                );
             }
+            
+            console.log(`✅ Payment approved! Total Collected: ${currentCollected} → ${newCollected}`);
+            alert(`✅ Payment approved!\nAmount: UGX ${actualAmount.toLocaleString()}\nFee: UGX ${feeAmount.toLocaleString()}\nTo Owner: UGX ${amountToOwner.toLocaleString()}\nTransaction ID: ${transactionId}`);
+            
+            // Refresh all data
+            await loadPendingApprovals();
+            await loadProperties();
+            await loadActivityLog();
+            
+            // Reload the page after a short delay
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
             
         } catch (err) {
             console.error("Error in approvePayment:", err);
@@ -1349,7 +1522,13 @@
                 );
             }
             
-            await addActivityLog('payment_rejected', `Rejected payment request. Reason: ${reason}`, request.property_id);
+            const approverName = localStorage.getItem('battetech_user_name') || 'Admin';
+            
+            await addActivityLog(
+                'payment_rejected',
+                `${approverName} REJECTED payment request for ${request.action_data?.roomNumber} (${request.action_data?.tenantName}). Amount: UGX ${request.action_data?.amount?.toLocaleString()}. Reason: ${reason}`,
+                request.property_id
+            );
             
             alert('❌ Payment rejected');
             await loadPendingApprovals();
@@ -1482,42 +1661,321 @@
         await loadPendingWorkerBroadcasts();
     }
     
-    // ============ ACTIVITY LOG ============
+    // ============ ACTIVITY LOG (PRINT + RESET) ============
     
-    async function loadActivityLog() {
-        const adminId = localStorage.getItem('battetech_user_id');
-        const { data: workers } = await window.supabaseClient.from('users').select('id').eq('parent_id', adminId).eq('role', 'worker');
-        const workerIds = workers?.map(w => w.id) || [];
-        const userIds = [adminId, ...workerIds];
-        
-        const { data, error } = await window.supabaseClient
+    let currentActivitiesForPrint = [];
+
+    async function loadActivityLogWithDetails() {
+        const userRole = localStorage.getItem('battetech_user_role');
+        const userId = localStorage.getItem('battetech_user_id');
+
+        let query = window.supabaseClient
             .from('activity_logs')
-            .select('*')
-            .in('user_id', userIds)
+            .select(`*, properties:property_id (name)`) 
             .order('created_at', { ascending: false })
-            .limit(50);
-        
-        const container = document.getElementById('activityLogList');
-        
-        if (error || !data || data.length === 0) {
+            .limit(100);
+
+        // Filter based on user role
+        if (userRole === 'property_admin') {
+            const { data: properties } = await window.supabaseClient
+                .from('properties')
+                .select('id')
+                .eq('admin_id', userId);
+            const propertyIds = properties?.map(p => p.id) || [];
+            query = query.in('property_id', propertyIds);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('Error loading activity logs:', error);
+            return [];
+        }
+
+        currentActivitiesForPrint = data || [];
+        return currentActivitiesForPrint;
+    }
+
+    async function displayActivityLogWithDetails(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const logs = await loadActivityLogWithDetails();
+
+        if (!logs || logs.length === 0) {
             container.innerHTML = '<div class="activity-item"><i class="fas fa-info-circle"></i> No activities yet.</div>';
             return;
         }
-        
+
         let html = '';
-        for (let log of data) {
+        for (let log of logs) {
             const date = new Date(log.created_at);
+            const propertyName = log.properties?.name || 'N/A';
             const icon = getActivityIcon(log.action);
-            html += `<div class="activity-item">
-                <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small><br>
-                <strong>${icon} ${escapeHtml(log.user_name)}</strong> - ${escapeHtml(log.action)}<br>
-                ${escapeHtml(log.details || '')}
-                ${log.transaction_id ? `<br><small><i class="fas fa-receipt"></i> Transaction ID: ${escapeHtml(log.transaction_id)}</small>` : ''}
-            </div>`;
+
+            html += `
+                <div class="activity-item" style="margin-bottom: 0.8rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                        <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small>
+                        <small><i class="fas fa-building"></i> ${escapeHtml(propertyName)}</small>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <strong>${icon} ${escapeHtml(log.user_name || 'System')}</strong> (${escapeHtml(log.user_role || 'unknown')})
+                    </div>
+                    <div><i class="fas fa-tag"></i> ${escapeHtml(log.action)}</div>
+                    <div><i class="fas fa-info-circle"></i> ${escapeHtml(log.details || '')}</div>
+                    ${log.transaction_id ? `<div><small><i class="fas fa-receipt"></i> TXN: ${escapeHtml(log.transaction_id)}</small></div>` : ''}
+                </div>
+            `;
         }
         container.innerHTML = html;
     }
-    
+
+    function openPrintActivityModal() {
+        document.getElementById('printActivityModal').style.display = 'flex';
+        updatePrintFilterOptions();
+    }
+
+    function closePrintActivityModal() {
+        document.getElementById('printActivityModal').style.display = 'none';
+    }
+
+    async function updatePrintFilterOptions() {
+        const filterType = document.getElementById('printFilterType').value;
+        const optionsDiv = document.getElementById('printFilterOptions');
+        const dateRangeDiv = document.getElementById('dateRangeFields');
+
+        optionsDiv.innerHTML = '';
+        dateRangeDiv.style.display = 'none';
+
+        if (filterType === 'property') {
+            optionsDiv.style.display = 'block';
+            const { data: properties } = await window.supabaseClient
+                .from('properties')
+                .select('id, name');
+
+            let html = '<select id="printPropertySelect" style="width:100%; padding:10px;">';
+            html += '<option value="all">-- All Properties --</option>';
+            for (let prop of properties || []) {
+                html += `<option value="${prop.id}">${escapeHtml(prop.name)}</option>`;
+            }
+            html += '</select>';
+            optionsDiv.innerHTML = html;
+
+        } else if (filterType === 'user') {
+            optionsDiv.style.display = 'block';
+            const { data: users } = await window.supabaseClient
+                .from('users')
+                .select('id, full_name, role');
+
+            let html = '<select id="printUserSelect" style="width:100%; padding:10px;">';
+            html += '<option value="all">-- All Users --</option>';
+            for (let user of users || []) {
+                html += `<option value="${user.id}">${escapeHtml(user.full_name)} (${user.role})</option>`;
+            }
+            html += '</select>';
+            optionsDiv.innerHTML = html;
+
+        } else if (filterType === 'role') {
+            optionsDiv.style.display = 'block';
+            let html = '<select id="printRoleSelect" style="width:100%; padding:10px;">';
+            html += '<option value="all">-- All Roles --</option>';
+            html += '<option value="super_admin">Super Admin</option>';
+            html += '<option value="property_admin">Property Admin</option>';
+            html += '<option value="worker">Worker</option>';
+            html += '<option value="owner">Property Owner</option>';
+            html += '</select>';
+            optionsDiv.innerHTML = html;
+
+        } else if (filterType === 'date_range') {
+            dateRangeDiv.style.display = 'block';
+            optionsDiv.style.display = 'none';
+        } else {
+            optionsDiv.style.display = 'none';
+        }
+    }
+
+    async function printActivityLog() {
+        const filterType = document.getElementById('printFilterType').value;
+        let filteredLogs = [...currentActivitiesForPrint];
+
+        // Apply filters
+        if (filterType === 'property') {
+            const propertyId = document.getElementById('printPropertySelect')?.value;
+            if (propertyId && propertyId !== 'all') {
+                filteredLogs = filteredLogs.filter(log => log.property_id === propertyId);
+            }
+        } else if (filterType === 'user') {
+            const userId = document.getElementById('printUserSelect')?.value;
+            if (userId && userId !== 'all') {
+                filteredLogs = filteredLogs.filter(log => log.user_id === userId);
+            }
+        } else if (filterType === 'role') {
+            const role = document.getElementById('printRoleSelect')?.value;
+            if (role && role !== 'all') {
+                filteredLogs = filteredLogs.filter(log => log.user_role === role);
+            }
+        } else if (filterType === 'date_range') {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (startDate) {
+                filteredLogs = filteredLogs.filter(log => new Date(log.created_at) >= new Date(startDate));
+            }
+            if (endDate) {
+                filteredLogs = filteredLogs.filter(log => new Date(log.created_at) <= new Date(endDate + 'T23:59:59'));
+            }
+        }
+
+        // Generate print HTML
+        const printWindow = window.open('', '_blank');
+        const now = new Date();
+
+        let printHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Activity Log Report - BATTETECH</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: 'Courier New', monospace; padding: 20px; background: white; }
+                    .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+                    .header h1 { color: #0a2b4e; }
+                    .header p { color: #666; margin-top: 5px; }
+                    .summary { background: #f0f4fa; padding: 10px; margin-bottom: 20px; border-radius: 8px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; }
+                    th { background: #0a2b4e; color: white; }
+                    tr:nth-child(even) { background: #f9f9f9; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+                    @media print {
+                        body { margin: 0; padding: 10px; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>🏢 BATTETECH ACTIVITY LOG REPORT</h1>
+                    <p>Generated on: ${now.toLocaleString()}</p>
+                    <p>Filter: ${filterType.replace('_', ' ').toUpperCase()}</p>
+                </div>
+                <div class="summary">
+                    <strong>📊 Summary:</strong> Total ${filteredLogs.length} activities found
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date & Time</th>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Property</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>Transaction ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        for (let i = 0; i < filteredLogs.length; i++) {
+            const log = filteredLogs[i];
+            const date = new Date(log.created_at);
+            printHtml += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</td>
+                    <td>${escapeHtml(log.user_name || '-')}</td>
+                    <td>${escapeHtml(log.user_role || '-')}</td>
+                    <td>${escapeHtml(log.properties?.name || '-')}</td>
+                    <td>${escapeHtml(log.action)}</td>
+                    <td>${escapeHtml((log.details || '').substring(0, 100))}</td>
+                    <td>${escapeHtml(log.transaction_id || '-')}</td>
+                </tr>
+            `;
+        }
+
+        printHtml += `
+                    </tbody>
+                </table>
+                <div class="footer">
+                    <p>BATTETECH Property Management System - Confidential Report</p>
+                    <p>This report was generated automatically. For inquiries, contact battetech330@gmail.com</p>
+                </div>
+                <div class="no-print" style="text-align: center; margin-top: 20px;">
+                    <button onclick="window.print()" style="padding: 10px 20px;">🖨️ Print / Save as PDF</button>
+                    <button onclick="window.close()" style="padding: 10px 20px;">Close</button>
+                </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.write(printHtml);
+        printWindow.document.close();
+        closePrintActivityModal();
+    }
+
+    function confirmResetActivityLog() {
+        document.getElementById('resetActivityModal').style.display = 'flex';
+        document.getElementById('resetConfirmText').value = '';
+    }
+
+    function closeResetActivityModal() {
+        document.getElementById('resetActivityModal').style.display = 'none';
+    }
+
+    async function resetActivityLog() {
+        const confirmText = document.getElementById('resetConfirmText').value;
+        const userRole = localStorage.getItem('battetech_user_role');
+
+        if (confirmText !== 'DELETE ALL LOGS') {
+            alert('Please type "DELETE ALL LOGS" to confirm');
+            return;
+        }
+
+        if (!confirm('⚠️ FINAL WARNING: This will permanently delete ALL activity logs. This cannot be undone! Are you absolutely sure?')) {
+            return;
+        }
+
+        try {
+            let query = window.supabaseClient.from('activity_logs').delete();
+
+            // For property admin, only delete their property logs
+            if (userRole === 'property_admin') {
+                const userId = localStorage.getItem('battetech_user_id');
+                const { data: properties } = await window.supabaseClient
+                    .from('properties')
+                    .select('id')
+                    .eq('admin_id', userId);
+                const propertyIds = properties?.map(p => p.id) || [];
+                query = query.in('property_id', propertyIds);
+            }
+
+            const { error } = await query;
+
+            if (error) {
+                alert('Failed to reset activity log: ' + error.message);
+            } else {
+                alert('✅ Activity log has been reset successfully!');
+                closeResetActivityModal();
+                await displayActivityLogWithDetails('activityLogList');
+
+                // Log the reset action
+                await addActivityLog('activity_log_reset', 'Activity log was reset by ' + localStorage.getItem('battetech_user_name'));
+            }
+        } catch (err) {
+            console.error('Error resetting activity log:', err);
+            alert('Error: ' + err.message);
+        }
+    }
+
     function getActivityIcon(action) {
         if (action.includes('payment')) return '<i class="fas fa-money-bill-wave" style="color:#10b981;"></i>';
         if (action.includes('room')) return '<i class="fas fa-door-open" style="color:#2c7be5;"></i>';
@@ -1526,6 +1984,7 @@
         if (action.includes('evacuation')) return '<i class="fas fa-door-open" style="color:#dc2626;"></i>';
         return '<i class="fas fa-bell" style="color:#6c757d;"></i>';
     }
+
     
     function logout() { 
         if (confirm('Logout from Dashboard?')) { 
