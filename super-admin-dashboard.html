@@ -203,19 +203,7 @@
                 <button onclick="createPropertyAdmin()"><i class="fas fa-check"></i> Create Property Admin</button>
             </div>
             
-            <!-- ASSIGN PROPERTY ADMIN TO PROPERTY -->
-            <div class="section-card">
-                <div class="section-title"><i class="fas fa-link"></i> Assign Property Admin to Property</div>
-                <div class="form-row">
-                    <select id="assignAdminSelect">
-                        <option value="">-- Select Property Admin --</option>
-                    </select>
-                    <select id="assignPropertySelect">
-                        <option value="">-- Select Property --</option>
-                    </select>
-                </div>
-                <button onclick="assignAdminToProperty()"><i class="fas fa-check"></i> Assign Admin to Property</button>
-            </div>
+
 
             <!-- CREATE NEW PROPERTY -->
             <div class="section-card">
@@ -275,155 +263,66 @@
                 <div id="ownersList" class="grid-2"></div>
             </div>
             
-            <!-- ACTIVITY LOG SECTION - REPLACE EXISTING WITH THIS -->
+            <!-- ACTIVITY LOG -->
             <div class="section-card">
                 <div class="section-title">
                     <i class="fas fa-list-check"></i> ACTIVITY LOG
                     <div style="margin-left: auto; display: flex; gap: 0.5rem;">
-                        <button onclick="openPrintActivityModal()" class="warning small" style="background:#8b5cf6; padding: 8px 16px;">
+                        <button onclick="openPrintActivityModal()" class="warning small" style="background:#8b5cf6;">
                             <i class="fas fa-print"></i> Print
                         </button>
-                        <button onclick="confirmResetActivityLog()" class="danger small" style="padding: 8px 16px;">
+                        <button onclick="confirmResetActivityLog()" class="danger small">
                             <i class="fas fa-trash-alt"></i> Reset All
                         </button>
                     </div>
                 </div>
-                <div id="activityLogList" style="max-height: 500px; overflow-y: auto;"></div>
+                <div id="activityLogList"></div>
             </div>
 
-            <!-- PRINT ACTIVITY MODAL - COMPLETE VERSION -->
+            <!-- Print Activity Modal -->
             <div id="printActivityModal" class="modal">
-                <div class="modal-content" style="max-width: 600px;">
-                    <h3><i class="fas fa-print"></i> Print Activity Log Report</h3>
-                    
-                    <div class="form-row" style="margin-top: 1rem;">
-                        <select id="printReportType" onchange="togglePrintOptions()" style="width:100%; padding: 12px;">
-                            <option value="all">📋 All Activities (Entire System)</option>
-                            <option value="property">🏢 By Specific Property</option>
-                            <option value="user">👤 By Specific User</option>
-                            <option value="role">👥 By User Role</option>
-                            <option value="date">📅 By Date Range</option>
-                            <option value="payment">💰 Payment Transactions Only</option>
-                            <option value="remittance">💸 Remittance Transactions Only</option>
+                <div class="modal-content" style="max-width: 500px;">
+                    <h3><i class="fas fa-print"></i> Print Activity Log</h3>
+                    <div class="form-row">
+                        <select id="printFilterType" onchange="updatePrintFilterOptions()">
+                            <option value="all">All Activities</option>
+                            <option value="property">By Property</option>
+                            <option value="user">By User</option>
+                            <option value="role">By Role</option>
+                            <option value="date_range">By Date Range</option>
                         </select>
                     </div>
-                    
-                    <!-- Property Selection -->
-                    <div id="propertySelectDiv" class="form-row" style="display:none;">
-                        <label>Select Property:</label>
-                        <select id="printPropertySelect" style="width:100%; padding: 12px;">
-                            <option value="">-- Loading Properties --</option>
-                        </select>
+                    <div id="printFilterOptions" style="display: none;">
+                        <!-- Dynamic options will appear here -->
                     </div>
-                    
-                    <!-- User Selection -->
-                    <div id="userSelectDiv" class="form-row" style="display:none;">
-                        <label>Select User:</label>
-                        <select id="printUserSelect" style="width:100%; padding: 12px;">
-                            <option value="">-- Loading Users --</option>
-                        </select>
+                    <div class="form-row" id="dateRangeFields" style="display: none;">
+                        <input type="date" id="startDate" placeholder="Start Date">
+                        <input type="date" id="endDate" placeholder="End Date">
                     </div>
-                    
-                    <!-- Role Selection -->
-                    <div id="roleSelectDiv" class="form-row" style="display:none;">
-                        <label>Select Role:</label>
-                        <select id="printRoleSelect" style="width:100%; padding: 12px;">
-                            <option value="all">All Roles</option>
-                            <option value="super_admin">👑 Super Admin</option>
-                            <option value="property_admin">🏢 Property Admin</option>
-                            <option value="worker">👷 Worker</option>
-                            <option value="owner">👤 Property Owner</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Date Range -->
-                    <div id="dateRangeDiv" class="form-row" style="display:none; gap: 1rem;">
-                        <input type="date" id="startDate" placeholder="Start Date" style="flex:1;">
-                        <input type="date" id="endDate" placeholder="End Date" style="flex:1;">
-                    </div>
-                    
-                    <div style="margin-top: 1rem; padding: 12px; background: #f0f4fa; border-radius: 12px;">
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="checkbox" id="includeDetails" checked>
-                            <small><i class="fas fa-info-circle"></i> Include full transaction details</small>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 5px;">
-                            <input type="checkbox" id="includeTransactionIds" checked>
-                            <small><i class="fas fa-receipt"></i> Include Transaction IDs</small>
-                        </label>
-                    </div>
-                    
-                    <div style="display: flex; gap: 0.8rem; margin-top: 1.5rem;">
-                        <button onclick="generateAndPrintActivityLog()" class="success" style="flex:1;">
-                            <i class="fas fa-file-pdf"></i> Generate Report & Print
-                        </button>
-                        <button onclick="closePrintActivityModal()" style="flex:1;">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                    <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
+                        <button onclick="printActivityLog()" class="success"><i class="fas fa-print"></i> Print</button>
+                        <button onclick="closePrintActivityModal()"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 </div>
             </div>
 
-            <!-- RESET ACTIVITY LOG MODAL -->
+            <!-- Reset Activity Log Confirmation Modal -->
             <div id="resetActivityModal" class="modal">
                 <div class="modal-content">
-                    <h3><i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i> Reset Activity Log</h3>
-                    
-                    <div style="background: #fee2e2; padding: 15px; border-radius: 12px; margin: 15px 0;">
-                        <p><strong>⚠️ DANGER: This will permanently delete activity logs</strong></p>
-                        <p style="margin-top: 10px; font-size: 0.85rem;">Select what to delete:</p>
+                    <h3><i class="fas fa-exclamation-triangle"></i> Reset Activity Log</h3>
+                    <p style="margin-bottom: 1rem;">⚠️ WARNING: This will permanently delete ALL activity logs from the database. This action cannot be undone!</p>
+                    <div class="form-row">
+                        <input type="text" id="resetConfirmText" placeholder='Type "DELETE ALL LOGS" to confirm'>
                     </div>
-                    
-                    <div class="form-row" style="flex-direction: column; gap: 0.8rem;">
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="radio" name="resetScope" value="all" checked>
-                            <strong>🗑️ Delete ALL activity logs (entire system)</strong>
-                            <small style="color:#dc2626;">- Cannot be undone!</small>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="radio" name="resetScope" value="property">
-                            <strong>🏢 Delete logs for a specific property</strong>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="radio" name="resetScope" value="user">
-                            <strong>👤 Delete logs for a specific user</strong>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="radio" name="resetScope" value="older">
-                            <strong>📅 Delete logs older than 30 days</strong>
-                        </label>
-                    </div>
-                    
-                    <div id="resetPropertySelectDiv" class="form-row" style="display:none; margin-top: 1rem;">
-                        <select id="resetPropertySelect" style="width:100%; padding: 12px;">
-                            <option value="">-- Select Property --</option>
-                        </select>
-                    </div>
-                    
-                    <div id="resetUserSelectDiv" class="form-row" style="display:none; margin-top: 1rem;">
-                        <select id="resetUserSelect" style="width:100%; padding: 12px;">
-                            <option value="">-- Select User --</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-row" style="margin-top: 1rem;">
-                        <input type="text" id="resetConfirmText" placeholder='Type "CONFIRM DELETE" to confirm' style="text-align: center; font-weight: bold;">
-                    </div>
-                    
-                    <div style="display: flex; gap: 0.8rem; margin-top: 1.5rem;">
-                        <button onclick="executeResetActivityLog()" class="danger" style="flex:1;">
-                            <i class="fas fa-trash-alt"></i> Execute Delete
-                        </button>
-                        <button onclick="closeResetActivityModal()" style="flex:1;">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                    <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
+                        <button onclick="resetActivityLog()" class="danger"><i class="fas fa-trash-alt"></i> Permanently Delete</button>
+                        <button onclick="closeResetActivityModal()"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 </div>
             </div>
 
         </div>
     </div>
-
 
     <!-- Broadcast Modal -->
     <div id="broadcastModal" class="modal">
@@ -551,6 +450,28 @@
         </div>
         <div id="imageManagerContent" class="image-manager-content">
             <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading images...</div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <div class="chat-toggle" onclick="toggleChatPanel()">
+        <i class="fas fa-comments"></i>
+    </div>
+
+    <!-- Chat Panel -->
+    <div id="chatPanel" class="chat-panel">
+        <div class="chat-header">
+            <span><i class="fas fa-comments"></i> Team Chat</span>
+            <button onclick="toggleChatPanel()" class="chat-close">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessagesContainer">
+            <div style="text-align: center; padding: 20px; color: #666;">
+                <i class="fas fa-spinner fa-spin"></i> Loading messages...
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chatMessageInput" rows="2" placeholder="Type your message here..."></textarea>
+            <button onclick="sendChatMessage()" class="chat-send-btn">Send</button>
         </div>
     </div>
 
@@ -1041,14 +962,7 @@
             }
         }
         
-        async function assignAdminToProperty() {
-            const adminId = document.getElementById('assignAdminSelect').value;
-            const propertyId = document.getElementById('assignPropertySelect').value;
-            if (!adminId || !propertyId) { alert('Please select both an admin and a property'); return; }
-            const { error } = await window.supabaseClient.from('properties').update({ admin_id: adminId }).eq('id', propertyId);
-            if (error) { alert('Failed: ' + error.message); }
-            else { alert('✅ Admin assigned to property successfully'); await loadMyProperties(); await addActivityLog('admin_assigned', `Assigned admin to property`); }
-        }
+
 
         // ============ CREATE NEW PROPERTY ============
 
@@ -1339,543 +1253,6 @@
             // Render using the enriched activity-log details used by Print/Reset
             await displayActivityLogWithDetails('activityLogList');
         }
-
-        // ============ COMPLETE ACTIVITY LOG MANAGEMENT ============
-
-        let currentActivitiesForPrint = [];
-
-        async function loadAllActivitiesWithDetails() {
-            console.log("Loading all activities with details...");
-            
-            const { data, error } = await window.supabaseClient
-                .from('activity_logs')
-                .select(`
-                    *,
-                    properties:property_id (id, name, location)
-                `)
-                .order('created_at', { ascending: false })
-                .limit(500);
-            
-            if (error) {
-                console.error('Error loading activity logs:', error);
-                return [];
-            }
-            
-            currentActivitiesForPrint = data || [];
-            return currentActivitiesForPrint;
-        }
-
-        async function displayActivityLogsFull() {
-            const container = document.getElementById('activityLogList');
-            if (!container) return;
-            
-            const logs = await loadAllActivitiesWithDetails();
-            
-            if (!logs || logs.length === 0) {
-                container.innerHTML = '<div class="activity-item"><i class="fas fa-info-circle"></i> No activities recorded yet.</div>';
-                return;
-            }
-            
-            let html = '';
-            for (let log of logs) {
-                const date = new Date(log.created_at);
-                const propertyName = log.properties?.name || '🌍 System Wide';
-                const propertyLocation = log.properties?.location || '';
-                const icon = getActivityIconHtml(log.action);
-                const actionDisplay = log.action.replace(/_/g, ' ').toUpperCase();
-                
-                // Format details with balance highlighting
-                let detailsHtml = log.details || '';
-                if (log.action === 'payment_recorded' || log.action === 'payment_approved') {
-                    detailsHtml = detailsHtml.replace(/balance: UGX ([\d,]+)/gi, '<span style="color:#dc2626; font-weight:bold;">balance: UGX $1</span>');
-                    detailsHtml = detailsHtml.replace(/UGX ([\d,]+)/gi, '<span style="color:#10b981; font-weight:bold;">UGX $1</span>');
-                }
-                
-                html += `
-                    <div class="activity-item" style="margin-bottom: 0.8rem; border-left: 4px solid ${getActivityColor(log.action)};">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                            <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small>
-                            <small><i class="fas fa-building"></i> <strong>${escapeHtml(propertyName)}</strong> ${propertyLocation ? `(${escapeHtml(propertyLocation)})` : ''}</small>
-                        </div>
-                        <div style="margin-top: 8px;">
-                            <strong>${icon} ${escapeHtml(log.user_name || 'System')}</strong>
-                            <span class="role-badge" style="background: ${getRoleColor(log.user_role)}; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; margin-left: 5px;">
-                                ${escapeHtml(log.user_role || 'unknown')}
-                            </span>
-                        </div>
-                        <div style="margin-top: 5px;">
-                            <span style="font-weight: 700; font-size: 0.85rem;">${actionDisplay}</span>
-                        </div>
-                        <div style="margin-top: 5px; font-size: 0.8rem; color: #475569;">
-                            <i class="fas fa-info-circle"></i> ${escapeHtml(detailsHtml)}
-                        </div>
-                        ${log.transaction_id ? `<div style="margin-top: 5px;"><small><i class="fas fa-receipt"></i> <strong>Transaction ID:</strong> ${escapeHtml(log.transaction_id)}</small></div>` : ''}
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        }
-
-        // Used by existing loadAllActivities()
-        async function displayActivityLogWithDetails(containerId) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            const logs = await loadAllActivitiesWithDetails();
-            
-            if (!logs || logs.length === 0) {
-                container.innerHTML = '<div class="activity-item"><i class="fas fa-info-circle"></i> No activities recorded yet.</div>';
-                return;
-            }
-            
-            let html = '';
-            for (let log of logs) {
-                const date = new Date(log.created_at);
-                const propertyName = log.properties?.name || '🌍 System Wide';
-                const propertyLocation = log.properties?.location || '';
-                const icon = getActivityIconHtml(log.action);
-                const actionDisplay = log.action.replace(/_/g, ' ').toUpperCase();
-
-                // Keep same formatting rules as full view
-                let detailsHtml = log.details || '';
-                if (log.action === 'payment_recorded' || log.action === 'payment_approved') {
-                    detailsHtml = detailsHtml.replace(/balance: UGX ([\d,]+)/gi, '<span style="color:#dc2626; font-weight:bold;">balance: UGX $1</span>');
-                    detailsHtml = detailsHtml.replace(/UGX ([\d,]+)/gi, '<span style="color:#10b981; font-weight:bold;">UGX $1</span>');
-                }
-
-                html += `
-                    <div class="activity-item" style="margin-bottom: 0.8rem; border-left: 4px solid ${getActivityColor(log.action)};">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                            <small><i class="fas fa-calendar-alt"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small>
-                            <small><i class="fas fa-building"></i> <strong>${escapeHtml(propertyName)}</strong> ${propertyLocation ? `(${escapeHtml(propertyLocation)})` : ''}</small>
-                        </div>
-                        <div style="margin-top: 8px;">
-                            <strong>${icon} ${escapeHtml(log.user_name || 'System')}</strong>
-                            <span class="role-badge" style="background: ${getRoleColor(log.user_role)}; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; margin-left: 5px;">
-                                ${escapeHtml(log.user_role || 'unknown')}
-                            </span>
-                        </div>
-                        <div style="margin-top: 5px;">
-                            <span style="font-weight: 700; font-size: 0.85rem;">${actionDisplay}</span>
-                        </div>
-                        <div style="margin-top: 5px; font-size: 0.8rem; color: #475569;">
-                            <i class="fas fa-info-circle"></i> ${escapeHtml(detailsHtml)}
-                        </div>
-                        ${log.transaction_id ? `<div style="margin-top: 5px;"><small><i class="fas fa-receipt"></i> <strong>Transaction ID:</strong> ${escapeHtml(log.transaction_id)}</small></div>` : ''}
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        }
-
-        function getActivityColor(action) {
-            if (action.includes('payment')) return '#10b981';
-            if (action.includes('remittance')) return '#8b5cf6';
-            if (action.includes('bill')) return '#f59e0b';
-            if (action.includes('room')) return '#2c7be5';
-            if (action.includes('worker')) return '#f59e0b';
-            if (action.includes('evacuation')) return '#dc2626';
-            if (action.includes('broadcast')) return '#ec489a';
-            if (action.includes('reset')) return '#dc2626';
-            return '#6c757d';
-        }
-
-        function getRoleColor(role) {
-            if (role === 'super_admin') return '#8b5cf6';
-            if (role === 'property_admin') return '#2c7be5';
-            if (role === 'worker') return '#f59e0b';
-            if (role === 'owner') return '#10b981';
-            return '#6c757d';
-        }
-
-        function getActivityIconHtml(action) {
-            if (action.includes('payment')) return '<i class="fas fa-money-bill-wave" style="color:#10b981;"></i>';
-            if (action.includes('remittance')) return '<i class="fas fa-paper-plane" style="color:#8b5cf6;"></i>';
-            if (action.includes('bill')) return '<i class="fas fa-receipt" style="color:#f59e0b;"></i>';
-            if (action.includes('room')) return '<i class="fas fa-door-open" style="color:#2c7be5;"></i>';
-            if (action.includes('worker')) return '<i class="fas fa-hard-hat" style="color:#f59e0b;"></i>';
-            if (action.includes('evacuation')) return '<i class="fas fa-user-slash" style="color:#dc2626;"></i>';
-            if (action.includes('broadcast')) return '<i class="fas fa-bullhorn" style="color:#ec489a;"></i>';
-            if (action.includes('reset')) return '<i class="fas fa-trash-alt" style="color:#dc2626;"></i>';
-            return '<i class="fas fa-bell" style="color:#6c757d;"></i>';
-        }
-
-        // ============ TOGGLE PRINT OPTIONS ============
-
-        function togglePrintOptions() {
-            const reportType = document.getElementById('printReportType').value;
-            
-            document.getElementById('propertySelectDiv').style.display = 'none';
-            document.getElementById('userSelectDiv').style.display = 'none';
-            document.getElementById('roleSelectDiv').style.display = 'none';
-            document.getElementById('dateRangeDiv').style.display = 'none';
-            
-            if (reportType === 'property') {
-                document.getElementById('propertySelectDiv').style.display = 'block';
-                loadPropertiesForSelect('printPropertySelect');
-            } else if (reportType === 'user') {
-                document.getElementById('userSelectDiv').style.display = 'block';
-                loadUsersForSelect('printUserSelect');
-            } else if (reportType === 'role') {
-                document.getElementById('roleSelectDiv').style.display = 'block';
-            } else if (reportType === 'date') {
-                document.getElementById('dateRangeDiv').style.display = 'block';
-            }
-        }
-
-        async function loadPropertiesForSelect(selectId) {
-            const { data } = await window.supabaseClient
-                .from('properties')
-                .select('id, name, location')
-                .order('name');
-            
-            const select = document.getElementById(selectId);
-            if (select && data) {
-                select.innerHTML = '<option value="">-- Select Property --</option>';
-                for (let prop of data) {
-                    select.innerHTML += `<option value="${prop.id}">🏢 ${escapeHtml(prop.name)} (${escapeHtml(prop.location)})</option>`;
-                }
-            }
-        }
-
-        async function loadUsersForSelect(selectId) {
-            const { data } = await window.supabaseClient
-                .from('users')
-                .select('id, full_name, role')
-                .order('full_name');
-            
-            const select = document.getElementById(selectId);
-            if (select && data) {
-                select.innerHTML = '<option value="">-- Select User --</option>';
-                for (let user of data) {
-                    const roleIcon = user.role === 'super_admin' ? '👑' : (user.role === 'property_admin' ? '🏢' : '👷');
-                    select.innerHTML += `<option value="${user.id}">${roleIcon} ${escapeHtml(user.full_name)} (${user.role.replace('_', ' ')})</option>`;
-                }
-            }
-        }
-
-        // ============ GENERATE AND PRINT ACTIVITY LOG ============
-
-        function openPrintActivityModal() {
-            document.getElementById('printActivityModal').style.display = 'flex';
-            togglePrintOptions();
-        }
-
-        function closePrintActivityModal() {
-            document.getElementById('printActivityModal').style.display = 'none';
-        }
-
-        async function generateAndPrintActivityLog() {
-            const reportType = document.getElementById('printReportType').value;
-            const includeDetails = document.getElementById('includeDetails').checked;
-            const includeTransactionIds = document.getElementById('includeTransactionIds').checked;
-            
-            let filteredLogs = [...currentActivitiesForPrint];
-            let reportTitle = 'ALL ACTIVITIES';
-            let reportSubtitle = 'Entire System - Complete Activity Log';
-            
-            // Apply filters based on report type
-            if (reportType === 'property') {
-                const propertyId = document.getElementById('printPropertySelect').value;
-                if (propertyId) {
-                    filteredLogs = filteredLogs.filter(log => log.property_id === propertyId);
-                    const property = await getPropertyName(propertyId);
-                    reportTitle = `PROPERTY: ${property}`;
-                    reportSubtitle = `Activity Log for ${property}`;
-                }
-            } else if (reportType === 'user') {
-                const userId = document.getElementById('printUserSelect').value;
-                if (userId) {
-                    filteredLogs = filteredLogs.filter(log => log.user_id === userId);
-                    const userName = await getUserName(userId);
-                    reportTitle = `USER: ${userName}`;
-                    reportSubtitle = `Activity Log for ${userName}`;
-                }
-            } else if (reportType === 'role') {
-                const role = document.getElementById('printRoleSelect').value;
-                if (role && role !== 'all') {
-                    filteredLogs = filteredLogs.filter(log => log.user_role === role);
-                    reportTitle = `ROLE: ${role.replace('_', ' ').toUpperCase()}`;
-                    reportSubtitle = `Activity Log for all ${role.replace('_', ' ')} users`;
-                }
-            } else if (reportType === 'date') {
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-                if (startDate) {
-                    filteredLogs = filteredLogs.filter(log => new Date(log.created_at) >= new Date(startDate));
-                }
-                if (endDate) {
-                    filteredLogs = filteredLogs.filter(log => new Date(log.created_at) <= new Date(endDate + 'T23:59:59'));
-                }
-                reportTitle = `DATE RANGE REPORT`;
-                reportSubtitle = `${startDate || 'All'} to ${endDate || 'Present'}`;
-            } else if (reportType === 'payment') {
-                filteredLogs = filteredLogs.filter(log => log.action.includes('payment'));
-                reportTitle = `PAYMENT TRANSACTIONS ONLY`;
-                reportSubtitle = `All payment-related activities`;
-            } else if (reportType === 'remittance') {
-                filteredLogs = filteredLogs.filter(log => log.action.includes('remittance'));
-                reportTitle = `REMITTANCE TRANSACTIONS ONLY`;
-                reportSubtitle = `All remittance-related activities`;
-            }
-            
-            // Calculate summary
-            const totalCollected = filteredLogs
-                .filter(log => log.action === 'payment_recorded' || log.action === 'payment_approved')
-                .reduce((sum, log) => {
-                    const match = log.details?.match(/UGX ([\d,]+)/);
-                    return sum + (match ? parseInt(match[1].replace(/,/g, '')) : 0);
-                }, 0);
-            
-            const totalRemitted = filteredLogs
-                .filter(log => log.action === 'remittance_sent')
-                .reduce((sum, log) => {
-                    const match = log.details?.match(/UGX ([\d,]+)/);
-                    return sum + (match ? parseInt(match[1].replace(/,/g, '')) : 0);
-                }, 0);
-            
-            // Generate print HTML
-            const printWindow = window.open('', '_blank');
-            const now = new Date();
-            
-            let printHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>BATTETECH Activity Report - ${reportTitle}</title>
-                    <meta charset="UTF-8">
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { 
-                            font-family: 'Segoe UI', Arial, sans-serif; 
-                            padding: 20px; 
-                            background: white; 
-                            font-size: 11px;
-                            line-height: 1.4;
-                        }
-                        .header { 
-                            text-align: center; 
-                            margin-bottom: 20px; 
-                            padding-bottom: 15px; 
-                            border-bottom: 3px solid #0a2b4e;
-                        }
-                        .header h1 { color: #0a2b4e; font-size: 22px; margin-bottom: 5px; }
-                        .header h2 { color: #2c7be5; font-size: 16px; margin-bottom: 5px; }
-                        .header p { color: #666; margin-top: 5px; font-size: 10px; }
-                        .summary { 
-                            background: #f0f4fa; 
-                            padding: 12px; 
-                            margin-bottom: 20px; 
-                            border-radius: 8px;
-                            display: flex;
-                            justify-content: space-around;
-                            flex-wrap: wrap;
-                        }
-                        .summary-box { text-align: center; }
-                        .summary-box .number { font-size: 18px; font-weight: bold; color: #0a2b4e; }
-                        .summary-box .label { font-size: 9px; color: #666; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                        th, td { border: 1px solid #ddd; padding: 8px 6px; text-align: left; vertical-align: top; }
-                        th { background: #0a2b4e; color: white; font-size: 10px; font-weight: bold; }
-                        tr:nth-child(even) { background: #f9f9f9; }
-                        .footer { margin-top: 20px; text-align: center; font-size: 9px; color: #666; padding-top: 10px; border-top: 1px solid #ddd; }
-                        .payment-row { background: #d1fae5; }
-                        .remittance-row { background: #e9d5ff; }
-                        @media print {
-                            body { margin: 0; padding: 10px; }
-                            .no-print { display: none; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>🏢 BATTETECH PROPERTY MANAGEMENT</h1>
-                        <h2>ACTIVITY LOG REPORT</h2>
-                        <p>${reportTitle}</p>
-                        <p>${reportSubtitle}</p>
-                        <p>Generated on: ${now.toLocaleString()}</p>
-                        <p>Generated by: ${localStorage.getItem('battetech_user_name')} (Super Admin)</p>
-                    </div>
-                    
-                    <div class="summary">
-                        <div class="summary-box">
-                            <div class="number">${filteredLogs.length}</div>
-                            <div class="label">Total Activities</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="number">UGX ${totalCollected.toLocaleString()}</div>
-                            <div class="label">Total Payments</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="number">UGX ${totalRemitted.toLocaleString()}</div>
-                            <div class="label">Total Remitted</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="number">${filteredLogs.filter(l => l.action.includes('room')).length}</div>
-                            <div class="label">Room Changes</div>
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Date & Time</th>
-                                <th>User</th>
-                                <th>Role</th>
-                                <th>Property</th>
-                                <th>Action</th>
-                                ${includeDetails ? '<th>Details</th>' : ''}
-                                ${includeTransactionIds ? '<th>Transaction ID</th>' : ''}
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            for (let i = 0; i < filteredLogs.length; i++) {
-                const log = filteredLogs[i];
-                const date = new Date(log.created_at);
-                const rowClass = log.action.includes('payment') ? 'payment-row' : (log.action.includes('remittance') ? 'remittance-row' : '');
-                
-                printHtml += `<tr class="${rowClass}">
-                    <td style="text-align: center;">${i + 1}</td>
-                    <td>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</td>
-                    <td>${escapeHtml(log.user_name || '-')}</td>
-                    <td>${escapeHtml(log.user_role || '-')}</td>
-                    <td>${escapeHtml(log.properties?.name || '-')}</td>
-                    <td>${escapeHtml(log.action.replace(/_/g, ' ').toUpperCase())}</td>
-                    ${includeDetails ? `<td>${escapeHtml((log.details || '').substring(0, 200))}</td>` : ''}
-                    ${includeTransactionIds ? `<td><small>${escapeHtml(log.transaction_id || '-')}</small></td>` : ''}
-                </tr>`;
-            }
-            
-            printHtml += `
-                        </tbody>
-                    </table>
-                    
-                    <div class="footer">
-                        <p>BATTETECH Property Management System - Confidential Report</p>
-                        <p>For inquiries: battetech330@gmail.com | Tel: 0794115704 / 0756182284</p>
-                        <p>This report was generated automatically. For questions, contact support.</p>
-                    </div>
-                    
-                    <div class="no-print" style="text-align: center; margin-top: 20px;">
-                        <button onclick="window.print()" style="padding: 10px 20px; margin: 0 5px; background: #0a2b4e; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                            🖨️ Print / Save as PDF
-                        </button>
-                        <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                            ✖️ Close
-                        </button>
-                    </div>
-                    <script>
-                        setTimeout(function() { window.print(); }, 500);
-                    <\/script>
-                </body>
-                </html>
-            `;
-            
-            printWindow.document.write(printHtml);
-            printWindow.document.close();
-            closePrintActivityModal();
-        }
-
-        // Helper functions
-        async function getPropertyName(propertyId) {
-            const { data } = await window.supabaseClient
-                .from('properties')
-                .select('name')
-                .eq('id', propertyId)
-                .single();
-            return data?.name || 'Unknown Property';
-        }
-
-        async function getUserName(userId) {
-            const { data } = await window.supabaseClient
-                .from('users')
-                .select('full_name')
-                .eq('id', userId)
-                .single();
-            return data?.full_name || 'Unknown User';
-        }
-
-        // ============ RESET ACTIVITY LOG (COMPLETE) ============
-
-        function confirmResetActivityLog() {
-            loadPropertiesForSelect('resetPropertySelect');
-            loadUsersForSelect('resetUserSelect');
-            document.getElementById('resetActivityModal').style.display = 'flex';
-            document.getElementById('resetConfirmText').value = '';
-            
-            // Add event listener to radio buttons
-            document.querySelectorAll('input[name="resetScope"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.getElementById('resetPropertySelectDiv').style.display = 
-                        this.value === 'property' ? 'block' : 'none';
-                    document.getElementById('resetUserSelectDiv').style.display = 
-                        this.value === 'user' ? 'block' : 'none';
-                });
-            });
-        }
-
-        function closeResetActivityModal() {
-            document.getElementById('resetActivityModal').style.display = 'none';
-        }
-
-        async function executeResetActivityLog() {
-            const confirmText = document.getElementById('resetConfirmText').value;
-            if (confirmText !== 'CONFIRM DELETE') {
-                alert('❌ Please type "CONFIRM DELETE" to confirm deletion');
-                return;
-            }
-            
-            const scope = document.querySelector('input[name="resetScope"]:checked').value;
-            let query = window.supabaseClient.from('activity_logs').delete();
-            
-            if (scope === 'property') {
-                const propertyId = document.getElementById('resetPropertySelect').value;
-                if (!propertyId) {
-                    alert('Please select a property');
-                    return;
-                }
-                query = query.eq('property_id', propertyId);
-            } else if (scope === 'user') {
-                const userId = document.getElementById('resetUserSelect').value;
-                if (!userId) {
-                    alert('Please select a user');
-                    return;
-                }
-                query = query.eq('user_id', userId);
-            } else if (scope === 'older') {
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                query = query.lt('created_at', thirtyDaysAgo.toISOString());
-            }
-            // else scope === 'all' - delete all
-            
-            if (!confirm('⚠️ FINAL WARNING: This action cannot be undone!\n\nAre you absolutely sure?')) {
-                return;
-            }
-            
-            try {
-                const { error } = await query;
-                
-                if (error) {
-                    alert('Failed to reset activity log: ' + error.message);
-                } else {
-                    alert('✅ Activity log has been reset successfully!');
-                    closeResetActivityModal();
-                    await displayActivityLogsFull();
-                    
-                    // Log the reset action
-                    await addActivityLog('activity_log_reset', `Activity logs were reset (Scope: ${scope}) by ${localStorage.getItem('battetech_user_name')}`);
-                    await displayActivityLogsFull();
-                }
-            } catch (err) {
-                console.error('Error resetting activity log:', err);
-                alert('Error: ' + err.message);
-            }
-        }
-
 
         
         // ============ PENDING BROADCAST APPROVALS ============

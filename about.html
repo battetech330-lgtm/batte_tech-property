@@ -370,6 +370,28 @@
                 justify-content: center;
             }
         }
+
+        /* Chat Panel Mobile Responsive */
+        @media (max-width: 600px) {
+            .chat-panel {
+                width: calc(100% - 40px) !important;
+                right: 20px !important;
+                left: 20px !important;
+                bottom: 80px !important;
+                height: 450px !important;
+            }
+            
+            #chatToggleBtn {
+                bottom: 15px;
+                right: 15px;
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .chat-message {
+                max-width: 95%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -461,10 +483,31 @@
         </div>
     </footer>
 
+    <!-- Chat Panel -->
+    <div id="chatPanel" class="chat-panel" style="display: none;">
+        <div class="chat-header">
+            <span><i class="fas fa-comments"></i> Team Chat</span>
+            <button onclick="toggleChatPanel()" class="chat-close">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessagesContainer">
+            <div style="text-align: center; padding: 20px; color: #666;">Loading messages...</div>
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chatMessageInput" rows="2" placeholder="Type your message here..."></textarea>
+            <button onclick="sendChatMessage()" class="chat-send-btn">Send</button>
+        </div>
+    </div>
+
+    <button id="chatToggleBtn" onclick="toggleChatPanel()">
+        <i class="fas fa-comments"></i> Chat
+    </button>
+
+
     <!-- Supabase Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-data.js"></script>
+    <script src="chat-system.js"></script>
 
     <script>
         // Slideshow background images

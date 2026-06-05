@@ -10,85 +10,103 @@ let contactRequests = [];
 
 // ============ LOAD DATA FROM SUPABASE ============
 
+let dataLoaded = false;
+let loadingPromise = null;
+
 async function loadAllData() {
-    console.log("Loading data from Supabase...");
-    
-    try {
-        const { data: properties, error: propError } = await window.supabaseClient
-            .from('properties')
-            .select('*');
-        
-        if (propError) {
-            console.error("Error loading properties:", propError);
-        } else if (properties) {
-            propertiesDB = {};
-            properties.forEach(prop => {
-                propertiesDB[prop.id] = prop.data || prop;
-                if (!propertiesDB[prop.id].units) {
-                    propertiesDB[prop.id].units = [];
+    // Single-flight guard (prevents duplicate network bursts)
+    if (loadingPromise) return loadingPromise;
+    if (dataLoaded) return Promise.resolve();
+
+    console.log("Loading data from Supabase (optimized)...");
+
+    loadingPromise = (async () => {
+        try {
+            const [propertiesRes, ownersRes, updatesRes, messagesRes, notesRes] = await Promise.all([
+                window.supabaseClient
+                    .from('properties')
+                    .select('*')
+                    .limit(200),
+                window.supabaseClient
+                    .from('owners')
+                    .select('*')
+                    .limit(200),
+                window.supabaseClient
+                    .from('updates')
+                    .select('*')
+                    .limit(500),
+                window.supabaseClient
+                    .from('messages')
+                    .select('*')
+                    .limit(500),
+                window.supabaseClient
+                    .from('notes')
+                    .select('*')
+                    .limit(200)
+            ]);
+
+            // Properties
+            if (!propertiesRes.error && propertiesRes.data) {
+                propertiesDB = {};
+                for (const prop of propertiesRes.data) {
+                    propertiesDB[prop.id] = prop.data || prop;
+                    if (!propertiesDB[prop.id].units) propertiesDB[prop.id].units = [];
                 }
-            });
-            console.log(`Loaded ${Object.keys(propertiesDB).length} properties`);
+                console.log(`Loaded ${Object.keys(propertiesDB).length} properties`);
+            } else {
+                console.error("Error loading properties:", propertiesRes.error);
+            }
+
+            // Owners
+            if (!ownersRes.error && ownersRes.data) {
+                ownersDB = ownersRes.data.map(o => o.data || o);
+                console.log(`Loaded ${ownersDB.length} owners`);
+            } else {
+                console.error("Error loading owners:", ownersRes.error);
+            }
+
+            // Updates
+            if (!updatesRes.error && updatesRes.data) {
+                globalUpdates = {};
+                for (const update of updatesRes.data) {
+                    globalUpdates[update.property_id] = update.data?.updates || [];
+                }
+            } else {
+                console.error("Error loading updates:", updatesRes.error);
+            }
+
+            // Messages
+            if (!messagesRes.error && messagesRes.data) {
+                messagesDB = {};
+                for (const msg of messagesRes.data) {
+                    messagesDB[msg.property_id] = msg.data?.messages || [];
+                }
+            } else {
+                console.error("Error loading messages:", messagesRes.error);
+            }
+
+            // Notes
+            if (!notesRes.error && notesRes.data) {
+                adminNotes = {};
+                for (const note of notesRes.data) {
+                    adminNotes[note.property_id] = note.data?.note || "";
+                }
+            } else {
+                console.error("Error loading notes:", notesRes.error);
+            }
+
+            dataLoaded = true;
+            console.log("All data loaded from Supabase successfully (optimized)");
+        } catch (error) {
+            console.error("Error in loadAllData:", error);
+        } finally {
+            loadingPromise = null;
         }
-        
-        const { data: owners, error: ownerError } = await window.supabaseClient
-            .from('owners')
-            .select('*');
-        
-        if (ownerError) {
-            console.error("Error loading owners:", ownerError);
-        } else if (owners) {
-            ownersDB = [];
-            owners.forEach(owner => {
-                ownersDB.push(owner.data || owner);
-            });
-            console.log(`Loaded ${ownersDB.length} owners`);
-        }
-        
-        const { data: updates, error: updateError } = await window.supabaseClient
-            .from('updates')
-            .select('*');
-        
-        if (updateError) {
-            console.error("Error loading updates:", updateError);
-        } else if (updates) {
-            globalUpdates = {};
-            updates.forEach(update => {
-                globalUpdates[update.property_id] = update.data?.updates || [];
-            });
-        }
-        
-        const { data: messages, error: msgError } = await window.supabaseClient
-            .from('messages')
-            .select('*');
-        
-        if (msgError) {
-            console.error("Error loading messages:", msgError);
-        } else if (messages) {
-            messagesDB = {};
-            messages.forEach(msg => {
-                messagesDB[msg.property_id] = msg.data?.messages || [];
-            });
-        }
-        
-        const { data: notes, error: noteError } = await window.supabaseClient
-            .from('notes')
-            .select('*');
-        
-        if (noteError) {
-            console.error("Error loading notes:", noteError);
-        } else if (notes) {
-            adminNotes = {};
-            notes.forEach(note => {
-                adminNotes[note.property_id] = note.data?.note || "";
-            });
-        }
-        
-        console.log("All data loaded from Supabase successfully");
-    } catch (error) {
-        console.error("Error in loadAllData:", error);
-    }
+    })();
+
+    return loadingPromise;
 }
+
 
 async function saveAllData() {
     console.log("Saving data to Supabase...");
@@ -125,10 +143,27 @@ function formatDate(date) {
     return date.toISOString().split('T')[0];
 }
 
-// ============ FINANCIAL CALCULATIONS ============
+// ============ FINANCIAL CALCULATIONS (CACHED) ============
+
+let financialsCache = {};
+
+function clearFinancialsCache(propertyId) {
+    if (propertyId && financialsCache[propertyId]) {
+        delete financialsCache[propertyId];
+    } else {
+        financialsCache = {};
+    }
+}
 
 function getFinancials(property) {
+    const propertyId = property?.id;
+
+    if (propertyId && financialsCache[propertyId] && (Date.now() - financialsCache[propertyId].timestamp) < 30000) {
+        return financialsCache[propertyId].data;
+    }
+
     const units = property.data?.units || property.units || [];
+
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
     const monthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
@@ -163,8 +198,9 @@ function getFinancials(property) {
     console.log("Already Remitted:", alreadyRemitted);
     console.log("Pending to Remit:", pendingToRemit);
     
-    return {
+    const result = {
         currentMonthRentDue: currentMonthCollected + currentMonthPending,
+
         currentMonthCollected: currentMonthCollected,
         currentMonthPending: currentMonthPending,
         totalCollectedSinceLastRemit: totalCollectedSinceLastRemit,
@@ -175,12 +211,25 @@ function getFinancials(property) {
         billsHistory: property.bills_history || [],
         statements: property.statements || []
     };
+
+    if (propertyId) {
+        financialsCache[propertyId] = {
+            data: result,
+            timestamp: Date.now()
+        };
+    }
+
+    return result;
 }
+
 
 // ============ PROCESS APPROVED PAYMENT (FIXED - ADDS TO TOTALS) ============
 
 async function processApprovedPayment(propertyId, roomIndex, amount, month, method, reference, transactionId, paymentDate) {
     console.log("=== processApprovedPayment START ===");
+    // Invalidate cached financials (if any)
+    clearFinancialsCache(propertyId);
+
     console.log("Amount to add:", amount);
     console.log("Month (selected):", month);
     console.log("Room Index:", roomIndex);
@@ -337,13 +386,18 @@ async function processApprovedPayment(propertyId, roomIndex, amount, month, meth
 // Make globally accessible
 window.processApprovedPayment = processApprovedPayment;
 window.getFinancials = getFinancials;
+window.clearFinancialsCache = clearFinancialsCache;
 
 // ============ REMIT TO OWNER (RESETS COUNTERS) ============
+
 
 async function remitToOwner(propertyId, amount, method, reference) {
     console.log("=== remitToOwner called ===");
     console.log("Amount to remit:", amount);
-    
+
+    // Invalidate cached financials (if any)
+    clearFinancialsCache(propertyId);
+
     try {
         // Get FRESH property data
         const { data: property, error } = await window.supabaseClient
@@ -424,6 +478,9 @@ window.remitToOwner = remitToOwner;
 
 async function addBillPayment(propertyId, billType, amount, receiptImage, description) {
     try {
+        // Invalidate cached financials (if any)
+        clearFinancialsCache(propertyId);
+
         const { data: property, error } = await window.supabaseClient
             .from('properties')
             .select('*')
@@ -477,7 +534,15 @@ window.addBillPayment = addBillPayment;
 
 // ============ GET VACANT UNITS ============
 
-function getAllVacantUnits() {
+let vacantUnitsCache = null;
+let vacantUnitsCacheTime = 0;
+
+function getAllVacantUnits(forceRefresh = false) {
+    // Cache for 1 minute
+    if (!forceRefresh && vacantUnitsCache && (Date.now() - vacantUnitsCacheTime) < 60000) {
+        return vacantUnitsCache;
+    }
+
     const vacantUnits = [];
     for (let propId in propertiesDB) {
         const prop = propertiesDB[propId];
@@ -497,17 +562,28 @@ function getAllVacantUnits() {
             }
         }
     }
+    vacantUnitsCache = vacantUnits;
+    vacantUnitsCacheTime = Date.now();
     return vacantUnits;
 }
+
 
 window.getAllVacantUnits = getAllVacantUnits;
 
 // ============ OWNER AUTHENTICATION ============
 
+let ownerPasswordCache = {};
+
 async function getOwnerByPassword(password) {
     if (!password) return null;
-    
+
+    // Check cache (5 minutes)
+    if (ownerPasswordCache[password] && (Date.now() - ownerPasswordCache[password].timestamp) < 300000) {
+        return ownerPasswordCache[password].data;
+    }
+
     const { data, error } = await window.supabaseClient
+
         .from('properties')
         .select('id, name, owner_name, owner_phone, owner_password')
         .eq('owner_password', password);
@@ -515,14 +591,24 @@ async function getOwnerByPassword(password) {
     if (error || !data || data.length === 0) return null;
     
     const property = data[0];
-    return {
+    const result = {
         id: property.id,
+
         name: property.owner_name,
         phone: property.owner_phone,
         propertyId: property.id,
         password: property.owner_password
     };
+
+    // Store cache
+    ownerPasswordCache[password] = {
+        data: result,
+        timestamp: Date.now()
+    };
+
+    return result;
 }
+
 
 window.getOwnerByPassword = getOwnerByPassword;
 
@@ -684,6 +770,11 @@ window.resetMonth = resetMonth;
 async function deleteProperty(propertyId) {
     await window.supabaseClient.from('properties').delete().eq('id', propertyId);
     delete propertiesDB[propertyId];
+
+    // Clear caches
+    clearFinancialsCache(propertyId);
+    vacantUnitsCache = null;
+
     delete messagesDB[propertyId];
     delete adminNotes[propertyId];
     delete globalUpdates[propertyId];

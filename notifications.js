@@ -21,7 +21,7 @@ async function registerDeviceForNotifications() {
     if (!user) return;
     
     currentDeviceId = getDeviceId();
-    
+
     // Get device info
     const deviceInfo = {
         userAgent: navigator.userAgent,
@@ -38,7 +38,7 @@ async function registerDeviceForNotifications() {
         .eq('user_id', user.id)
         .eq('device_id', currentDeviceId)
         .single();
-    
+
     if (existing) {
         // Update last active timestamp
         await window.supabaseClient
@@ -78,7 +78,7 @@ async function updatePrimaryDevice(userId) {
         .eq('user_id', userId)
         .eq('is_active', true)
         .order('last_active', { ascending: false });
-    
+
     if (!devices || devices.length === 0) return;
     
     // The most recently active device becomes primary
@@ -170,14 +170,22 @@ async function subscribeToPushNotifications() {
 
 // Helper function for VAPID key
 function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
+    // Remove any whitespace and handle URL-safe encoding
+    const cleanBase64 = base64String.replace(/\s/g, '');
+    const padding = '='.repeat((4 - cleanBase64.length % 4) % 4);
+    const base64 = (cleanBase64 + padding).replace(/-/g, '+').replace(/_/g, '/');
+    
+    try {
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    } catch (e) {
+        console.warn('Invalid VAPID key, push notifications disabled');
+        return new Uint8Array(0);
     }
-    return outputArray;
 }
 
 // ============ SEND NOTIFICATION TO USER (INTELLIGENT ROUTING) ============
@@ -196,7 +204,7 @@ async function sendNotificationToUser(userId, userRole, title, message, type, re
         .eq('is_active', true)
         .order('is_primary', { ascending: false })
         .order('last_active', { ascending: false });
-    
+
     // 3. Send to primary device (most recently active) if available
     if (devices && devices.length > 0) {
         const primaryDevice = devices[0];
@@ -411,8 +419,8 @@ function setupRealtimeNotifications() {
         .channel('notifications-channel')
         .on('postgres_changes', 
             { 
-                event: 'INSERT', 
-                schema: 'public', 
+                event: 'INSERT',
+                schema: 'public',
                 table: 'system_notifications',
                 filter: `user_id=eq.${user.id}`
             }, 
@@ -473,3 +481,4 @@ window.markNotificationAsRead = markNotificationAsRead;
 window.markAllNotificationsAsRead = markAllNotificationsAsRead;
 window.updateNotificationBadge = updateNotificationBadge;
 window.showLocalNotification = showLocalNotification;
+
